@@ -1,0 +1,343 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* テック系ダークテーマのカラー - コントラスト改善 */
+  --primary: #a78bfa;         /* より明るい紫に調整 */
+  --primary-dark: #8b5cf6;    /* 中間の紫 */
+  --primary-light: #c4b5fd;   /* さらに明るい紫 */
+  --secondary: #cbd5e1;       /* より明るいグレーに変更 */
+  --bg-color: #0f1118;        /* 深い黒は維持 */
+  --text-color: #f1f5f9;      /* よりはっきりした明るいテキスト */
+  --card-bg: rgba(30, 35, 48, 0.8); /* 不透明度を上げて視認性向上 */
+  --card-border: rgba(76, 81, 111, 0.6); /* より明るい境界線 */
+  --error-color: #f87171;
+  --success-color: #4ade80;
+  --warning-color: #fbbf24;
+  --info-color: #38bdf8;      /* 明るい青 */
+  
+  /* アクセントカラー - コントラスト改善 */
+  --accent1: #60a5fa;         /* より明るいブルー */
+  --accent2: #f472b6;         /* より明るいピンク */
+  --accent3: #34d399;         /* ターコイズ */
+
+  /* テキスト関連 */
+  --heading-color: #f8fafc;   /* 見出しをより明るく */
+  --border-color: #64748b;    /* 境界線をより明確に */
+  --glass-bg: rgba(31, 41, 65, 0.7); /* 不透明度を上げる */
+  --glass-border: rgba(76, 85, 101, 0.6); /* 境界線の可視性向上 */
+  --glass-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* 影を強くする */
+}
+
+:root.dark {
+  --primary: #a78bfa;
+  --primary-dark: #8b5cf6;
+  --primary-light: #c4b5fd;
+  --secondary: #cbd5e1;
+  --bg-color: #0f172a;        /* 若干青みがかった暗い背景に変更 */
+  --card-bg: #1e293b;         /* カードの背景も明るめに */
+  --text-color: #f1f5f9;      /* テキストをより明るく */
+  --heading-color: #ffffff;   /* 見出しは純白に */
+  --border-color: #475569;    /* 境界線を明るく */
+  --glass-bg: rgba(30, 41, 59, 0.7);
+  --glass-border: rgba(71, 85, 105, 0.65);
+  --glass-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply font-sans;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+  font-family: 'Noto Sans JP', sans-serif;
+  background-image: radial-gradient(
+    circle at 50% 0%, 
+    rgba(139, 92, 246, 0.07) 0%, 
+    rgba(30, 35, 48, 0) 50%
+  );
+}
+
+/* グラスモーフィズム用の共通クラス */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-card {
+  @apply glass rounded-lg p-6;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(10px);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 
+              0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+.glass-button {
+  @apply glass rounded-md px-4 py-2 transition-all hover:bg-opacity-30;
+}
+
+/* ボタンスタイル */
+.btn {
+  @apply px-4 py-2 rounded font-medium transition-all;
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  color: white;
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+
+.btn-secondary {
+  @apply bg-secondary text-white hover:bg-secondary-dark;
+}
+
+.btn-ghost {
+  @apply bg-transparent text-primary hover:bg-primary hover:bg-opacity-10;
+}
+
+/* アニメーション */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* スクロールバーのカスタマイズ */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--secondary);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* フォームスタイル */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 0.25rem;
+}
+
+.form-error {
+  color: var(--error-color);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* アニメーション */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* グローエフェクト */
+.glow-effect {
+  box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+  transition: all 0.3s ease;
+}
+
+.glow-effect:hover {
+  box-shadow: 0 0 25px rgba(139, 92, 246, 0.6);
+}
+
+.glow-icon {
+  filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5));
+}
+
+.logo-text {
+  text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+/* ホバーエフェクト */
+.hover-effect {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.hover-effect::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: var(--primary);
+  transition: width 0.3s ease;
+}
+
+.hover-effect:hover::after {
+  width: 100%;
+}
+
+/* カードエフェクト強化 */
+.glass-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 
+              0 0 0 1px rgba(255, 255, 255, 0.07) inset;
+}
+
+/* 特殊なフォームグループのスタイル */
+html body .form-group input,
+html body .form-group textarea,
+html body .form-group select,
+html body .input-group input,
+html body .input-group textarea,
+html body .input-group select {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid #475569;
+}
+
+/* 入力グループのプレフィックス/サフィックス */
+html body .input-group-text,
+html body span.inline-flex {
+  background-color: #2d3748;
+  color: #f1f5f9;
+  border: 1px solid #475569;
+}
+
+/* プレースホルダーのスタイル */
+html body input::placeholder,
+html body textarea::placeholder {
+  color: #94a3b8;
+}
+
+/* フォーカス時のスタイル */
+html body input:focus,
+html body textarea:focus,
+html body select:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+/* チェックボックスとラジオボタンのスタイル */
+html body input[type="checkbox"],
+html body input[type="radio"] {
+  accent-color: var(--primary);
+}
+
+/* コンテナ */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* リセットCSS */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body, h1, h2, h3, h4, h5, h6, p, ul, ol {
+  margin: 0;
+  padding: 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 100%;
+}
+
+/* アクセシビリティユーティリティ */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* 特殊な入力フィールドの強制スタイリング */
+html body .flex input,
+html body input.flex-1,
+html body input[class*="bg-white"],
+html body input[class*="dark:bg-gray-800"] {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border-color: #475569 !important;
+}
+
+/* @マークなどのインラインフレックス要素 */
+html body .inline-flex,
+html body span[class*="bg-gray-100"],
+html body span[class*="dark:bg-gray-700"] {
+  background-color: #2d3748 !important;
+  color: #f1f5f9 !important;
+  border-color: #475569 !important;
+}
+
+/* ブラウザ自動入力のスタイル上書き */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #1e293b inset !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+  transition: background-color 5000s ease-in-out 0s;
+  caret-color: #f1f5f9;
+} 
