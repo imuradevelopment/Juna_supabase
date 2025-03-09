@@ -56,7 +56,7 @@ import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { getProfileImageUrl, getCoverImageUrl } from '../../lib/storage';
 
-const props = defineProps({
+defineProps({
   post: {
     type: Object,
     required: true

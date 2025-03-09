@@ -168,14 +168,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted } from 'vue';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
 import { v4 as uuidv4 } from 'uuid';
 import { getProfileImageUrl } from '../lib/storage';
 
-const router = useRouter();
 const authStore = useAuthStore();
 
 // プロフィールデータ

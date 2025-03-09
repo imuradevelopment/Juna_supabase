@@ -208,7 +208,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onBeforeUnmount, onMounted, watch } from 'vue';
+import { ref, onBeforeUnmount, onMounted, watch } from 'vue';
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
@@ -217,7 +217,6 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/auth';
-import { useRoute } from 'vue-router';
 
 // エディターの型を修正
 const editor = ref<Editor | undefined>(undefined);
@@ -225,38 +224,16 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const uploading = ref(false);
 const showLinkModal = ref(false);
 const linkUrl = ref('');
-const linkSelection = ref<Range | null>(null);
 const showLinkMenu = ref(false);
 const linkMenuPosition = ref({ x: 0, y: 0 });
 const isFocused = ref(false);
 const authStore = useAuthStore();
-const route = useRoute();
 
 // アップロードした画像を記録（投稿作成時に使用）
 const uploadedImages = ref<{path: string, userId: string}[]>([]);
 
 // アップロードした画像の情報をemitするイベント
 const emit = defineEmits(['update:modelValue', 'imagesUploaded']);
-
-// 一時的な投稿IDを生成または取得
-const getTempPostId = computed(() => {
-  // 編集モードの場合は既存の投稿IDを使用
-  const editingPostId = route.params.id;
-  if (editingPostId && typeof editingPostId === 'string') {
-    return editingPostId;
-  }
-  
-  // 新規作成モードの場合はsessionStorageから取得または生成
-  const storedTempId = sessionStorage.getItem('temp_post_id');
-  if (storedTempId) {
-    return storedTempId;
-  }
-  
-  // 新しい一時IDを生成して保存
-  const newTempId = uuidv4();
-  sessionStorage.setItem('temp_post_id', newTempId);
-  return newTempId;
-});
 
 // URL検出の正規表現
 const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
@@ -271,12 +248,6 @@ const props = defineProps({
     type: String,
     default: '内容を入力してください...'
   }
-});
-
-// エディターの内容をモデルに同期（修正版）
-const content = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value)
 });
 
 // エディター初期化
@@ -461,7 +432,7 @@ function uploadImage(event: Event) {
 }
 </script>
 
-<style>
+<style lang="postcss">
 .menu-button {
   @apply p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300;
 }

@@ -218,7 +218,6 @@ import { ref, computed, onMounted, watch, inject } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
-import PostCardHorizontal from '../components/post/PostCardHorizontal.vue';
 import { getProfileImageUrl } from '../lib/storage';
 import PostCard from '../components/post/PostCard.vue';
 
@@ -248,43 +247,6 @@ const userId = computed(() => {
 
 const isOwnProfile = computed(() => {
   return authStore.isAuthenticated && authStore.user?.id === userId.value;
-});
-
-const totalPages = computed(() => {
-  return Math.ceil(totalPosts.value / pageSize);
-});
-
-// ページネーション用の表示するページ番号配列
-const paginationPages = computed(() => {
-  const pages = [];
-  const maxVisiblePages = 5;
-  
-  if (totalPages.value <= maxVisiblePages) {
-    // 全ページが表示可能な場合
-    for (let i = 1; i <= totalPages.value; i++) {
-      pages.push(i);
-    }
-  } else {
-    // 表示ページ数を制限する場合
-    if (currentPage.value <= 3) {
-      // 最初のページ付近
-      for (let i = 1; i <= 5; i++) {
-        pages.push(i);
-      }
-    } else if (currentPage.value >= totalPages.value - 2) {
-      // 最後のページ付近
-      for (let i = totalPages.value - 4; i <= totalPages.value; i++) {
-        pages.push(i);
-      }
-    } else {
-      // 中間のページ
-      for (let i = currentPage.value - 2; i <= currentPage.value + 2; i++) {
-        pages.push(i);
-      }
-    }
-  }
-  
-  return pages;
 });
 
 // プロフィールデータの取得
@@ -413,13 +375,6 @@ async function fetchTopCategories() {
   } catch (err) {
     console.error('カテゴリ取得エラー:', err);
   }
-}
-
-// ページ変更処理
-function changePage(page: number) {
-  if (page < 1 || page > totalPages.value) return;
-  currentPage.value = page;
-  fetchPosts();
 }
 
 // プロフィールをシェア
@@ -558,7 +513,7 @@ async function deleteProfile() {
 }
 </script>
 
-<style scoped>
+<style scoped lang="postcss">
 /* アバターのエフェクト */
 .avatar-container {
   transition: transform 0.3s ease;

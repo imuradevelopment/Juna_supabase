@@ -157,7 +157,6 @@ const authStore = useAuthStore();
 
 // 状態
 const loading = ref(true);
-const error = ref('');
 const stats = ref({
   postsCount: 0,
   publishedPostsCount: 0,
@@ -318,44 +317,10 @@ async function fetchStats() {
   }
 }
 
-// 総閲覧数の計算
-async function calculateTotalViews(postIds: string[]) {
-  if (postIds.length === 0) return 0;
-  
-  const { data, error } = await supabase
-    .from('posts')
-    .select('views')
-    .in('id', postIds);
-    
-  if (error) {
-    console.error('閲覧数取得エラー:', error);
-    return 0;
-  }
-  
-  return data?.reduce((sum, post) => sum + (post.views || 0), 0) || 0;
-}
-
-// 人気投稿の取得
-async function fetchPopularPosts(postIds: string[]) {
-  if (postIds.length === 0) return [];
-  
-  const { data, error } = await supabase
-    .from('posts')
-    .select('id, title, views')
-    .in('id', postIds)
-    .order('views', { ascending: false })
-    .limit(5);
-    
-  if (error) {
-    console.error('人気投稿取得エラー:', error);
-    return [];
-  }
-  
-  return data || [];
-}
-
 // 最近の活動を取得
 async function fetchRecentActivities() {
+  if (!authStore.user) return [];
+  
   // 最近の投稿
   const { data: recentPosts } = await supabase
     .from('posts')

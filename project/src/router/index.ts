@@ -85,7 +85,7 @@ const router = createRouter({
 });
 
 // ナビゲーションガード
-router.beforeEach(async (to, from, next) => {
+router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore();
   
   // 認証が必要なルートのチェック

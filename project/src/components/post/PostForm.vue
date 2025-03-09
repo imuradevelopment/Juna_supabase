@@ -163,16 +163,6 @@ import { useAuthStore } from '../../stores/auth';
 import RichTextEditor from '../editor/RichTextEditor.vue';
 import { getCoverImageUrl } from '../../lib/storage';
 
-// 環境変数の型定義
-declare global {
-  interface ImportMeta {
-    env: {
-      VITE_SUPABASE_ANON_KEY: string;
-      [key: string]: string;
-    };
-  }
-}
-
 // 型定義
 interface FormData {
   title: string;

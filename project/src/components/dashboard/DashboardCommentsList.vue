@@ -166,15 +166,16 @@ import { getProfileImageUrl } from '../../lib/storage';
 interface Comment {
   id: string;
   post_id: string;
-  author_id: string;
+  parent_comment_id?: string | null;
   content: string;
   created_at: string;
   updated_at: string;
   posts?: {
+    id: string;
     title: string;
     profiles?: {
       nickname: string | null;
-      avatar_data?: string;
+      avatar_data?: string | null;
     };
   };
 }
@@ -245,7 +246,7 @@ async function fetchComments() {
       .range(from, to);
     
     if (commentsError) throw commentsError;
-    comments.value = data as Comment[] || [];
+    comments.value = data || [];
   } catch (err) {
     console.error('コメント取得エラー:', err);
   } finally {

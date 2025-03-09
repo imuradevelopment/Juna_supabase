@@ -89,7 +89,7 @@ interface Post {
   avatar_url?: string | null;
 }
 
-const props = defineProps({
+defineProps({
   post: {
     type: Object as () => Post,
     required: true

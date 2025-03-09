@@ -108,8 +108,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { format, parseISO } from 'date-fns';
-import { ja } from 'date-fns/locale';
 import { debounce } from 'lodash';
 import PostCardHorizontal from '@/components/post/PostCardHorizontal.vue';
 import { supabase } from '@/lib/supabase';
@@ -284,15 +282,6 @@ function getPageNumbers(): (number | string)[] {
   }
   
   return pages;
-}
-
-// ヘルパー関数
-function formatDate(dateString: string) {
-  try {
-    return format(parseISO(dateString), 'yyyy年M月d日', { locale: ja });
-  } catch {
-    return dateString;
-  }
 }
 
 function getInitials(name: string): string {

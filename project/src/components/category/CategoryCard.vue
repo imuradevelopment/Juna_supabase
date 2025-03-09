@@ -21,7 +21,7 @@
 import { defineProps } from 'vue';
 import CategoryIcon from './CategoryIcon.vue';
 
-const props = defineProps({
+defineProps({
   category: {
     type: Object,
     required: true

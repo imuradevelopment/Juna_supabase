@@ -283,13 +283,6 @@ const showDeleteModal = ref(false);
 const deleteSubmitting = ref(false);
 const showShareNotification = ref(false);
 
-// マークダウンからHTMLに変換
-const renderedContent = computed(() => {
-  if (!post.value?.content) return '';
-  const cleanHtml = DOMPurify.sanitize(marked.parse(post.value.content));
-  return cleanHtml;
-});
-
 // 投稿の著者かどうか
 const isAuthor = computed(() => {
   return authStore.isAuthenticated && authStore.user?.id === post.value?.author_id;
@@ -590,7 +583,7 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style scoped lang="postcss">
 /* ローディングスピナー */
 .loading-spinner {
   width: 40px;

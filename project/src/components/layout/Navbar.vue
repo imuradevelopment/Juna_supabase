@@ -158,7 +158,6 @@
 import { ref, onMounted, watch, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
-import { getProfileImageUrl } from '../../lib/storage';
 
 const router = useRouter();
 const authStore = useAuthStore();
@@ -212,14 +211,9 @@ function getInitials(name: string | undefined): string {
   if (!name) return 'U';
   return name.charAt(0).toUpperCase();
 }
-
-// avatarUrlの取得を修正
-function getAvatarUrl(path: string): string {
-  return getProfileImageUrl(path);
-}
 </script>
 
-<style scoped>
+<style scoped lang="postcss">
 .nav-link {
   @apply relative text-secondary hover:text-primary-light transition-colors duration-300 py-1;
   letter-spacing: 0.02em;

@@ -176,11 +176,6 @@ const isOwner = computed(() => {
          props.comment.author_id === authStore.user.id;
 });
 
-// ルートコメントのみを取得（親コメントがないもの）
-const rootComments = computed(() => {
-  return !props.comment.parent_comment_id;
-});
-
 // 返信コメントを取得
 async function fetchReplies() {
   if (!props.comment.id) return;
