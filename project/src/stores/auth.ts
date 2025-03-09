@@ -2,10 +2,20 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { supabase } from '../lib/supabase';
 import type { User } from '@supabase/supabase-js';
-import type { Database } from '../lib/database.types';
 import { getProfileImageUrl } from '../lib/storage';
 
-type Profile = Database['public']['Tables']['profiles']['Row'];
+// 独自のProfile型を定義
+type Profile = {
+  id: string;
+  account_id: string;
+  nickname: string | null;
+  bio: string | null;
+  avatar_data: string | null;
+  disability_type_id: number | null;
+  disability_description: string | null;
+  created_at: string;
+  updated_at: string;
+};
 
 export const useAuthStore = defineStore('auth', () => {
   // 状態

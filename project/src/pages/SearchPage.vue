@@ -111,7 +111,6 @@ import { useRoute, useRouter } from 'vue-router';
 import { debounce } from 'lodash';
 import PostCardHorizontal from '@/components/post/PostCardHorizontal.vue';
 import { supabase } from '@/lib/supabase';
-import type { Database } from '@/lib/database.types';
 
 // 検索結果の型定義
 interface SearchResult {
@@ -125,6 +124,22 @@ interface SearchResult {
   views: number;
   author_name?: string;
   avatar_url?: string | null;
+}
+
+// 投稿データの型定義
+interface Post {
+  id: string;
+  author_id: string;
+  title: string;
+  content: any;
+  excerpt: string | null;
+  cover_image_path: string | null;
+  published: boolean;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+  views: number;
+  last_edited_by: string | null;
 }
 
 // 検索関連の状態
@@ -214,7 +229,7 @@ async function performSearch() {
     
     if (data && data.length > 0) {
       // プロフィール情報を取得してアバターURLを追加
-      const resultsWithAvatars = await Promise.all(data.map(async (post: Database['public']['Tables']['posts']['Row']) => {
+      const resultsWithAvatars = await Promise.all(data.map(async (post: Post) => {
         const { data: profileData } = await supabase
           .from('profiles')
           .select('avatar_data, nickname')
