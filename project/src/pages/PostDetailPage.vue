@@ -256,10 +256,6 @@ import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
 import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale';
-// @ts-ignore - 型定義がない場合
-import DOMPurify from 'dompurify';
-// @ts-ignore - 型定義がない場合
-import { marked } from 'marked';
 import PostCard from '../components/post/PostCard.vue';
 import RichTextContent from '../components/editor/RichTextContent.vue';
 import CommentForm from '../components/comment/CommentForm.vue';
@@ -485,8 +481,9 @@ async function fetchRelatedPosts() {
     // 重複を除去して整形
     const uniquePosts = new Map();
     data?.forEach(item => {
-      if (item.posts && !uniquePosts.has(item.posts.id)) {
-        uniquePosts.set(item.posts.id, item.posts);
+      const post = Array.isArray(item.posts) ? item.posts[0] : item.posts;
+      if (post && post.id && !uniquePosts.has(post.id)) {
+        uniquePosts.set(post.id, post);
       }
     });
     

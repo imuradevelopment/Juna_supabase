@@ -79,7 +79,13 @@ footer {
 }
 
 .footer-link {
-  @apply text-gray-400 hover:text-primary-light transition-colors duration-300;
+  color: rgba(156, 163, 175, 1); /* text-gray-400 */
+  transition-property: color;
+  transition-duration: 300ms;
+}
+
+.footer-link:hover {
+  color: var(--primary-light); /* hover:text-primary-light */
 }
 
 @media (max-width: 768px) {

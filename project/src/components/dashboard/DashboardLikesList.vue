@@ -54,7 +54,7 @@
               <!-- 投稿情報 -->
               <h3 class="font-bold text-lg mb-1">
                 <router-link :to="`/posts/${like.post_id}`" class="hover:text-primary">
-                  {{ like.posts?.title || '不明な投稿' }}
+                  {{ like.posts[0]?.title || '不明な投稿' }}
                 </router-link>
               </h3>
               
@@ -62,19 +62,19 @@
               <div class="flex items-center mb-2">
                 <div class="w-6 h-6 rounded-full bg-primary-light flex items-center justify-center text-white overflow-hidden mr-2">
                   <img 
-                    v-if="like.posts?.profiles?.avatar_data" 
-                    :src="getAvatarUrl(like.posts.profiles.avatar_data)" 
-                    :alt="like.posts?.profiles?.nickname || ''"
+                    v-if="like.posts[0]?.profiles[0]?.avatar_data" 
+                    :src="getAvatarUrl(like.posts[0].profiles[0].avatar_data)" 
+                    :alt="like.posts[0]?.profiles[0]?.nickname || ''"
                     class="w-full h-full object-cover"
                   />
-                  <span v-else>{{ getInitials(like.posts?.profiles?.nickname || '') }}</span>
+                  <span v-else>{{ getInitials(like.posts[0]?.profiles[0]?.nickname || '') }}</span>
                 </div>
-                <span class="text-sm">{{ like.posts?.profiles?.nickname || '不明なユーザー' }}</span>
+                <span class="text-sm">{{ like.posts[0]?.profiles[0]?.nickname || '不明なユーザー' }}</span>
               </div>
               
               <!-- 投稿の抜粋 -->
-              <p v-if="like.posts?.excerpt" class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
-                {{ like.posts.excerpt }}
+              <p v-if="like.posts[0]?.excerpt" class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
+                {{ like.posts[0].excerpt }}
               </p>
             </div>
             
@@ -140,17 +140,17 @@
             <div class="flex-1">
               <!-- コメント情報 -->
               <div class="mb-2 p-3 bg-gray-50 dark:bg-gray-800 rounded">
-                <p class="text-sm whitespace-pre-wrap">{{ like.comments?.content || '不明なコメント' }}</p>
+                <p class="text-sm whitespace-pre-wrap">{{ like.comments[0]?.content || '不明なコメント' }}</p>
               </div>
               
               <!-- 投稿情報 -->
               <div class="flex items-center justify-between">
                 <router-link 
-                  v-if="like.comments?.post_id" 
-                  :to="`/posts/${like.comments.post_id}`" 
+                  v-if="like.comments[0]?.post_id" 
+                  :to="`/posts/${like.comments[0].post_id}`" 
                   class="text-sm text-primary hover:underline"
                 >
-                  {{ like.comments?.posts?.title || '不明な投稿' }}
+                  {{ like.comments[0]?.posts[0]?.title || '不明な投稿' }}
                 </router-link>
                 <span class="text-xs text-gray-600 dark:text-gray-400">
                   {{ formatDate(like.created_at) }}
@@ -161,14 +161,14 @@
               <div class="flex items-center mt-2">
                 <div class="w-5 h-5 rounded-full bg-primary-light flex items-center justify-center text-white overflow-hidden mr-2">
                   <img 
-                    v-if="like.comments?.profiles?.avatar_data" 
-                    :src="getAvatarUrl(like.comments.profiles.avatar_data)" 
-                    :alt="like.comments?.profiles?.nickname || ''"
+                    v-if="like.comments[0]?.profiles[0]?.avatar_data" 
+                    :src="getAvatarUrl(like.comments[0].profiles[0].avatar_data)" 
+                    :alt="like.comments[0]?.profiles[0]?.nickname || ''"
                     class="w-full h-full object-cover"
                   />
-                  <span v-else>{{ getInitials(like.comments?.profiles?.nickname || '') }}</span>
+                  <span v-else>{{ getInitials(like.comments[0]?.profiles[0]?.nickname || '') }}</span>
                 </div>
-                <span class="text-xs">{{ like.comments?.profiles?.nickname || '不明なユーザー' }}</span>
+                <span class="text-xs">{{ like.comments[0]?.profiles[0]?.nickname || '不明なユーザー' }}</span>
               </div>
             </div>
             
@@ -259,37 +259,37 @@ interface PostLike {
   user_id: string;
   post_id: string;
   created_at: string;
-  posts?: {
+  posts: {
     id: string;
     title: string;
     excerpt?: string | null;
     published_at?: string | null;
     views?: number;
-    profiles?: {
+    profiles: {
       nickname: string | null;
       avatar_data?: string | null;
-    };
-  } | null;
+    }[];
+  }[];
 }
 
 interface CommentLike {
   user_id: string;
   comment_id: string;
   created_at: string;
-  comments?: {
+  comments: {
     id: string;
     content: string;
     post_id: string;
     created_at: string;
-    posts?: {
-      id: string;
-      title: string;
-    } | null;
-    profiles?: {
+    profiles: {
       nickname: string | null;
       avatar_data?: string | null;
-    };
-  } | null;
+    }[];
+    posts: {
+      id: string;
+      title: string;
+    }[];
+  }[];
 }
 
 // タブ状態

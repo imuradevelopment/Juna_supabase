@@ -171,7 +171,7 @@ async function fetchFeaturedPosts() {
     
     // プロフィール情報を取得
     if (postsData && postsData.length > 0) {
-      const authorIds = postsData.map(post => post.author_id);
+      const authorIds = postsData.map((post: any) => post.author_id);
       
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
@@ -181,7 +181,7 @@ async function fetchFeaturedPosts() {
       if (profilesError) throw profilesError;
       
       // 投稿データとプロフィールデータを結合
-      featuredPosts.value = postsData.map(post => {
+      featuredPosts.value = postsData.map((post: any) => {
         const profile = profilesData?.find(p => p.id === post.author_id);
         return {
           ...post,

@@ -31,14 +31,14 @@
             <div class="flex items-center">
               <div class="w-6 h-6 rounded-full bg-primary-light flex items-center justify-center text-white overflow-hidden mr-2">
                 <img 
-                  v-if="comment.posts?.profiles?.avatar_data" 
-                  :src="getAvatarUrl(comment.posts.profiles.avatar_data)" 
-                  :alt="comment.posts?.profiles?.nickname || ''"
+                  v-if="comment.posts?.[0]?.profiles?.[0]?.avatar_data" 
+                  :src="getAvatarUrl(comment.posts[0].profiles[0].avatar_data)" 
+                  :alt="comment.posts?.[0]?.profiles?.[0]?.nickname || ''"
                   class="w-full h-full object-cover"
                 />
-                <span v-else>{{ getInitials(comment.posts?.profiles?.nickname || '') }}</span>
+                <span v-else>{{ getInitials(comment.posts?.[0]?.profiles?.[0]?.nickname || '') }}</span>
               </div>
-              <span class="text-sm">{{ comment.posts?.profiles?.nickname || '不明なユーザー' }}</span>
+              <span class="text-sm">{{ comment.posts?.[0]?.profiles?.[0]?.nickname || '不明なユーザー' }}</span>
             </div>
             
             <p class="whitespace-pre-wrap mb-2">{{ comment.content }}</p>
@@ -173,11 +173,11 @@ interface Comment {
   posts?: {
     id: string;
     title: string;
-    profiles?: {
+    profiles: {
       nickname: string | null;
       avatar_data?: string | null;
-    };
-  };
+    }[];
+  }[];  // 配列として定義
 }
 
 const authStore = useAuthStore();
@@ -291,7 +291,7 @@ function getPageNumbers(): (number | string)[] {
 
 // 投稿タイトルを取得
 function getPostTitle(comment: Comment): string {
-  return comment.posts?.title || '不明な投稿';
+  return comment.posts?.[0]?.title || '不明な投稿';
 }
 
 // コメント編集確認

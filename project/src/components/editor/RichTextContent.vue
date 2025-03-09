@@ -4,7 +4,6 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
-// @ts-ignore - DOMPurifyの型定義がない場合
 import DOMPurify from 'dompurify';
 
 const props = defineProps({
@@ -46,22 +45,43 @@ const content = computed(() => sanitizedContent.value);
 
 <style>
 .rich-text-content img {
-  @apply max-w-full rounded-lg my-4;
+  max-width: 100%;
+  border-radius: 0.5rem; /* rounded-lg */
+  margin-top: 1rem;
+  margin-bottom: 1rem; /* my-4 */
 }
 
 .rich-text-content a {
-  @apply text-primary hover:underline;
+  color: var(--primary); /* text-primary */
+}
+.rich-text-content a:hover {
+  text-decoration: underline;
 }
 
 .rich-text-content blockquote {
-  @apply border-l-4 border-primary pl-4 italic;
+  border-left-width: 4px;
+  border-left-color: var(--primary);
+  padding-left: 1rem;
+  font-style: italic;
 }
 
 .rich-text-content code {
-  @apply bg-gray-100 dark:bg-gray-800 px-1 rounded;
+  background-color: rgba(243, 244, 246, 1); /* bg-gray-100 */
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  border-radius: 0.25rem;
+}
+.dark .rich-text-content code {
+  background-color: rgba(31, 41, 55, 1); /* dark:bg-gray-800 */
 }
 
 .rich-text-content pre {
-  @apply bg-gray-100 dark:bg-gray-800 p-4 rounded overflow-x-auto;
+  background-color: rgba(243, 244, 246, 1); /* bg-gray-100 */
+  padding: 1rem;
+  border-radius: 0.25rem;
+  overflow-x: auto;
+}
+.dark .rich-text-content pre {
+  background-color: rgba(31, 41, 55, 1); /* dark:bg-gray-800 */
 }
 </style> 
