@@ -637,66 +637,77 @@ onMounted(() => {
   @apply opacity-70 cursor-not-allowed;
 }
 
-/* コメントフォームのスタイル強化 */
+/* コメントフォームのスタイル強化 - 修正版 */
 .comment-form-wrapper :deep(.comment-form) {
-  @apply transition-all duration-300 shadow-sm hover:shadow rounded-lg overflow-hidden dark:bg-gray-900/90;
+  @apply transition-all duration-300 shadow-sm hover:shadow rounded-lg overflow-hidden;
   max-width: 100%;
 }
 
+/* ダークモード用に別のセレクタを定義 */
+:global(.dark) .comment-form-wrapper :deep(.comment-form) {
+  @apply bg-gray-900/90;
+}
+
 .comment-form-wrapper :deep(.comment-form textarea) {
-  @apply transition-all duration-200 focus:shadow-inner bg-white dark:bg-gray-900 
-    text-gray-800 dark:text-gray-50 border-gray-200 dark:border-gray-800
-    focus:ring-2 focus:ring-primary/30 dark:focus:ring-primary-light/30;
+  @apply transition-all duration-200 focus:shadow-inner bg-white
+    text-gray-800 border-gray-200
+    focus:ring-2 focus:ring-primary/30;
+}
+
+/* ダークモード用に別のセレクタを定義 */
+:global(.dark) .comment-form-wrapper :deep(.comment-form textarea) {
+  @apply bg-gray-900 text-gray-50 border-gray-800 focus:ring-primary-light/30;
 }
 
 .comment-form-wrapper :deep(.comment-form .submit-button) {
-  @apply transition-transform duration-200 bg-primary dark:bg-primary-dark text-white 
-    hover:bg-primary-dark dark:hover:bg-primary/90;
+  @apply transition-transform duration-200 bg-primary text-white
+    hover:bg-primary-dark;
 }
 
-/* 記事本文のスタイル強化 */
-.prose-container {
-  @apply text-base leading-relaxed;
+/* ダークモード用に別のセレクタを定義 */
+:global(.dark) .comment-form-wrapper :deep(.comment-form .submit-button) {
+  @apply bg-primary-dark hover:bg-primary/90;
 }
 
+/* 記事本文のスタイル強化 - 修正版 */
 .prose-container :deep(h2) {
-  @apply text-xl font-bold mt-6 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700;
+  @apply text-xl font-bold mt-6 mb-4 pb-2 border-b border-gray-200;
 }
 
-.prose-container :deep(h3) {
-  @apply text-lg font-semibold mt-5 mb-3;
-}
-
-.prose-container :deep(p) {
-  @apply mb-4;
-}
-
-.prose-container :deep(img) {
-  @apply rounded-lg my-6 mx-auto shadow-md transition-transform duration-300 hover:scale-[1.02] max-w-full;
+:global(.dark) .prose-container :deep(h2) {
+  @apply border-gray-700;
 }
 
 .prose-container :deep(a) {
-  @apply text-primary dark:text-primary-light hover:underline;
+  @apply text-primary hover:underline;
 }
 
-.prose-container :deep(ul), .prose-container :deep(ol) {
-  @apply pl-6 mb-4 space-y-2;
-}
-
-.prose-container :deep(li) {
-  @apply mb-1;
+:global(.dark) .prose-container :deep(a) {
+  @apply text-primary-light;
 }
 
 .prose-container :deep(blockquote) {
-  @apply pl-4 border-l-4 border-primary italic my-4 text-gray-700 dark:text-gray-300;
+  @apply pl-4 border-l-4 border-primary italic my-4 text-gray-700;
+}
+
+:global(.dark) .prose-container :deep(blockquote) {
+  @apply text-gray-300;
 }
 
 .prose-container :deep(pre) {
-  @apply bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto my-4;
+  @apply bg-gray-100 p-4 rounded-lg overflow-x-auto my-4;
+}
+
+:global(.dark) .prose-container :deep(pre) {
+  @apply bg-gray-800;
 }
 
 .prose-container :deep(code) {
-  @apply bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded text-sm font-mono;
+  @apply bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono;
+}
+
+:global(.dark) .prose-container :deep(code) {
+  @apply bg-gray-800;
 }
 
 /* アニメーション */

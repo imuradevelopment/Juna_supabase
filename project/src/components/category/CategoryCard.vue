@@ -18,7 +18,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
 import CategoryIcon from './CategoryIcon.vue';
 
 defineProps({

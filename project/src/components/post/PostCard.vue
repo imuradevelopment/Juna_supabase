@@ -51,7 +51,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
 import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { getProfileImageUrl, getCoverImageUrl } from '../../lib/storage';

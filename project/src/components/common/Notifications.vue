@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineExpose } from 'vue';
+import { ref } from 'vue';
 
 // 通知の型定義
 interface Notification {

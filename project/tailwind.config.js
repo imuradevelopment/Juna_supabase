@@ -9,19 +9,19 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#6366f1',
-          dark: '#4f46e5',
-          light: '#818cf8'
+          DEFAULT: '#a78bfa',
+          dark: '#8b5cf6',
+          light: '#c4b5fd'
         },
         secondary: {
-          DEFAULT: '#64748b',
-          dark: '#475569',
-          light: '#94a3b8'
+          DEFAULT: '#cbd5e1',
+          dark: '#94a3b8',
+          light: '#e2e8f0'
         },
         dark: {
-          bg: '#111827',
-          card: '#1f2937',
-          border: '#374151'
+          bg: '#0f172a',
+          card: '#1e293b',
+          border: '#475569'
         },
         light: {
           bg: '#f8fafc',
@@ -29,8 +29,8 @@ export default {
           border: '#e2e8f0'
         },
         glass: {
-          bg: 'rgba(255, 255, 255, 0.1)',
-          border: 'rgba(255, 255, 255, 0.2)'
+          bg: 'rgba(31, 41, 65, 0.7)',
+          border: 'rgba(76, 85, 101, 0.6)'
         },
         'input-bg': 'var(--input-bg)',
         'input-text': 'var(--input-text)',
