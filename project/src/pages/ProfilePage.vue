@@ -52,17 +52,20 @@
               <p>登録日: {{ formatDate(profile.created_at) }}</p>
             </div>
             
-            <!-- 障害タイプ情報 -->
-            <div v-if="profile.disability_type_name" class="mb-4">
+            <!-- 障害タイプ情報 - 表示形式を調整 -->
+            <div v-if="profile.disability_types" class="mb-4">
               <span class="px-3 py-1 rounded-full bg-primary/20 text-primary-light text-sm">
-                {{ profile.disability_type_name }}
+                {{ profile.disability_types.name }}
               </span>
             </div>
             
             <!-- 自己紹介 -->
-            <p v-if="profile.bio" class="mb-6 text-gray-300 leading-relaxed">
-              {{ profile.bio }}
-            </p>
+            <div v-if="profile.bio" class="mb-6">
+              <h3 class="text-sm uppercase tracking-wide text-gray-400 mb-2">自己紹介</h3>
+              <p class="text-gray-300 leading-relaxed">
+                {{ profile.bio }}
+              </p>
+            </div>
             
             <!-- 障害に関する説明 -->
             <div v-if="profile.disability_description" class="mb-6">
