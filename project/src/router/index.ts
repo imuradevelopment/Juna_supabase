@@ -11,16 +11,22 @@ const router = createRouter({
       component: HomePage
     },
     {
-      path: '/login',
-      name: 'login',
-      component: () => import('../pages/LoginPage.vue'),
+      path: '/auth',
+      name: 'auth',
+      component: () => import('../pages/AuthPage.vue'),
       meta: { requiresGuest: true }
     },
     {
+      path: '/login',
+      redirect: to => {
+        return { path: '/auth', query: { ...to.query, mode: 'login' } };
+      }
+    },
+    {
       path: '/register',
-      name: 'register',
-      component: () => import('../pages/RegisterPage.vue'),
-      meta: { requiresGuest: true }
+      redirect: to => {
+        return { path: '/auth', query: { ...to.query, mode: 'register' } };
+      }
     },
     {
       path: '/categories',
@@ -90,7 +96,7 @@ router.beforeEach(async (to, _, next) => {
   
   // 認証が必要なルートのチェック
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next('/login');
+    next({ path: '/auth', query: { redirect: to.fullPath } });
   } 
   // ゲスト専用ルートのチェック
   else if (to.meta.requiresGuest && authStore.isAuthenticated) {

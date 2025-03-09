@@ -102,80 +102,133 @@
                 </button>
               </div>
             </div>
-            
-            <!-- 投稿ボタン -->
-            <router-link to="/create-post" class="btn btn-primary flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              投稿
+          </template>
+
+          <!-- 未認証の場合 - 統合認証ページへのリンク -->
+          <template v-else>
+            <router-link
+              to="/auth"
+              class="btn-outline-primary px-4 py-1.5 rounded-full border-2 border-primary text-primary-light hover:bg-primary/10 transition-all"
+            >
+              ログイン
+            </router-link>
+            <router-link
+              to="/auth?mode=register"
+              class="hidden sm:block btn-primary gradient-bg px-4 py-1.5 rounded-full text-white shadow-sm shadow-primary/30 transition-all hover:shadow-md"
+            >
+              会員登録
             </router-link>
           </template>
-          
-          <!-- 未認証の場合 -->
-          <template v-else>
-            <router-link to="/login" class="btn btn-outline py-2 px-4 rounded-md border transition">ログイン</router-link>
-            <router-link to="/register" class="btn btn-primary py-2 px-4 rounded-md">会員登録</router-link>
-          </template>
         </div>
-
+        
         <!-- モバイルメニューボタン -->
-        <button @click="toggleMenu" class="md:hidden flex items-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path v-if="!isMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-            <path v-else stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        <button 
+          @click="toggleMobileMenu" 
+          class="md:hidden p-2 rounded-lg focus:outline-none"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            class="h-6 w-6" 
+            fill="none" 
+            viewBox="0 0 24 24" 
+            stroke="currentColor"
+          >
+            <path 
+              v-if="!isMenuOpen" 
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              stroke-width="2" 
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+            <path 
+              v-else 
+              stroke-linecap="round" 
+              stroke-linejoin="round" 
+              stroke-width="2" 
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
       </div>
     </nav>
-
+    
     <!-- モバイルメニュー -->
-    <div v-if="isMenuOpen" class="md:hidden absolute top-full left-0 right-0 glass-card py-4 px-6 mt-1 border-t">
-      <div class="flex flex-col space-y-4">
-        <router-link to="/" class="nav-link text-base" @click="isMenuOpen = false">ホーム</router-link>
-        <router-link to="/categories" class="nav-link text-base" @click="isMenuOpen = false">カテゴリ</router-link>
-        <router-link to="/posts" class="nav-link text-base" @click="isMenuOpen = false">投稿一覧</router-link>
-        <router-link to="/search" class="nav-link text-base" @click="isMenuOpen = false">検索</router-link>
-        
-        <div v-if="authStore.isAuthenticated" class="pt-2 border-t">
-          <router-link to="/dashboard" class="nav-link text-base block py-2" @click="isMenuOpen = false">ダッシュボード</router-link>
-          <router-link :to="`/profile/${authStore.user?.id}`" class="nav-link text-base block py-2" @click="isMenuOpen = false">プロフィール</router-link>
-          <router-link to="/profile/edit" class="nav-link text-base block py-2" @click="isMenuOpen = false">設定</router-link>
-          <router-link to="/create-post" class="nav-link text-base block py-2" @click="isMenuOpen = false">新規投稿</router-link>
-          <button @click="handleLogout" class="text-left w-full text-base py-2 text-red-500">ログアウト</button>
+    <div 
+      v-if="isMenuOpen" 
+      class="md:hidden fixed inset-0 z-40 bg-black bg-opacity-80 backdrop-blur-sm"
+      @click="isMenuOpen = false"
+    >
+      <div 
+        class="bg-gray-900 w-64 h-full p-5 transform transition-transform"
+        @click.stop
+      >
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold">メニュー</h2>
+          <button @click="isMenuOpen = false" class="rounded-full p-1 hover:bg-gray-800">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
         
-        <div v-else class="flex flex-col space-y-2 pt-2 border-t">
-          <router-link to="/login" class="btn btn-outline w-full text-center" @click="isMenuOpen = false">ログイン</router-link>
-          <router-link to="/register" class="btn btn-primary w-full text-center" @click="isMenuOpen = false">会員登録</router-link>
-        </div>
+        <nav class="flex flex-col space-y-4">
+          <router-link to="/" class="block py-2" @click="isMenuOpen = false">ホーム</router-link>
+          <router-link to="/categories" class="block py-2" @click="isMenuOpen = false">カテゴリ</router-link>
+          <router-link to="/posts" class="block py-2" @click="isMenuOpen = false">投稿一覧</router-link>
+          <router-link to="/search" class="block py-2" @click="isMenuOpen = false">検索</router-link>
+          
+          <div class="border-t border-gray-800 my-2 pt-2">
+            <template v-if="authStore.isAuthenticated">
+              <div class="flex items-center py-2 mb-2">
+                <div class="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center text-white mr-3">
+                  <img 
+                    v-if="authStore.avatarUrl" 
+                    :src="authStore.avatarUrl" 
+                    :alt="authStore.displayName"
+                    class="w-full h-full object-cover rounded-full"
+                  />
+                  <span v-else>{{ getInitials(authStore.displayName) }}</span>
+                </div>
+                <span>{{ authStore.displayName }}</span>
+              </div>
+              <router-link to="/dashboard" class="block py-2" @click="isMenuOpen = false">ダッシュボード</router-link>
+              <router-link :to="`/profile/${authStore.user?.id}`" class="block py-2" @click="isMenuOpen = false">プロフィール</router-link>
+              <router-link to="/profile/edit" class="block py-2" @click="isMenuOpen = false">設定</router-link>
+              <button @click="handleLogout" class="block w-full text-left py-2 text-red-400">ログアウト</button>
+            </template>
+            <template v-else>
+              <router-link to="/auth" class="block py-2" @click="isMenuOpen = false">ログイン</router-link>
+              <router-link to="/auth?mode=register" class="block py-2" @click="isMenuOpen = false">会員登録</router-link>
+            </template>
+          </div>
+        </nav>
       </div>
     </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 
 const router = useRouter();
 const authStore = useAuthStore();
-const isMenuOpen = ref(false);
 const dropdownOpen = ref(false);
+const isMenuOpen = ref(false);
 const dropdownRef = ref<HTMLElement | null>(null);
 
-// ドロップダウンメニュー切り替え
+// ドロップダウンの表示・非表示を切り替え
 function toggleDropdown() {
   dropdownOpen.value = !dropdownOpen.value;
 }
 
-// モバイルメニュー切り替え
-function toggleMenu() {
+// モバイルメニューの表示・非表示を切り替え
+function toggleMobileMenu() {
   isMenuOpen.value = !isMenuOpen.value;
 }
 
-// ドロップダウンメニューの外側をクリックした時に閉じる
+// ドロップダウン以外の場所をクリックしたときに閉じる
 function handleClickOutside(event: MouseEvent) {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
     dropdownOpen.value = false;
