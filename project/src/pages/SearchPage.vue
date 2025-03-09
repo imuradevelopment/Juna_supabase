@@ -55,7 +55,12 @@
       </div>
       
       <div class="space-y-4">
-        <PostCardHorizontal v-for="post in results" :key="post.id" :post="post">
+        <PostCard 
+          v-for="post in results" 
+          :key="post.id" 
+          :post="post"
+          layout="horizontal"
+        >
           <div class="flex items-center">
             <div class="w-6 h-6 rounded-full bg-primary-light flex items-center justify-center text-white mr-2">
               <img 
@@ -68,7 +73,7 @@
             </div>
             <span class="text-xs text-gray-600 dark:text-gray-400">{{ post.author_name }}</span>
           </div>
-        </PostCardHorizontal>
+        </PostCard>
       </div>
       
       <!-- ページネーション -->
@@ -109,7 +114,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { debounce } from 'lodash';
-import PostCardHorizontal from '@/components/post/PostCardHorizontal.vue';
+import PostCard from '@/components/post/PostCard.vue';
 import { supabase } from '@/lib/supabase';
 
 // 検索結果の型定義

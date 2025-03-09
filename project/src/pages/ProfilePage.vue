@@ -155,7 +155,12 @@
         </div>
         
         <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <PostCard v-for="post in posts" :key="post.id" :post="post" />
+          <PostCard 
+            v-for="post in posts" 
+            :key="post.id" 
+            :post="post" 
+            layout="vertical"
+          />
         </div>
       </div>
       

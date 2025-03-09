@@ -68,7 +68,12 @@
       <!-- 投稿の表示 -->
       <div v-else>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <PostCard v-for="post in featuredPosts" :key="post.id" :post="post" />
+          <PostCard 
+            v-for="post in featuredPosts" 
+            :key="post.id" 
+            :post="post"
+            layout="vertical"
+          />
         </div>
       </div>
     </section>
@@ -105,7 +110,12 @@
       </div>
       
       <div class="space-y-6">
-        <PostCardHorizontal v-for="post in recentPosts" :key="post.id" :post="post" />
+        <PostCard 
+          v-for="post in recentPosts" 
+          :key="post.id" 
+          :post="post"
+          layout="horizontal"
+        />
       </div>
     </section>
   </div>
@@ -115,7 +125,6 @@
 import { ref, onMounted } from 'vue';
 import { supabase } from '../lib/supabase';
 import PostCard from '../components/post/PostCard.vue';
-import PostCardHorizontal from '../components/post/PostCardHorizontal.vue';
 import CategoryCard from '../components/category/CategoryCard.vue';
 
 // 投稿の型定義を修正

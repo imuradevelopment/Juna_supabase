@@ -202,7 +202,12 @@
           関連投稿
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <PostCard v-for="relatedPost in relatedPosts" :key="relatedPost.id" :post="relatedPost" />
+          <PostCard 
+            v-for="relatedPost in relatedPosts" 
+            :key="relatedPost.id" 
+            :post="relatedPost"
+            layout="vertical"
+          />
         </div>
       </div>
     </template>
