@@ -18,6 +18,20 @@
           <router-link to="/categories" class="nav-link text-base">カテゴリ</router-link>
           <router-link to="/posts" class="nav-link text-base">投稿一覧</router-link>
           <router-link to="/search" class="nav-link text-base">検索</router-link>
+          
+          <!-- 認証済みユーザーのみ表示 - ドロップダウンにも同じリンクがあるので条件付けする -->
+          <router-link 
+            v-if="authStore.isAuthenticated && !isLargeScreen" 
+            to="/create-post" 
+            class="nav-link text-base"
+          >
+            <span class="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              投稿作成
+            </span>
+          </router-link>
         </div>
 
         <!-- 右側のナビゲーション -->
@@ -75,6 +89,17 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   プロフィール
+                </router-link>
+                
+                <router-link 
+                  to="/create-post" 
+                  class="dropdown-item"
+                  @click="dropdownOpen = false"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                  投稿作成
                 </router-link>
                 
                 <router-link 
@@ -191,6 +216,7 @@
                 </div>
                 <span>{{ authStore.displayName }}</span>
               </div>
+              <router-link to="/create-post" class="block py-2" @click="isMenuOpen = false">投稿作成</router-link>
               <router-link to="/dashboard" class="block py-2" @click="isMenuOpen = false">ダッシュボード</router-link>
               <router-link :to="`/profile/${authStore.user?.id}`" class="block py-2" @click="isMenuOpen = false">プロフィール</router-link>
               <router-link to="/profile/edit" class="block py-2" @click="isMenuOpen = false">設定</router-link>
@@ -208,7 +234,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 
@@ -217,6 +243,17 @@ const authStore = useAuthStore();
 const dropdownOpen = ref(false);
 const isMenuOpen = ref(false);
 const dropdownRef = ref<HTMLElement | null>(null);
+const windowWidth = ref(window.innerWidth);
+
+// 画面サイズを監視
+function handleResize() {
+  windowWidth.value = window.innerWidth;
+}
+
+// 大画面か判定するための計算プロパティ
+const isLargeScreen = computed(() => {
+  return windowWidth.value >= 1024; // lg breakpoint
+});
 
 // ドロップダウンの表示・非表示を切り替え
 function toggleDropdown() {
@@ -237,10 +274,12 @@ function handleClickOutside(event: MouseEvent) {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
+  window.addEventListener('resize', handleResize);
 });
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
+  window.removeEventListener('resize', handleResize);
 });
 
 // ページ遷移時にメニューを閉じる
