@@ -49,16 +49,25 @@ const router = createRouter({
       component: () => import('../pages/PostDetailPage.vue')
     },
     {
-      path: '/create-post',
-      name: 'create-post',
-      component: () => import('../pages/CreatePostPage.vue'),
+      path: '/post/editor/:id?',
+      name: 'post-editor',
+      component: () => import('../pages/PostEditorPage.vue'),
+      props: route => ({
+        postId: route.params.id,
+        isEditMode: !!route.params.id
+      }),
       meta: { requiresAuth: true }
     },
     {
+      path: '/create-post',
+      redirect: { name: 'post-editor' }
+    },
+    {
       path: '/posts/:id/edit',
-      name: 'edit-post',
-      component: () => import('../pages/EditPostPage.vue'),
-      meta: { requiresAuth: true }
+      redirect: to => ({ 
+        name: 'post-editor', 
+        params: { id: to.params.id }
+      })
     },
     {
       path: '/profile/:id?',
