@@ -128,7 +128,7 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { supabase } from '../lib/supabase';
-import PostCard from '../components/post/PostCard.vue';
+import PostCard from '../components/common/PostCard.vue';
 
 // 状態
 const posts = ref<any[]>([]);

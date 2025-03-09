@@ -109,11 +109,11 @@
 import { ref, onMounted } from 'vue';
 import { useAuthStore } from '../stores/auth';
 import { useRouter } from 'vue-router';
-import DashboardPostsList from '../components/dashboard/DashboardPostsList.vue';
-import DashboardDraftsList from '../components/dashboard/DashboardDraftsList.vue';
-import DashboardCommentsList from '../components/dashboard/DashboardCommentsList.vue';
-import DashboardLikesList from '../components/dashboard/DashboardLikesList.vue';
-import DashboardStatistics from '../components/dashboard/DashboardStatistics.vue';
+import DashboardPostsList from '../components/DashboardPage/DashboardPostsList.vue';
+import DashboardDraftsList from '../components/DashboardPage/DashboardDraftsList.vue';
+import DashboardCommentsList from '../components/DashboardPage/DashboardCommentsList.vue';
+import DashboardLikesList from '../components/DashboardPage/DashboardLikesList.vue';
+import DashboardStatistics from '../components/DashboardPage/DashboardStatistics.vue';
 
 const router = useRouter();
 const authStore = useAuthStore();

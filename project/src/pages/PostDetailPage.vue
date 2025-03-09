@@ -265,8 +265,8 @@ import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
-import RichTextContent from '../components/editor/RichTextContent.vue';
-import CommentSystem from '../components/comment/CommentSystem.vue';
+import RichTextContent from '../components/PostDetailPage/RichTextContent.vue';
+import CommentSystem from '../components/PostDetailPage/CommentSystem.vue';
 import { getProfileImageUrl, getCoverImageUrl } from '../lib/storage';
 
 const route = useRoute();

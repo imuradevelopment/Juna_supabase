@@ -176,7 +176,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { supabase } from '../lib/supabase';
-import PostCard from '../components/post/PostCard.vue';
+import PostCard from '../components/common/PostCard.vue';
 
 // 投稿の型定義を修正
 interface Post {

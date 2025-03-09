@@ -162,7 +162,7 @@ import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
-import RichTextEditor from '../components/editor/RichTextEditor.vue';
+import RichTextEditor from '../components/PostEditorPage/RichTextEditor.vue';
 import { getCoverImageUrl } from '../lib/storage';
 
 // 型定義

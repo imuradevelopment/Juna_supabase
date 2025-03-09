@@ -224,7 +224,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
 import { getProfileImageUrl } from '../lib/storage';
-import PostCard from '../components/post/PostCard.vue';
+import PostCard from '../components/common/PostCard.vue';
 
 // 通知機能を注入
 const showNotification = inject('showNotification') as (type: 'success' | 'error' | 'info' | 'warning', title: string, message: string) => void;

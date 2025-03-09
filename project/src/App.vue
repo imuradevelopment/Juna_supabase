@@ -31,9 +31,9 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, provide } from 'vue';
 import { useAuthStore } from './stores/auth';
-import Navbar from './components/layout/Navbar.vue';
-import Footer from './components/layout/Footer.vue';
-import Notifications from './components/common/Notifications.vue';
+import Navbar from './components/App/Navbar.vue';
+import Footer from './components/App/Footer.vue';
+import Notifications from './components/App/Notifications.vue';
 // 使用していないようなので削除
 // import Toast from './components/ui/Toast.vue';
 

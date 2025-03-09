@@ -114,7 +114,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { debounce } from 'lodash';
-import PostCard from '@/components/post/PostCard.vue';
+import PostCard from '@/components/common/PostCard.vue';
 import { supabase } from '@/lib/supabase';
 
 // 検索結果の型定義
