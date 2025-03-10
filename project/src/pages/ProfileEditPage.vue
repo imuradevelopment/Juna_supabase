@@ -4,12 +4,12 @@
       <h1 class="text-2xl font-bold mb-6">プロフィール設定</h1>
       
       <!-- エラーメッセージ -->
-      <div v-if="error" class="bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 px-4 py-3 rounded mb-6">
+      <div v-if="error" class="bg-red-900/30 border border-red-700 text-red-400 px-4 py-3 rounded mb-6">
         {{ error }}
       </div>
       
       <!-- 成功メッセージ -->
-      <div v-if="successMessage" class="bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 text-green-700 dark:text-green-400 px-4 py-3 rounded mb-6">
+      <div v-if="successMessage" class="bg-green-900/30 border border-green-700 text-green-400 px-4 py-3 rounded mb-6">
         {{ successMessage }}
       </div>
       
@@ -66,7 +66,7 @@
                   ref="avatarInput"
                 />
               </label>
-              <p class="text-sm text-gray-600 dark:text-gray-400 mt-2">推奨サイズ: 200x200px (2MB以下)</p>
+              <p class="text-sm text-gray-400 mt-2">推奨サイズ: 200x200px (2MB以下)</p>
             </div>
           </div>
         </div>
@@ -96,7 +96,7 @@
               placeholder="account_id"
             />
           </div>
-          <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">
+          <p class="text-xs text-gray-400 mt-1">
             半角英数字とアンダースコアのみ使用可能です
           </p>
         </div>

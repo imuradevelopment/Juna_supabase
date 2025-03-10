@@ -1,5 +1,5 @@
 <template>
-  <div class="rich-text-content prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg xl:prose-xl max-w-none" v-html="content"></div>
+  <div class="rich-text-content prose prose-invert prose-sm sm:prose-base lg:prose-lg xl:prose-xl max-w-none" v-html="content"></div>
 </template>
 
 <script setup lang="ts">
@@ -72,7 +72,7 @@ const content = computed(() => sanitizedContent.value);
   border-radius: 0.25rem;
 }
 .dark .rich-text-content code {
-  background-color: rgba(31, 41, 55, 1); /* dark:bg-gray-800 */
+  background-color: rgba(31, 41, 55, 1); /* bg-gray-800 */
 }
 
 .rich-text-content pre {
@@ -82,6 +82,6 @@ const content = computed(() => sanitizedContent.value);
   overflow-x: auto;
 }
 .dark .rich-text-content pre {
-  background-color: rgba(31, 41, 55, 1); /* dark:bg-gray-800 */
+  background-color: rgba(31, 41, 55, 1); /* bg-gray-800 */
 }
 </style> 

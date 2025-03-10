@@ -2,12 +2,12 @@
   <div class="comment-system">
     <!-- コメント投稿フォーム -->
     <div class="mb-6">
-      <div style="background-color: #1a1e2d !important;" class="bg-white dark:bg-gray-900 p-5 rounded-lg comment-form border border-gray-100 dark:border-gray-800 shadow-sm">
+      <div style="background-color: #1a1e2d !important;" class="bg-gray-900 p-5 rounded-lg comment-form border border-gray-800 shadow-sm">
         <div v-if="!authStore.isAuthenticated" class="text-center py-4">
-          <p class="text-gray-600 dark:text-gray-300 mb-3">
+          <p class="text-gray-300 mb-3">
             コメントするにはログインが必要です
           </p>
-          <router-link to="/login" class="btn btn-primary dark:bg-primary-dark dark:text-white transition-all hover:shadow-md">
+          <router-link to="/login" class="btn btn-primary bg-primary-dark text-white transition-all hover:shadow-md">
             ログインする
           </router-link>
         </div>
@@ -16,7 +16,7 @@
           <div class="mb-3 textarea-wrapper">
             <textarea 
               v-model="commentText" 
-              class="w-full p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-primary-light focus:border-transparent text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+              class="w-full p-4 bg-gray-900 border border-gray-800 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-gray-100 placeholder-gray-500"
               rows="3"
               :placeholder="parentCommentId ? '返信を入力...' : 'コメントを入力...'"
               :disabled="submitting"
@@ -27,7 +27,7 @@
           <div class="flex justify-end">
             <button 
               type="submit" 
-              class="btn btn-primary dark:bg-primary-dark submit-button dark:text-white flex items-center justify-center transition-all hover:shadow-md"
+              class="btn btn-primary bg-primary-dark submit-button text-white flex items-center justify-center transition-all hover:shadow-md"
               :disabled="submitting || !commentText.trim()"
             >
               <svg v-if="submitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
@@ -52,7 +52,7 @@
     </div>
 
     <div v-else-if="comments.length === 0" class="text-center py-8">
-      <p class="text-gray-500 dark:text-gray-400">
+      <p class="text-gray-400">
         まだコメントはありません。最初のコメントを投稿してみましょう。
       </p>
     </div>
@@ -83,20 +83,20 @@
                 <!-- ユーザー情報と日時 -->
                 <div class="flex justify-between items-center mb-2">
                   <span class="font-medium">{{ comment.profiles?.nickname }}</span>
-                  <span class="text-xs text-gray-500 dark:text-gray-400">{{ formatDate(comment.created_at) }}</span>
+                  <span class="text-xs text-gray-400">{{ formatDate(comment.created_at) }}</span>
                 </div>
                 
                 <!-- 編集フォーム -->
                 <div v-if="editingCommentId === comment.id" class="mb-2">
                   <textarea 
                     v-model="editedContent" 
-                    class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
+                    class="w-full px-3 py-2 rounded border border-gray-700 bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
                     rows="2"
                   ></textarea>
                   <div class="flex justify-end space-x-2 mt-2">
                     <button 
                       @click="cancelEdit" 
-                      class="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                      class="text-xs text-gray-400 hover:text-gray-200"
                     >
                       キャンセル
                     </button>
@@ -118,7 +118,7 @@
               <div class="flex text-xs mt-1 space-x-4">
                 <button 
                   @click="setReplyTo(comment)" 
-                  class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light"
+                  class="text-gray-400 hover:text-primary-light"
                 >
                   返信
                 </button>
@@ -126,13 +126,13 @@
                 <div v-if="isCommentOwner(comment)">
                   <button 
                     @click="startEdit(comment)" 
-                    class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light"
+                    class="text-gray-400 hover:text-primary-light"
                   >
                     編集
                   </button>
                   <button 
                     @click="confirmDelete(comment)" 
-                    class="text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 ml-4"
+                    class="text-gray-400 hover:text-red-500 ml-4"
                   >
                     削除
                   </button>
@@ -140,8 +140,8 @@
                 
                 <button 
                   @click="toggleLike(comment)" 
-                  class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light ml-4"
-                  :class="{ 'text-primary dark:text-primary-light': isCommentLiked(comment.id) }"
+                  class="text-gray-400 hover:text-primary-light ml-4"
+                  :class="{ 'text-primary-light': isCommentLiked(comment.id) }"
                 >
                   <span class="flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{ 'fill-current': isCommentLiked(comment.id) }">
@@ -156,12 +156,12 @@
           
           <!-- 返信フォーム -->
           <div v-if="parentCommentId === comment.id" class="ml-12 mb-4">
-            <div style="background-color: #1a1e2d !important;" class="bg-white dark:bg-gray-900 p-5 rounded-lg comment-form border border-gray-100 dark:border-gray-800 shadow-sm">
+            <div style="background-color: #1a1e2d !important;" class="bg-gray-900 p-5 rounded-lg comment-form border border-gray-800 shadow-sm">
               <form @submit.prevent="submitComment" class="space-y-3">
                 <div class="mb-3 textarea-wrapper">
                   <textarea 
                     v-model="commentText" 
-                    class="w-full p-4 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-primary-light focus:border-transparent text-gray-800 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                    class="w-full p-4 bg-gray-900 border border-gray-800 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-gray-100 placeholder-gray-500"
                     rows="3"
                     placeholder="返信を入力..."
                     :disabled="submitting"
@@ -173,14 +173,14 @@
                   <button 
                     type="button"
                     @click="cancelReply" 
-                    class="text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                    class="text-gray-400 hover:text-gray-200"
                   >
                     キャンセル
                   </button>
                 
                   <button 
                     type="submit" 
-                    class="btn btn-primary dark:bg-primary-dark submit-button dark:text-white flex items-center justify-center transition-all hover:shadow-md"
+                    class="btn btn-primary bg-primary-dark submit-button text-white flex items-center justify-center transition-all hover:shadow-md"
                     :disabled="submitting || !commentText.trim()"
                   >
                     <svg v-if="submitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
@@ -218,20 +218,20 @@
                     <!-- ユーザー情報と日時 -->
                     <div class="flex justify-between items-center mb-2">
                       <span class="font-medium">{{ reply.profiles?.nickname }}</span>
-                      <span class="text-xs text-gray-500 dark:text-gray-400">{{ formatDate(reply.created_at) }}</span>
+                      <span class="text-xs text-gray-400">{{ formatDate(reply.created_at) }}</span>
                     </div>
                     
                     <!-- 編集フォーム -->
                     <div v-if="editingCommentId === reply.id" class="mb-2">
                       <textarea 
                         v-model="editedContent" 
-                        class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
+                        class="w-full px-3 py-2 rounded border border-gray-700 bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary"
                         rows="2"
                       ></textarea>
                       <div class="flex justify-end space-x-2 mt-2">
                         <button 
                           @click="cancelEdit" 
-                          class="text-xs text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                          class="text-xs text-gray-400 hover:text-gray-200"
                         >
                           キャンセル
                         </button>
@@ -253,7 +253,7 @@
                   <div class="flex text-xs mt-1 space-x-4">
                     <button 
                       @click="setReplyTo(comment)" 
-                      class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light"
+                      class="text-gray-400 hover:text-primary-light"
                     >
                       返信
                     </button>
@@ -261,13 +261,13 @@
                     <div v-if="isCommentOwner(reply)">
                       <button 
                         @click="startEdit(reply)" 
-                        class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light"
+                        class="text-gray-400 hover:text-primary-light"
                       >
                         編集
                       </button>
                       <button 
                         @click="confirmDelete(reply)" 
-                        class="text-gray-600 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 ml-4"
+                        class="text-gray-400 hover:text-red-500 ml-4"
                       >
                         削除
                       </button>
@@ -275,8 +275,8 @@
                     
                     <button 
                       @click="toggleLike(reply)" 
-                      class="text-gray-600 dark:text-gray-400 hover:text-primary dark:hover:text-primary-light ml-4"
-                      :class="{ 'text-primary dark:text-primary-light': isCommentLiked(reply.id) }"
+                      class="text-gray-400 hover:text-primary-light ml-4"
+                      :class="{ 'text-primary-light': isCommentLiked(reply.id) }"
                     >
                       <span class="flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{ 'fill-current': isCommentLiked(reply.id) }">
@@ -298,7 +298,7 @@
     <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div class="glass-card p-6 max-w-sm w-full">
         <h3 class="text-lg font-bold mb-4">コメントを削除しますか？</h3>
-        <p class="text-gray-600 dark:text-gray-400 mb-6">
+        <p class="text-gray-400 mb-6">
           この操作は取り消せません。
         </p>
         <div class="flex justify-end space-x-4">

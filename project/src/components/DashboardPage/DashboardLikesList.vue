@@ -2,19 +2,19 @@
   <div class="dashboard-likes-list">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">いいね管理</h2>
-      <div class="text-sm text-gray-600 dark:text-gray-400">
+      <div class="text-sm text-gray-400">
         全 {{ activeLikeType === 'post' ? totalPostLikes : totalCommentLikes }} 件
       </div>
     </div>
     
     <!-- タブ切り替え -->
-    <div class="flex border-b border-gray-200 dark:border-gray-700 mb-4">
+    <div class="flex border-b border-gray-700 mb-4">
       <button 
         @click="activeLikeType = 'post'" 
         class="py-2 px-4 font-medium text-sm focus:outline-none"
         :class="activeLikeType === 'post' 
           ? 'border-b-2 border-primary text-primary' 
-          : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
+          : 'text-gray-400 hover:text-gray-300'"
       >
         投稿のいいね
       </button>
@@ -23,7 +23,7 @@
         class="py-2 px-4 font-medium text-sm focus:outline-none"
         :class="activeLikeType === 'comment' 
           ? 'border-b-2 border-primary text-primary' 
-          : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'"
+          : 'text-gray-400 hover:text-gray-300'"
       >
         コメントのいいね
       </button>
@@ -41,7 +41,7 @@
     <div v-else-if="activeLikeType === 'post'">
       <!-- いいねがない場合 -->
       <div v-if="postLikes.length === 0" class="glass-card p-8 text-center">
-        <p class="text-gray-600 dark:text-gray-400">
+        <p class="text-gray-400">
           まだいいねした投稿はありません
         </p>
       </div>
@@ -73,7 +73,7 @@
               </div>
               
               <!-- 投稿の抜粋 -->
-              <p v-if="like.posts[0]?.excerpt" class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
+              <p v-if="like.posts[0]?.excerpt" class="text-sm text-gray-400 line-clamp-2 mb-2">
                 {{ like.posts[0].excerpt }}
               </p>
             </div>
@@ -128,7 +128,7 @@
     <div v-else-if="activeLikeType === 'comment'">
       <!-- いいねがない場合 -->
       <div v-if="commentLikes.length === 0" class="glass-card p-8 text-center">
-        <p class="text-gray-600 dark:text-gray-400">
+        <p class="text-gray-400">
           まだいいねしたコメントはありません
         </p>
       </div>
@@ -139,7 +139,7 @@
           <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div class="flex-1">
               <!-- コメント情報 -->
-              <div class="mb-2 p-3 bg-gray-50 dark:bg-gray-800 rounded">
+              <div class="mb-2 p-3 bg-gray-800 rounded">
                 <p class="text-sm whitespace-pre-wrap">{{ like.comments[0]?.content || '不明なコメント' }}</p>
               </div>
               
@@ -152,7 +152,7 @@
                 >
                   {{ like.comments[0]?.posts[0]?.title || '不明な投稿' }}
                 </router-link>
-                <span class="text-xs text-gray-600 dark:text-gray-400">
+                <span class="text-xs text-gray-400">
                   {{ formatDate(like.created_at) }}
                 </span>
               </div>
@@ -222,7 +222,7 @@
     <div v-if="showUnlikeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="glass-card p-6 max-w-md mx-auto">
         <h3 class="text-xl font-bold mb-4">いいねを解除しますか？</h3>
-        <p class="mb-6 text-gray-600 dark:text-gray-400">
+        <p class="mb-6 text-gray-400">
           {{ activeLikeType === 'post' ? 'この投稿' : 'このコメント' }}のいいねを解除しますか？
         </p>
         <div class="flex justify-end space-x-3">

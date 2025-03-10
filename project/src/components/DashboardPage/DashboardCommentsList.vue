@@ -2,7 +2,7 @@
   <div class="dashboard-comments-list">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">コメント管理</h2>
-      <div class="text-sm text-gray-600 dark:text-gray-400">
+      <div class="text-sm text-gray-400">
         全 {{ totalComments }} 件
       </div>
     </div>
@@ -17,7 +17,7 @@
     
     <!-- コメントがない場合 -->
     <div v-else-if="comments.length === 0" class="glass-card p-8 text-center">
-      <p class="text-gray-600 dark:text-gray-400">
+      <p class="text-gray-400">
         まだコメントはありません
       </p>
     </div>
@@ -50,7 +50,7 @@
               >
                 {{ getPostTitle(comment) }}
               </router-link>
-              <span class="text-xs text-gray-600 dark:text-gray-400">
+              <span class="text-xs text-gray-400">
                 {{ formatDate(comment.created_at) }}
               </span>
             </div>
@@ -110,7 +110,7 @@
         <h3 class="text-xl font-bold mb-4">コメントを編集</h3>
         <textarea 
           v-model="editedContent" 
-          class="w-full px-3 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+          class="w-full px-3 py-2 rounded border border-gray-700 bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary mb-4"
           rows="3"
         ></textarea>
         <div class="flex justify-end space-x-3">
@@ -134,7 +134,7 @@
     <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="glass-card p-6 max-w-md mx-auto">
         <h3 class="text-xl font-bold mb-4">コメントを削除しますか？</h3>
-        <p class="mb-6 text-gray-600 dark:text-gray-400">この操作は取り消せません。本当にこのコメントを削除しますか？</p>
+        <p class="mb-6 text-gray-400">この操作は取り消せません。本当にこのコメントを削除しますか？</p>
         <div class="flex justify-end space-x-3">
           <button @click="showDeleteModal = false" class="btn btn-ghost">キャンセル</button>
           <button 

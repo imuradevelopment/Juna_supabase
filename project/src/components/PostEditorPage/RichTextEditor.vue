@@ -178,19 +178,19 @@
           v-model="linkUrl"
           type="text"
           placeholder="URLを入力"
-          class="px-2 py-1 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-sm flex-1"
+          class="px-2 py-1 rounded border border-gray-700 bg-gray-800 text-sm flex-1"
         />
       </div>
       <div class="flex justify-end space-x-2">
         <button 
           @click="showLinkMenu = false"
-          class="px-2 py-1 text-xs rounded bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
+          class="px-2 py-1 text-xs rounded bg-gray-700 hover:bg-gray-600"
         >
           キャンセル
         </button>
         <button 
           @click="removeLink"
-          class="px-2 py-1 text-xs rounded bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-900/50"
+          class="px-2 py-1 text-xs rounded bg-red-900/30 text-red-400 hover:bg-red-900/50"
           :disabled="!editor?.isActive('link')"
         >
           リンク解除
@@ -434,11 +434,11 @@ function uploadImage(event: Event) {
 
 <style lang="postcss">
 .menu-button {
-  @apply p-1.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300;
+  @apply p-1.5 rounded hover:bg-gray-700 text-gray-300;
 }
 
 .menu-button.is-active {
-  @apply bg-primary/10 dark:bg-primary/20 text-primary;
+  @apply bg-primary/20 text-primary;
 }
 
 .editor-focused {

@@ -4,7 +4,7 @@
     <div v-if="loading" class="glass-card p-8 flex justify-center items-center min-h-[300px]">
       <div class="flex flex-col items-center">
         <div class="loading-spinner mb-4"></div>
-        <p class="text-gray-600 dark:text-gray-400 animate-pulse">投稿を読み込んでいます...</p>
+        <p class="text-gray-400 animate-pulse">投稿を読み込んでいます...</p>
       </div>
     </div>
     
@@ -14,7 +14,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
       <h2 class="text-xl font-bold mb-2">投稿の読み込みに失敗しました</h2>
-      <p class="text-gray-600 dark:text-gray-400 mb-4">{{ error }}</p>
+      <p class="text-gray-400 mb-4">{{ error }}</p>
       <router-link to="/" class="btn btn-primary transition-transform hover:scale-105">ホームに戻る</router-link>
     </div>
     
@@ -24,7 +24,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       <h2 class="text-xl font-bold mb-2">投稿が見つかりませんでした</h2>
-      <p class="text-gray-600 dark:text-gray-400 mb-4">お探しの投稿は削除されたか、存在しない可能性があります。</p>
+      <p class="text-gray-400 mb-4">お探しの投稿は削除されたか、存在しない可能性があります。</p>
       <router-link to="/" class="btn btn-primary transition-transform hover:scale-105">ホームに戻る</router-link>
     </div>
     
@@ -35,7 +35,7 @@
         <!-- ヘッダー部分 - アイキャッチと投稿情報を横並びに -->
         <div class="flex flex-col md:flex-row">
           <!-- 左側 - アイキャッチ画像 -->
-          <div v-if="post.cover_image_path" class="relative md:w-1/3 h-40 md:h-[200px] bg-gray-200 dark:bg-gray-700 overflow-hidden">
+          <div v-if="post.cover_image_path" class="relative md:w-1/3 h-40 md:h-[200px] bg-gray-700 overflow-hidden">
             <img 
               :src="getImageUrl(post.cover_image_path)" 
               :alt="post.title"
@@ -62,7 +62,7 @@
             <h1 class="text-xl md:text-2xl font-bold mb-3 leading-tight">{{ post.title }}</h1>
             
             <!-- 閲覧数・更新情報 -->
-            <div class="flex items-center text-sm text-gray-500 dark:text-gray-400 mb-3">
+            <div class="flex items-center text-sm text-gray-400 mb-3">
               <span class="flex items-center mr-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -74,7 +74,9 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                {{ formatDate(post.updated_at || post.created_at) }}
+                <p class="text-xs text-gray-400 flex items-center">
+                  {{ formatDate(post.updated_at || post.created_at) }}
+                </p>
               </span>
             </div>
             
@@ -95,7 +97,7 @@
                   <p class="text-base font-medium group-hover:text-primary transition-colors">
                     {{ post.profiles?.nickname || '不明なユーザー' }}
                   </p>
-                  <p class="text-xs text-gray-600 dark:text-gray-400 flex items-center">
+                  <p class="text-xs text-gray-400 flex items-center">
                     {{ formatDate(post.created_at) }}
                   </p>
                 </div>
@@ -234,7 +236,7 @@
       <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="glass-card p-6 max-w-sm w-full rounded-lg">
           <h3 class="text-lg font-bold mb-4">投稿を削除しますか？</h3>
-          <p class="text-gray-600 dark:text-gray-400 mb-6">
+          <p class="text-gray-400 mb-6">
             この操作は取り消せません。本当にこの投稿を削除しますか？
           </p>
           <div class="flex justify-end space-x-4">
@@ -581,7 +583,7 @@ watch(() => route.params.id, (newId) => {
 }
 
 .liked-btn {
-  @apply text-primary dark:text-primary-light;
+  @apply text-primary-light;
 }
 
 .edit-btn {

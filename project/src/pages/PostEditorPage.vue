@@ -4,7 +4,7 @@
       <h1 class="text-2xl font-bold mb-6">{{ isEditMode ? '投稿を編集' : '新しい投稿を作成' }}</h1>
       
       <!-- エラーメッセージ -->
-      <div v-if="formError" class="bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-400 px-4 py-3 rounded mb-6">
+      <div v-if="formError" class="bg-red-900/30 border border-red-700 text-red-400 px-4 py-3 rounded mb-6">
         {{ formError }}
       </div>
       
@@ -16,7 +16,7 @@
             id="title"
             v-model="formData.title"
             type="text"
-            class="w-full px-4 py-2 rounded border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full px-4 py-2 rounded border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="投稿のタイトル"
             required
           />
@@ -29,7 +29,7 @@
             id="excerpt"
             v-model="formData.excerpt"
             rows="3"
-            class="w-full px-4 py-2 rounded border border-gray-300 dark:border-gray-700 !bg-gray-800 !text-white focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full px-4 py-2 rounded border border-gray-700 !bg-gray-800 !text-white focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="投稿の短い説明（オプション）"
           ></textarea>
         </div>
@@ -39,7 +39,7 @@
           <label class="block text-sm font-medium mb-1">アイキャッチ画像</label>
           <div class="flex items-center space-x-4">
             <!-- 画像プレビュー -->
-            <div v-if="featuredImagePreview || formData.cover_image_path" class="relative w-32 h-24 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
+            <div v-if="featuredImagePreview || formData.cover_image_path" class="relative w-32 h-24 bg-gray-700 rounded overflow-hidden">
               <img 
                 :src="featuredImagePreview || getCoverImageUrl(formData.cover_image_path as string)" 
                 alt="プレビュー" 
@@ -70,7 +70,7 @@
                   @change="handleImageUpload"
                 />
               </label>
-              <p class="text-xs text-gray-600 dark:text-gray-400 mt-1">最大サイズ: 2MB</p>
+              <p class="text-xs text-gray-400 mt-1">最大サイズ: 2MB</p>
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@
   <div class="dashboard-drafts-list">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">下書き</h2>
-      <div class="text-sm text-gray-600 dark:text-gray-400">
+      <div class="text-sm text-gray-400">
         全 {{ totalDrafts }} 件
       </div>
     </div>
@@ -17,7 +17,7 @@
     
     <!-- 下書きがない場合 -->
     <div v-else-if="drafts.length === 0" class="glass-card p-8 text-center">
-      <p class="text-gray-600 dark:text-gray-400 mb-4">
+      <p class="text-gray-400 mb-4">
         下書きはありません
       </p>
       <router-link to="/create-post" class="btn btn-primary">
@@ -33,7 +33,7 @@
             <h3 class="font-bold text-lg mb-1">
               {{ draft.title || '(無題)' }}
             </h3>
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+            <p class="text-sm text-gray-400 mb-2">
               最終更新: {{ formatDate(draft.updated_at || draft.created_at) }}
             </p>
           </div>
@@ -93,7 +93,7 @@
     <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="glass-card p-6 max-w-md mx-auto">
         <h3 class="text-xl font-bold mb-4">下書きを削除しますか？</h3>
-        <p class="mb-6 text-gray-600 dark:text-gray-400">この操作は取り消せません。本当にこの下書きを削除しますか？</p>
+        <p class="mb-6 text-gray-400">この操作は取り消せません。本当にこの下書きを削除しますか？</p>
         <div class="flex justify-end space-x-3">
           <button @click="showDeleteModal = false" class="btn btn-ghost">キャンセル</button>
           <button 
@@ -115,7 +115,7 @@
     <div v-if="showPublishModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="glass-card p-6 max-w-md mx-auto">
         <h3 class="text-xl font-bold mb-4">下書きを公開しますか？</h3>
-        <p class="mb-6 text-gray-600 dark:text-gray-400">この下書きを公開すると、すべてのユーザーが閲覧できるようになります。</p>
+        <p class="mb-6 text-gray-400">この下書きを公開すると、すべてのユーザーが閲覧できるようになります。</p>
         <div class="flex justify-end space-x-3">
           <button @click="showPublishModal = false" class="btn btn-ghost">キャンセル</button>
           <button 

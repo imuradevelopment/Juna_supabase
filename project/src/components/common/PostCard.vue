@@ -66,7 +66,7 @@
         <p 
           v-if="post.excerpt_highlight" 
           :class="[
-            layout === 'vertical' ? 'text-sm mb-4 card-description' : 'text-sm text-gray-600 dark:text-gray-400 mb-2',
+            layout === 'vertical' ? 'text-sm mb-4 card-description' : 'text-sm text-gray-400 mb-2',
             'line-clamp-' + (layout === 'vertical' ? 3 : 2)
           ]"
           v-html="post.excerpt_highlight"
@@ -74,7 +74,7 @@
         <p 
           v-else-if="post.excerpt" 
           :class="[
-            layout === 'vertical' ? 'text-sm mb-4 card-description' : 'text-sm text-gray-600 dark:text-gray-400 mb-2',
+            layout === 'vertical' ? 'text-sm mb-4 card-description' : 'text-sm text-gray-400 mb-2',
             'line-clamp-' + (layout === 'vertical' ? 3 : 2)
           ]"
         >
@@ -122,7 +122,7 @@
         </div>
         
         <!-- 横型レイアウト用フッター -->
-        <div v-else class="flex justify-between items-center text-xs text-gray-600 dark:text-gray-400">
+        <div v-else class="flex justify-between items-center text-xs text-gray-400">
           <div class="flex items-center">
             <span class="mr-3">{{ formatDate(post.published_at || post.created_at) }}</span>
             <span class="mr-1">{{ getUserName() }}</span>

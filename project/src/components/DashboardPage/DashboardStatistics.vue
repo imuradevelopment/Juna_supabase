@@ -15,17 +15,17 @@
       <!-- 概要カード -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="glass-card p-4 flex flex-col items-center">
-          <h3 class="text-lg font-semibold text-gray-600 dark:text-gray-400 mb-1">投稿数</h3>
+          <h3 class="text-lg font-semibold text-gray-400 mb-1">投稿数</h3>
           <p class="text-3xl font-bold text-primary">{{ stats.postsCount }}</p>
         </div>
         
         <div class="glass-card p-4 flex flex-col items-center">
-          <h3 class="text-lg font-semibold text-gray-600 dark:text-gray-400 mb-1">コメント数</h3>
+          <h3 class="text-lg font-semibold text-gray-400 mb-1">コメント数</h3>
           <p class="text-3xl font-bold text-primary">{{ stats.commentsCount }}</p>
         </div>
         
         <div class="glass-card p-4 flex flex-col items-center">
-          <h3 class="text-lg font-semibold text-gray-600 dark:text-gray-400 mb-1">いいね数</h3>
+          <h3 class="text-lg font-semibold text-gray-400 mb-1">いいね数</h3>
           <p class="text-3xl font-bold text-primary">{{ stats.totalLikesGivenCount }}</p>
         </div>
       </div>
@@ -34,39 +34,39 @@
       <div class="glass-card p-4">
         <h3 class="text-lg font-bold mb-3">詳細統計</h3>
         
-        <div class="divide-y divide-gray-200 dark:divide-gray-700">
+        <div class="divide-y divide-gray-700">
           <div class="py-3 flex justify-between">
-            <span class="text-gray-600 dark:text-gray-400">公開中の投稿</span>
+            <span class="text-gray-400">公開中の投稿</span>
             <span class="font-semibold">{{ stats.publishedPostsCount }}</span>
           </div>
           
           <div class="py-3 flex justify-between">
-            <span class="text-gray-600 dark:text-gray-400">下書き</span>
+            <span class="text-gray-400">下書き</span>
             <span class="font-semibold">{{ stats.draftsCount }}</span>
           </div>
           
           <div class="py-3 flex justify-between">
-            <span class="text-gray-600 dark:text-gray-400">総閲覧数</span>
+            <span class="text-gray-400">総閲覧数</span>
             <span class="font-semibold">{{ stats.totalViews }}</span>
           </div>
           
           <div class="py-3 flex justify-between">
-            <span class="text-gray-600 dark:text-gray-400">投稿への返信コメント</span>
+            <span class="text-gray-400">投稿への返信コメント</span>
             <span class="font-semibold">{{ stats.commentsOnPostsCount }}</span>
           </div>
           
           <div class="py-3 flex justify-between">
-            <span class="text-gray-600 dark:text-gray-400">自分がいいねした投稿</span>
+            <span class="text-gray-400">自分がいいねした投稿</span>
             <span class="font-semibold">{{ stats.postLikesGivenCount }}</span>
           </div>
           
           <div class="py-3 flex justify-between">
-            <span class="text-gray-600 dark:text-gray-400">自分がいいねしたコメント</span>
+            <span class="text-gray-400">自分がいいねしたコメント</span>
             <span class="font-semibold">{{ stats.commentLikesGivenCount }}</span>
           </div>
           
           <div class="py-3 flex justify-between">
-            <span class="text-gray-600 dark:text-gray-400">自分の投稿が受けたいいね</span>
+            <span class="text-gray-400">自分の投稿が受けたいいね</span>
             <span class="font-semibold">{{ stats.likesReceivedCount }}</span>
           </div>
         </div>
@@ -82,7 +82,7 @@
               <router-link :to="`/posts/${post.id}`" class="font-medium hover:text-primary">
                 {{ post.title }}
               </router-link>
-              <div class="text-sm text-gray-600 dark:text-gray-400 flex items-center">
+              <div class="text-sm text-gray-400 flex items-center">
                 <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -115,7 +115,7 @@
               <p class="text-sm">
                 {{ getActivityText(activity) }}
               </p>
-              <p class="text-xs text-gray-600 dark:text-gray-400">
+              <p class="text-xs text-gray-400">
                 {{ formatDate(activity.created_at) }}
               </p>
             </div>
@@ -137,7 +137,7 @@
           </div>
           <div>
             <h3 class="text-xl font-bold">{{ profile?.nickname }}</h3>
-            <p v-if="profile?.bio" class="text-sm text-gray-600 dark:text-gray-400 mt-1">{{ profile.bio }}</p>
+            <p v-if="profile?.bio" class="text-sm text-gray-400 mt-1">{{ profile.bio }}</p>
           </div>
         </div>
       </div>
@@ -401,14 +401,14 @@ function getInitials(name: string): string {
 function getActivityIconClass(type: string) {
   switch (type) {
     case 'post':
-      return 'bg-blue-100 dark:bg-blue-900 text-blue-500';
+      return 'bg-blue-900 text-blue-500';
     case 'comment':
-      return 'bg-green-100 dark:bg-green-900 text-green-500';
+      return 'bg-green-900 text-green-500';
     case 'post-like':
     case 'comment-like':
-      return 'bg-red-100 dark:bg-red-900 text-red-500';
+      return 'bg-red-900 text-red-500';
     default:
-      return 'bg-gray-100 dark:bg-gray-900 text-gray-500';
+      return 'bg-gray-900 text-gray-500';
   }
 }
 

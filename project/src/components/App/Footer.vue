@@ -1,6 +1,6 @@
 <template>
   <footer>
-    <div class="glass border-t border-light-border dark:border-dark-border">
+    <div class="glass border-t border-light-border border-dark-border">
       <div class="container mx-auto py-8 px-5 md:px-6">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <!-- ロゴと説明 -->

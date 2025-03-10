@@ -23,11 +23,6 @@ export default {
           card: 'rgba(30, 41, 59, 1)',
           border: 'rgba(71, 85, 105, 1)'
         },
-        light: {
-          bg: 'rgba(248, 250, 252, 1)',
-          card: 'rgba(255, 255, 255, 1)',
-          border: 'rgba(226, 232, 240, 1)'
-        },
         glass: {
           bg: 'rgba(31, 41, 65, 0.7)',
           border: 'rgba(76, 85, 101, 0.6)'
