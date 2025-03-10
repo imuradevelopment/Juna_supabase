@@ -52,7 +52,7 @@ const content = computed(() => sanitizedContent.value);
 }
 
 .rich-text-content a {
-  color: var(--primary); /* text-primary */
+  color: var(--color-primary); /* text-primary */
 }
 .rich-text-content a:hover {
   text-decoration: underline;
@@ -60,7 +60,7 @@ const content = computed(() => sanitizedContent.value);
 
 .rich-text-content blockquote {
   border-left-width: 4px;
-  border-left-color: var(--primary);
+  border-left-color: var(--color-primary);
   padding-left: 1rem;
   font-style: italic;
 }

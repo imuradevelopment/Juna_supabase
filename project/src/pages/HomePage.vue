@@ -5,7 +5,7 @@
       <!-- 装飾的な背景要素 -->
       <div class="absolute top-0 right-0 w-2/3 h-full opacity-15 pointer-events-none">
         <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-          <path fill="var(--primary-light)" d="M44.9,-76.2C58.3,-69.3,69.8,-58.3,78.1,-45C86.5,-31.7,91.8,-15.8,90.9,-0.5C90.1,14.8,83,29.7,74.4,43.4C65.8,57.2,55.6,69.9,42.2,77.8C28.8,85.7,14.4,88.7,-0.3,89.2C-15,89.7,-30.1,87.6,-41.9,79.5C-53.8,71.4,-62.4,57.1,-70.6,42.8C-78.8,28.5,-86.5,14.2,-88.5,-1.1C-90.5,-16.5,-86.8,-33,-78.2,-46.4C-69.5,-59.8,-55.9,-70.1,-41.6,-76.5C-27.3,-82.9,-13.6,-85.5,0.9,-87C15.4,-88.5,31.5,-89,44.9,-76.2Z" transform="translate(100 100)" />
+          <path fill="var(--color-primary-light)" d="M44.9,-76.2C58.3,-69.3,69.8,-58.3,78.1,-45C86.5,-31.7,91.8,-15.8,90.9,-0.5C90.1,14.8,83,29.7,74.4,43.4C65.8,57.2,55.6,69.9,42.2,77.8C28.8,85.7,14.4,88.7,-0.3,89.2C-15,89.7,-30.1,87.6,-41.9,79.5C-53.8,71.4,-62.4,57.1,-70.6,42.8C-78.8,28.5,-86.5,14.2,-88.5,-1.1C-90.5,-16.5,-86.8,-33,-78.2,-46.4C-69.5,-59.8,-55.9,-70.1,-41.6,-76.5C-27.3,-82.9,-13.6,-85.5,0.9,-87C15.4,-88.5,31.5,-89,44.9,-76.2Z" transform="translate(100 100)" />
         </svg>
       </div>
       
@@ -349,7 +349,7 @@ async function fetchCategories() {
 }
 
 .hero-title {
-  color: var(--primary-light);
+  color: var(--color-primary-light);
   text-shadow: 0 0 20px rgba(196, 181, 253, 0.6);
   animation: fadeInUp 1s ease-out;
 }
@@ -366,7 +366,7 @@ async function fetchCategories() {
   left: 50%;
   width: 100%;
   height: 0;
-  background: radial-gradient(circle, var(--primary-light) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--color-primary-light) 0%, transparent 70%);
   opacity: 0;
   transform: translate(-50%, -50%);
   transition: height 0.5s ease, opacity 0.3s ease;
@@ -392,7 +392,7 @@ async function fetchCategories() {
 
 /* プライマリボタンのスタイル改善 */
 .btn-primary-gradient {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
@@ -400,14 +400,14 @@ async function fetchCategories() {
 }
 
 .btn-primary-gradient:hover {
-  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
-  box-shadow: 0 10px 20px -10px var(--primary-dark);
+  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary-dark) 100%);
+  box-shadow: 0 10px 20px -10px var(--color-primary-dark);
 }
 
 /* セカンダリボタンもプライマリカラーを使ったスタイルに変更 */
 .btn-secondary-outline {
-  border: 2px solid var(--primary); 
-  color: var(--primary-light);
+  border: 2px solid var(--color-primary); 
+  color: var(--color-primary-light);
   background-color: rgba(139, 92, 246, 0.08);
   transition: all 0.3s ease;
   display: inline-flex;
@@ -417,7 +417,7 @@ async function fetchCategories() {
 
 .btn-secondary-outline:hover {
   background-color: rgba(139, 92, 246, 0.15);
-  border-color: var(--primary-light);
+  border-color: var(--color-primary-light);
   box-shadow: 0 0 15px rgba(196, 181, 253, 0.3);
 }
 

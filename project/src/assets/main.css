@@ -2,77 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
-/* テーマ変数 */
+/* テーマ変数（20色に集約） */
 :root {
-  /* 基本カラー */
-  --bg-color: 15 17 24;
-  --text-color: 241 245 249;
-  --heading-color: 248 250 252;
-  --border-color: 71 85 105;
+  /* メインカラー */
+  --color-primary: 167 139 250; /* 旧: --primary, --input-focus-border, --link-primary, --btn-primary-bg */
+  --color-primary-dark: 139 92 246; /* 旧: --primary-dark, --link-primary-hover, --btn-primary-hover */
+  --color-primary-light: 196 181 253; /* 旧: --primary-light */
   
-  /* プライマリカラー */
-  --primary: 167 139 250;
-  --primary-dark: 139 92 246;
-  --primary-light: 196 181 253;
-  --secondary: 203 213 225;
-  --secondary-dark: 148 163 184;
-  --secondary-light: 226 232 240;
+  /* 背景色 */
+  --color-background: 15 17 24; /* 旧: --bg-color */
+  --color-surface: 30 41 59; /* 旧: --dark-card, --input-bg, --card-bg */
+  --color-surface-variant: 31 41 65; /* 旧: --glass-bg */
+  --color-surface-accent: 45 55 72; /* 旧: --input-addon-bg */
   
-  /* ダークテーマ色 */
-  --dark-bg: 15 23 42;
-  --dark-card: 30 41 59;
-  --dark-border: 71 85 105;
+  /* テキスト色 */
+  --color-text: 241 245 249; /* 旧: --text-color, --input-text, --input-addon-text */
+  --color-heading: 248 250 252; /* 旧: --heading-color */
+  --color-text-muted: 148 163 184; /* 旧: --secondary-dark, --input-placeholder, --text-hint */
+  --color-text-white: 255 255 255; /* 旧: --btn-primary-text */
   
-  /* グラス効果 */
-  --glass-bg: 31 41 65;
-  --glass-border: 76 85 101;
-  --glass-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  /* ボーダー */
+  --color-border: 71 85 105; /* 旧: --border-color, --dark-border, --input-border */
+  --color-border-light: 76 85 101; /* 旧: --glass-border, --card-border */
+  
+  /* セカンダリカラー */
+  --color-secondary: 203 213 225; /* 旧: --secondary */
+  --color-secondary-light: 226 232 240; /* 旧: --secondary-light */
   
   /* ステータスカラー */
-  --error-color: 248 113 113;
-  --success-color: 74 222 128;
-  --warning-color: 251 191 36;
-  --info-color: 56 189 248;
+  --color-error: 248 113 113; /* 旧: --error-color, --text-required, --error-text */
+  --color-error-dark: 239 68 68; /* 旧: --error-bg, --error-border */
+  --color-success: 74 222 128; /* 旧: --success-color */
+  --color-success-dark: 16 185 129; /* 旧: --success-bg, --success-border, --success-text */
+  --color-warning: 251 191 36; /* 旧: --warning-color */
+  --color-info: 56 189 248; /* 旧: --info-color */
   
   /* アクセントカラー */
-  --accent1: 96 165 250;
-  --accent2: 244 114 182;
-  --accent3: 52 211 153;
+  --color-accent1: 96 165 250; /* 旧: --accent1 */
+  --color-accent2: 244 114 182; /* 旧: --accent2 */
+  --color-accent3: 52 211 153; /* 旧: --accent3 */
   
-  /* 入力フィールド */
-  --input-bg: 30 41 59;
-  --input-text: 241 245 249;
-  --input-border: 71 85 105;
-  --input-focus-border: 167 139 250;
-  --input-placeholder: 148 163 184;
-  --input-addon-bg: 45 55 72;
-  --input-addon-text: 241 245 249;
-  
-  /* アラート */
-  --error-bg: 239 68 68;
-  --error-border: 239 68 68; 
-  --error-text: 248 113 113;
-  --success-bg: 16 185 129;
-  --success-border: 16 185 129;
-  --success-text: 16 185 129;
-  
-  /* テキスト */
-  --text-hint: 148 163 184;
-  --text-required: 248 113 113;
-  
-  /* リンク */
-  --link-primary: 167 139 250;
-  --link-primary-hover: 139 92 246;
-  
-  /* ボタン */
-  --btn-primary-bg: 167 139 250;
-  --btn-primary-text: 255 255 255;
-  --btn-primary-hover: 139 92 246;
-  
-  /* カード */
-  --card-bg: 30 41 59;
-  --card-border: 76 85 101;
-  --card-shadow: 0 0 0;
+  /* シャドウ */
+  --shadow-glass: 0 4px 6px rgba(0, 0, 0, 0.3); /* 旧: --glass-shadow */
+  --shadow-card: 0 0 0; /* 旧: --card-shadow */
 }
 
 /* リセット */
@@ -102,13 +74,13 @@ html {
 
 body {
   @apply font-sans;
-  background-color: rgb(var(--bg-color));
-  color: rgb(var(--text-color));
+  background-color: rgb(var(--color-background));
+  color: rgb(var(--color-text));
   transition: background-color 0.3s, color 0.3s;
   font-family: 'Noto Sans JP', sans-serif;
   background-image: radial-gradient(
     circle at 50% 0%, 
-    rgb(var(--primary-dark) / 0.07) 0%, 
+    rgb(var(--color-primary-dark) / 0.07) 0%, 
     rgb(30 35 48 / 0) 50%
   );
 }
@@ -136,17 +108,17 @@ body {
 
 /* グラスモーフィズム */
 .glass {
-  background: rgb(var(--glass-bg) / 0.7);
+  background: rgb(var(--color-surface-variant) / 0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgb(var(--glass-border) / 0.6);
-  box-shadow: var(--glass-shadow);
+  border: 1px solid rgb(var(--color-border-light) / 0.6);
+  box-shadow: var(--shadow-glass);
 }
 
 .glass-card {
   @apply glass rounded-lg p-6;
-  background: rgb(var(--card-bg) / 0.8);
-  border: 1px solid rgb(var(--card-border) / 0.6);
+  background: rgb(var(--color-surface) / 0.8);
+  border: 1px solid rgb(var(--color-border-light) / 0.6);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 
               0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
@@ -157,15 +129,15 @@ body {
 }
 
 .btn-primary {
-  background-color: rgb(var(--primary));
-  color: rgb(var(--btn-primary-text));
-  box-shadow: 0 0 15px rgb(var(--primary-dark) / 0.3);
-  border: 1px solid rgb(var(--primary-dark) / 0.3);
+  background-color: rgb(var(--color-primary));
+  color: rgb(var(--color-text-white));
+  box-shadow: 0 0 15px rgb(var(--color-primary-dark) / 0.3);
+  border: 1px solid rgb(var(--color-primary-dark) / 0.3);
 }
 
 .btn-primary:hover {
-  background-color: rgb(var(--primary-dark));
-  box-shadow: 0 0 20px rgb(var(--primary-dark) / 0.5);
+  background-color: rgb(var(--color-primary-dark));
+  box-shadow: 0 0 20px rgb(var(--color-primary-dark) / 0.5);
 }
 
 .btn-primary:disabled {
@@ -188,16 +160,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-color);
+  background: var(--color-background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--secondary);
+  background: var(--color-secondary);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+  background: var(--color-primary);
 }
 
 /* フォーム */
@@ -218,22 +190,22 @@ body {
 input:not([type="radio"]):not([type="checkbox"]) {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   border-radius: 0.25rem;
-  background-color: var(--input-bg) !important;
-  color: var(--input-text) !important;
-  border-color: var(--input-border) !important;
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
 }
 
 .input-addon {
-  background-color: var(--input-addon-bg);
-  color: var(--input-addon-text);
-  border-color: var(--input-border);
+  background-color: var(--color-surface-accent);
+  color: var(--color-text);
+  border-color: var(--color-border);
 }
 
 /* プレースホルダー */
 ::placeholder {
-  color: var(--input-placeholder);
+  color: var(--color-text-muted);
 }
 
 /* フォーカス時のスタイル */
@@ -241,24 +213,24 @@ input:not([type="radio"]):not([type="checkbox"]) {
 input:focus,
 textarea:focus,
 select:focus {
-  border-color: var(--primary) !important;
+  border-color: var(--color-primary) !important;
   outline: none !important;
-  box-shadow: 0 0 0 1px var(--primary) !important;
+  box-shadow: 0 0 0 1px var(--color-primary) !important;
 }
 
 .form-checkbox,
 input[type="checkbox"] {
-  accent-color: var(--primary) !important;
+  accent-color: var(--color-primary) !important;
 }
 
 .form-error {
-  color: var(--error-color);
+  color: var(--color-error);
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
 
 .form-label {
-  color: var(--text-color);
+  color: var(--color-text);
 }
 
 /* アラート */
@@ -267,53 +239,53 @@ input[type="checkbox"] {
 }
 
 .alert-error {
-  background-color: rgb(var(--error-bg) / 0.2);
-  border-color: rgb(var(--error-border) / 0.5);
-  color: rgb(var(--error-text));
+  background-color: rgb(var(--color-error-dark) / 0.2);
+  border-color: rgb(var(--color-error-dark) / 0.5);
+  color: rgb(var(--color-error));
 }
 
 .success-alert {
-  background-color: rgb(var(--success-bg) / 0.2);
-  border-color: rgb(var(--success-border) / 0.5);
-  color: rgb(var(--success-text));
+  background-color: rgb(var(--color-success-dark) / 0.2);
+  border-color: rgb(var(--color-success-dark) / 0.5);
+  color: rgb(var(--color-success-dark));
 }
 
 /* テキスト色 */
 .text-hint {
-  color: var(--text-hint);
+  color: var(--color-text-muted);
 }
 
 .text-required {
-  color: var(--text-required);
+  color: var(--color-error);
 }
 
 /* リンク */
 .link-primary {
-  color: var(--link-primary);
+  color: var(--color-primary);
   text-decoration: none;
 }
 
 .link-primary:hover {
-  color: var(--link-primary-hover);
+  color: var(--color-primary-dark);
   text-decoration: underline;
 }
 
 /* アイコン */
 .logo-icon {
-  color: var(--primary-light);
+  color: var(--color-primary-light);
 }
 
 .icon-search {
-  color: var(--text-hint);
+  color: var(--color-text-muted);
 }
 
 .icon-search:hover {
-  color: var(--primary-light);
+  color: var(--color-primary-light);
 }
 
 /* ナビゲーション */
 .nav-link {
-  color: var(--text-color);
+  color: var(--color-text);
   position: relative;
 }
 
@@ -324,7 +296,7 @@ input[type="checkbox"] {
   height: 2px;
   bottom: -4px;
   left: 0;
-  background-color: var(--primary);
+  background-color: var(--color-primary);
   transition: width 0.3s ease;
 }
 
@@ -334,47 +306,47 @@ input[type="checkbox"] {
 
 /* ドロップダウン */
 .dropdown-menu {
-  background-color: var(--card-bg);
-  border: 1px solid var(--card-border);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-light);
 }
 
 .dropdown-item {
-  color: var(--text-color);
+  color: var(--color-text);
 }
 
 .dropdown-item:hover {
   background-color: rgba(139, 92, 246, 0.1);
-  color: var(--primary-light);
+  color: var(--color-primary-light);
 }
 
 .dropdown-divider {
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--color-border);
 }
 
 /* カード要素 */
 .card-accent {
-  background-image: linear-gradient(to right, var(--primary), var(--primary-light));
+  background-image: linear-gradient(to right, var(--color-primary), var(--color-primary-light));
 }
 
 .card-title {
-  color: var(--heading-color);
+  color: var(--color-heading);
 }
 
 .card-description {
-  color: var(--text-hint);
+  color: var(--color-text-muted);
 }
 
 .post-meta {
-  color: var(--text-hint);
+  color: var(--color-text-muted);
 }
 
 .author-name {
-  color: var(--text-color);
+  color: var(--color-text);
 }
 
 .avatar-placeholder {
   background-color: rgba(139, 92, 246, 0.3);
-  color: var(--text-color);
+  color: var(--color-text);
 }
 
 /* 特殊な入力フィールド */

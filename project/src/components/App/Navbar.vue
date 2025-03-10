@@ -329,7 +329,7 @@ function getInitials(name: string | undefined): string {
   left: 50%;
   width: 100%;
   height: 0;
-  background: radial-gradient(circle, var(--primary-light) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--color-primary-light) 0%, transparent 70%);
   opacity: 0;
   transform: translate(-50%, -50%);
   transition: height 0.5s ease, opacity 0.3s ease;

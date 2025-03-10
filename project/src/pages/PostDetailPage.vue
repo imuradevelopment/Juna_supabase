@@ -611,7 +611,7 @@ watch(() => route.params.id, (newId) => {
   height: 40px;
   border-radius: 50%;
   border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--primary);
+  border-top-color: var(--color-primary);
   animation: spin 1s ease-in-out infinite;
 }
 

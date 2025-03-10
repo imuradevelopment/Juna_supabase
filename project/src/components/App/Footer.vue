@@ -73,7 +73,7 @@ const currentYear = computed(() => new Date().getFullYear());
 
 <style scoped>
 footer {
-  background-color: var(--bg-color);
+  background-color: var(--color-background);
   position: relative;
   z-index: 10;
 }
@@ -85,7 +85,7 @@ footer {
 }
 
 .footer-link:hover {
-  color: var(--primary-light); /* hover:text-primary-light */
+  color: var(--color-primary-light); /* hover:text-primary-light */
 }
 
 @media (max-width: 768px) {

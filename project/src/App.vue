@@ -124,7 +124,7 @@ onMounted(async () => {
 }
 
 .tech-dark-theme {
-  background-color: var(--bg-color);
+  background-color: var(--color-background);
   min-height: 100vh;
   position: relative;
 }
@@ -141,17 +141,17 @@ onMounted(async () => {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-color);
+  background: var(--color-background);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary-dark);
+  background: var(--color-primary-dark);
   border-radius: 6px;
-  border: 3px solid var(--bg-color);
+  border: 3px solid var(--color-background);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--primary);
+  background: var(--color-primary);
 }
 
 :root {
@@ -160,13 +160,13 @@ onMounted(async () => {
   --secondary-color: #64748b;
   --background-color: #f8fafc;
   --content-background: #ffffff;
-  --text-color: #1e293b;
-  --heading-color: #0f172a;
-  --border-color: #e2e8f0;
-  --success-color: #10b981;
-  --warning-color: #f59e0b;
-  --error-color: #ef4444;
-  --info-color: #3b82f6;
+  --color-text: #1e293b;
+  --color-heading: #0f172a;
+  --color-border: #e2e8f0;
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
 }
 
 * {
@@ -178,7 +178,7 @@ onMounted(async () => {
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  color: var(--text-color);
+  color: var(--color-text);
   background-color: var(--background-color);
   line-height: 1.5;
 }
@@ -201,7 +201,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: var(--heading-color);
+  color: var(--color-heading);
   margin-bottom: 1rem;
 }
 
