@@ -5,72 +5,61 @@ import HomePage from '../pages/HomePage.vue';
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // メインページ
     {
       path: '/',
       name: 'home',
       component: HomePage
     },
+    
+    // 投稿一覧・検索・カテゴリー（統合ページ）
+    {
+      path: '/posts',
+      name: 'posts',
+      component: () => import('../pages/PostsPage.vue')
+    },
+    
+    // 投稿詳細
+    {
+      path: '/posts/:id',
+      name: 'post',
+      component: () => import('../pages/PostDetailPage.vue')
+    },
+    
+    // 投稿作成・編集
+    {
+      path: '/editor',
+      name: 'editor',
+      component: () => import('../pages/PostEditorPage.vue'),
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/editor/:id',
+      name: 'editor-id',
+      component: () => import('../pages/PostEditorPage.vue'),
+      props: true,
+      meta: { requiresAuth: true }
+    },
+    
+    // 認証（統合ページで切り替え）
     {
       path: '/auth',
       name: 'auth',
       component: () => import('../pages/AuthPage.vue'),
       meta: { requiresGuest: true }
     },
+    
+    // ダッシュボード
     {
-      path: '/login',
-      redirect: to => {
-        return { path: '/auth', query: { ...to.query, mode: 'login' } };
-      }
-    },
-    {
-      path: '/register',
-      redirect: to => {
-        return { path: '/auth', query: { ...to.query, mode: 'register' } };
-      }
-    },
-    {
-      path: '/categories',
-      name: 'categories',
-      component: () => import('../pages/CategoriesPage.vue')
-    },
-    {
-      path: '/categories/:id',
-      name: 'category',
-      component: () => import('../pages/CategoryPage.vue')
-    },
-    {
-      path: '/posts',
-      name: 'posts',
-      component: () => import('../pages/PostsPage.vue')
-    },
-    {
-      path: '/posts/:id',
-      name: 'post-detail',
-      component: () => import('../pages/PostDetailPage.vue')
-    },
-    {
-      path: '/post/editor/:id?',
-      name: 'post-editor',
-      component: () => import('../pages/PostEditorPage.vue'),
-      props: route => ({
-        postId: route.params.id,
-        isEditMode: !!route.params.id
-      }),
+      path: '/dashboard',
+      name: 'dashboard',
+      component: () => import('../pages/DashboardPage.vue'),
       meta: { requiresAuth: true }
     },
+    
+    // プロフィール
     {
-      path: '/create-post',
-      redirect: { name: 'post-editor' }
-    },
-    {
-      path: '/posts/:id/edit',
-      redirect: to => ({ 
-        name: 'post-editor', 
-        params: { id: to.params.id }
-      })
-    },
-    {
-      path: '/profile/:id?',
+      path: '/profile/:id',
       name: 'profile',
       component: () => import('../pages/ProfilePage.vue')
     },
@@ -80,17 +69,8 @@ const router = createRouter({
       component: () => import('../pages/ProfileEditPage.vue'),
       meta: { requiresAuth: true }
     },
-    {
-      path: '/dashboard',
-      name: 'dashboard',
-      component: () => import('../pages/DashboardPage.vue'),
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/search',
-      name: 'search',
-      component: () => import('../pages/SearchPage.vue')
-    },
+    
+    // 404ページ
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
@@ -100,14 +80,12 @@ const router = createRouter({
 });
 
 // ナビゲーションガード
-router.beforeEach(async (to, _, next) => {
+router.beforeEach((to, _, next) => {
   const authStore = useAuthStore();
   
-  // 認証が必要なルートのチェック
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ path: '/auth', query: { redirect: to.fullPath } });
   } 
-  // ゲスト専用ルートのチェック
   else if (to.meta.requiresGuest && authStore.isAuthenticated) {
     next({ name: 'home' });
   } 

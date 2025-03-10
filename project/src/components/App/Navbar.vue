@@ -15,14 +15,12 @@
         <!-- メインナビゲーション -->
         <div class="hidden md:flex items-center space-x-6">
           <router-link to="/" class="nav-link text-base">ホーム</router-link>
-          <router-link to="/categories" class="nav-link text-base">カテゴリ</router-link>
           <router-link to="/posts" class="nav-link text-base">投稿一覧</router-link>
-          <router-link to="/search" class="nav-link text-base">検索</router-link>
           
           <!-- 認証済みユーザーのみ表示 - ドロップダウンにも同じリンクがあるので条件付けする -->
           <router-link 
             v-if="authStore.isAuthenticated && !isLargeScreen" 
-            to="/create-post" 
+            to="/editor" 
             class="nav-link text-base"
           >
             <span class="flex items-center">
@@ -36,12 +34,7 @@
 
         <!-- 右側のナビゲーション -->
         <div class="flex items-center space-x-4">
-          <!-- 検索ボタン -->
-          <router-link to="/search" class="p-2 rounded-full">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 icon-search transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </router-link>
+          <!-- 検索ボタンを削除 -->
           
           <!-- 認証済みの場合 -->
           <template v-if="authStore.isAuthenticated">
@@ -92,7 +85,7 @@
                 </router-link>
                 
                 <router-link 
-                  to="/create-post" 
+                  to="/editor" 
                   class="dropdown-item"
                   @click="dropdownOpen = false"
                 >
@@ -132,7 +125,7 @@
           <!-- 未認証の場合 - 統合認証ページへのリンク -->
           <template v-else>
             <router-link
-              to="/auth"
+              to="/auth?mode=login"
               class="btn-outline-primary px-4 py-1.5 rounded-full border-2 border-primary text-primary-light hover:bg-primary/10 transition-all"
             >
               ログイン
@@ -198,9 +191,7 @@
         
         <nav class="flex flex-col space-y-4">
           <router-link to="/" class="block py-2" @click="isMenuOpen = false">ホーム</router-link>
-          <router-link to="/categories" class="block py-2" @click="isMenuOpen = false">カテゴリ</router-link>
           <router-link to="/posts" class="block py-2" @click="isMenuOpen = false">投稿一覧</router-link>
-          <router-link to="/search" class="block py-2" @click="isMenuOpen = false">検索</router-link>
           
           <div class="border-t border-gray-800 my-2 pt-2">
             <template v-if="authStore.isAuthenticated">
@@ -216,14 +207,14 @@
                 </div>
                 <span>{{ authStore.displayName }}</span>
               </div>
-              <router-link to="/create-post" class="block py-2" @click="isMenuOpen = false">投稿作成</router-link>
+              <router-link to="/editor" class="block py-2" @click="isMenuOpen = false">投稿作成</router-link>
               <router-link to="/dashboard" class="block py-2" @click="isMenuOpen = false">ダッシュボード</router-link>
               <router-link :to="`/profile/${authStore.user?.id}`" class="block py-2" @click="isMenuOpen = false">プロフィール</router-link>
               <router-link to="/profile/edit" class="block py-2" @click="isMenuOpen = false">設定</router-link>
               <button @click="handleLogout" class="block w-full text-left py-2 text-red-400">ログアウト</button>
             </template>
             <template v-else>
-              <router-link to="/auth" class="block py-2" @click="isMenuOpen = false">ログイン</router-link>
+              <router-link to="/auth?mode=login" class="block py-2" @click="isMenuOpen = false">ログイン</router-link>
               <router-link to="/auth?mode=register" class="block py-2" @click="isMenuOpen = false">会員登録</router-link>
             </template>
           </div>
