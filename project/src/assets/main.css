@@ -5,46 +5,46 @@
 /* テーマ変数（20色に集約） */
 :root {
   /* メインカラー */
-  --color-primary: 167 139 250; /* 旧: --primary, --input-focus-border, --link-primary, --btn-primary-bg */
-  --color-primary-dark: 139 92 246; /* 旧: --primary-dark, --link-primary-hover, --btn-primary-hover */
-  --color-primary-light: 196 181 253; /* 旧: --primary-light */
+  --color-primary: 167 139 250;
+  --color-primary-dark: 139 92 246;
+  --color-primary-light: 196 181 253;
   
   /* 背景色 */
-  --color-background: 15 17 24; /* 旧: --bg-color */
-  --color-surface: 30 41 59; /* 旧: --dark-card, --input-bg, --card-bg */
-  --color-surface-variant: 31 41 65; /* 旧: --glass-bg */
-  --color-surface-accent: 45 55 72; /* 旧: --input-addon-bg */
+  --color-background: 15 17 24;
+  --color-surface: 30 41 59;
+  --color-surface-variant: 31 41 65;
+  --color-surface-accent: 45 55 72;
   
   /* テキスト色 */
-  --color-text: 241 245 249; /* 旧: --text-color, --input-text, --input-addon-text */
-  --color-heading: 248 250 252; /* 旧: --heading-color */
-  --color-text-muted: 148 163 184; /* 旧: --secondary-dark, --input-placeholder, --text-hint */
-  --color-text-white: 255 255 255; /* 旧: --btn-primary-text */
+  --color-text: 241 245 249;
+  --color-heading: 248 250 252;
+  --color-text-muted: 148 163 184;
+  --color-text-white: 255 255 255;
   
   /* ボーダー */
-  --color-border: 71 85 105; /* 旧: --border-color, --dark-border, --input-border */
-  --color-border-light: 76 85 101; /* 旧: --glass-border, --card-border */
+  --color-border: 71 85 105;
+  --color-border-light: 76 85 101;
   
   /* セカンダリカラー */
-  --color-secondary: 203 213 225; /* 旧: --secondary */
-  --color-secondary-light: 226 232 240; /* 旧: --secondary-light */
+  --color-secondary: 203 213 225;
+  --color-secondary-light: 226 232 240;
   
   /* ステータスカラー */
-  --color-error: 248 113 113; /* 旧: --error-color, --text-required, --error-text */
-  --color-error-dark: 239 68 68; /* 旧: --error-bg, --error-border */
-  --color-success: 74 222 128; /* 旧: --success-color */
-  --color-success-dark: 16 185 129; /* 旧: --success-bg, --success-border, --success-text */
-  --color-warning: 251 191 36; /* 旧: --warning-color */
-  --color-info: 56 189 248; /* 旧: --info-color */
+  --color-error: 248 113 113;
+  --color-error-dark: 239 68 68;
+  --color-success: 74 222 128;
+  --color-success-dark: 16 185 129;
+  --color-warning: 251 191 36;
+  --color-info: 56 189 248;
   
   /* アクセントカラー */
-  --color-accent1: 96 165 250; /* 旧: --accent1 */
-  --color-accent2: 244 114 182; /* 旧: --accent2 */
-  --color-accent3: 52 211 153; /* 旧: --accent3 */
+  --color-accent1: 96 165 250;
+  --color-accent2: 244 114 182;
+  --color-accent3: 52 211 153;
   
   /* シャドウ */
-  --shadow-glass: 0 4px 6px rgba(0, 0, 0, 0.3); /* 旧: --glass-shadow */
-  --shadow-card: 0 0 0; /* 旧: --card-shadow */
+  --shadow-glass: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 0 0;
 }
 
 /* リセット */
@@ -146,7 +146,7 @@ body {
 }
 
 .btn-secondary {
-  @apply bg-secondary text-white hover:bg-secondary-dark;
+  @apply bg-secondary text-white hover:bg-secondary/80;
 }
 
 .btn-ghost {

@@ -6,31 +6,31 @@
         :key="notification.id" 
         class="notification glass-card p-4 shadow-lg flex"
         :class="{
-          'bg-success-500 bg-opacity-10 border-success-500': notification.type === 'success',
-          'bg-error-500 bg-opacity-10 border-error-500': notification.type === 'error',
-          'bg-info-500 bg-opacity-10 border-info-500': notification.type === 'info',
-          'bg-warning-500 bg-opacity-10 border-warning-500': notification.type === 'warning'
+          'bg-[rgb(var(--color-success)/0.1)] border-[rgb(var(--color-success))]': notification.type === 'success',
+          'bg-[rgb(var(--color-error)/0.1)] border-[rgb(var(--color-error))]': notification.type === 'error',
+          'bg-[rgb(var(--color-info)/0.1)] border-[rgb(var(--color-info))]': notification.type === 'info',
+          'bg-[rgb(var(--color-warning)/0.1)] border-[rgb(var(--color-warning))]': notification.type === 'warning'
         }"
       >
         <!-- アイコン部分 -->
         <div class="mr-3">
           <!-- 成功アイコン -->
-          <svg v-if="notification.type === 'success'" class="h-6 w-6 text-success-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg v-if="notification.type === 'success'" class="h-6 w-6 text-[rgb(var(--color-success))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           
           <!-- エラーアイコン -->
-          <svg v-else-if="notification.type === 'error'" class="h-6 w-6 text-error-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg v-else-if="notification.type === 'error'" class="h-6 w-6 text-[rgb(var(--color-error))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           
           <!-- 情報アイコン -->
-          <svg v-else-if="notification.type === 'info'" class="h-6 w-6 text-info-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg v-else-if="notification.type === 'info'" class="h-6 w-6 text-[rgb(var(--color-info))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           
           <!-- 警告アイコン -->
-          <svg v-else class="h-6 w-6 text-warning-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg v-else class="h-6 w-6 text-[rgb(var(--color-warning))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
           </svg>
         </div>
