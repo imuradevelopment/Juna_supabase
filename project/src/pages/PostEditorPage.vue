@@ -4,19 +4,19 @@
       <h1 class="text-2xl font-bold mb-6">{{ isEditMode ? '投稿を編集' : '新しい投稿を作成' }}</h1>
       
       <!-- エラーメッセージ -->
-      <div v-if="formError" class="bg-red-900/30 border border-red-700 text-red-400 px-4 py-3 rounded mb-6">
+      <div v-if="formError" class="alert alert-error px-4 py-3 rounded mb-6">
         {{ formError }}
       </div>
       
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- タイトル -->
         <div>
-          <label for="title" class="block text-sm font-medium mb-1">タイトル <span class="text-red-500">*</span></label>
+          <label for="title" class="block text-sm font-medium mb-1">タイトル <span class="text-required">*</span></label>
           <input
             id="title"
             v-model="formData.title"
             type="text"
-            class="w-full px-4 py-2 rounded border border-gray-700 bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full px-4 py-2 rounded border !bg-surface !text-white focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="投稿のタイトル"
             required
           />
@@ -29,7 +29,7 @@
             id="excerpt"
             v-model="formData.excerpt"
             rows="3"
-            class="w-full px-4 py-2 rounded border border-gray-700 !bg-gray-800 !text-white focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full px-4 py-2 rounded border !bg-surface !text-white focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="投稿の短い説明（オプション）"
           ></textarea>
         </div>
@@ -39,7 +39,7 @@
           <label class="block text-sm font-medium mb-1">アイキャッチ画像</label>
           <div class="flex items-center space-x-4">
             <!-- 画像プレビュー -->
-            <div v-if="featuredImagePreview || formData.cover_image_path" class="relative w-32 h-24 bg-gray-700 rounded overflow-hidden">
+            <div v-if="featuredImagePreview || formData.cover_image_path" class="relative w-32 h-24 bg-surface-variant rounded overflow-hidden">
               <img 
                 :src="featuredImagePreview || getCoverImageUrl(formData.cover_image_path as string)" 
                 alt="プレビュー" 
@@ -48,7 +48,7 @@
               <button 
                 type="button"
                 @click="clearImage" 
-                class="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 focus:outline-none"
+                class="absolute top-1 right-1 bg-error text-white p-1 rounded-full hover:bg-error-dark focus:outline-none"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -87,7 +87,7 @@
         
         <!-- カテゴリー -->
         <div>
-          <label class="block text-sm font-medium mb-1">カテゴリー <span class="text-red-500">*</span></label>
+          <label class="block text-sm font-medium mb-1">カテゴリー <span class="text-required">*</span></label>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
             <div 
               v-for="category in availableCategories" 
@@ -99,14 +99,14 @@
                 :id="`category-${category.id}`" 
                 :value="category.id" 
                 v-model="formData.categories"
-                class="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                class="form-checkbox h-4 w-4 focus:ring-primary rounded"
               />
               <label :for="`category-${category.id}`" class="ml-2 block text-sm">
                 {{ category.name }}
               </label>
             </div>
           </div>
-          <p v-if="formData.categories.length === 0" class="text-red-500 text-xs mt-1">
+          <p v-if="formData.categories.length === 0" class="text-error text-xs mt-1">
             少なくとも1つのカテゴリーを選択してください
           </p>
         </div>
@@ -120,7 +120,7 @@
                 type="radio" 
                 v-model="formData.published" 
                 :value="true"
-                class="h-4 w-4 text-primary focus:ring-primary border-gray-300"
+                class="h-4 w-4 text-primary focus:ring-primary"
               />
               <span class="ml-2">公開</span>
             </label>
@@ -129,7 +129,7 @@
                 type="radio" 
                 v-model="formData.published" 
                 :value="false"
-                class="h-4 w-4 text-primary focus:ring-primary border-gray-300"
+                class="h-4 w-4 text-primary focus:ring-primary"
               />
               <span class="ml-2">下書き</span>
             </label>

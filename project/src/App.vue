@@ -2,8 +2,8 @@
   <div class="flex flex-col min-h-screen tech-dark-theme relative">
     <!-- 背景装飾 -->
     <div class="fixed inset-0 z-0 pointer-events-none">
-      <div class="absolute top-0 right-0 w-1/3 h-1/3 bg-primary/5 rounded-full filter blur-3xl"></div>
-      <div class="absolute bottom-0 left-0 w-1/2 h-1/2 bg-primary/5 rounded-full filter blur-3xl"></div>
+      <div class="absolute top-0 right-0 w-1/3 h-1/3 bg-primary/5 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 left-0 w-1/2 h-1/2 bg-primary/5 rounded-full blur-3xl"></div>
     </div>
     
     <Navbar />
@@ -18,12 +18,7 @@
     
     <Footer />
     
-    <!-- デバッグビューを追加 -->
-    <!-- <div v-if="isDevMode" class="fixed bottom-20 left-4 bg-gray-800 text-white p-2 z-50 rounded">
-      <button @click="clearAllNotifications">通知をクリア</button>
-    </div> -->
-    
-    <!-- 通知コンポーネントの disabled フラグを追加 -->
+    <!-- 通知コンポーネント -->
     <Notifications ref="notificationsRef" />
   </div>
 </template>
@@ -34,17 +29,9 @@ import { useAuthStore } from './stores/auth';
 import Navbar from './components/App/Navbar.vue';
 import Footer from './components/App/Footer.vue';
 import Notifications from './components/App/Notifications.vue';
-// 使用していないようなので削除
-// import Toast from './components/ui/Toast.vue';
 
 const authStore = useAuthStore();
 const notificationsRef = ref<any>(null);
-// const isDevMode = ref(process.env.NODE_ENV === 'development');
-
-// 削除: 不要なトースト関連の変数
-// const showToast = ref(false);
-// const toastMessage = ref('');
-// const toastType = ref<'success' | 'error' | 'info'>('info');
 
 // 通知を表示する機能
 function showNotification(type: 'success' | 'error' | 'info' | 'warning', title: string, message: string) {
@@ -60,30 +47,6 @@ function showNotification(type: 'success' | 'error' | 'info' | 'warning', title:
 // この関数をコンポーネントから使用できるようにする
 provide('showNotification', showNotification);
 
-// デバッグ用関数
-/*
-function clearAllNotifications() {
-  if (notificationsRef.value) {
-    const notifications = notificationsRef.value.notifications;
-    for (const notification of notifications) {
-      notificationsRef.value.removeNotification(notification.id);
-    }
-  }
-}
-*/
-
-// 修正: トースト表示関数もコメントアウト
-/*
-provide('showToast', (message: string, type: 'success' | 'error' | 'info' = 'info') => {
-  toastMessage.value = message;
-  toastType.value = type;
-  showToast.value = true;
-  setTimeout(() => {
-    showToast.value = false;
-  }, 3000);
-});
-*/
-
 // 初期化
 onMounted(async () => {
   // ログイン状態の確認
@@ -92,13 +55,12 @@ onMounted(async () => {
   // 通知コンポーネントの参照が解決されるまで待機
   await nextTick();
   
-  // 既存の通知をクリアする - より直接的なアプローチ
+  // 既存の通知をクリアする
   if (notificationsRef.value) {
     // clearAllNotificationsを直接使用
     if (typeof notificationsRef.value.clearAllNotifications === 'function') {
       notificationsRef.value.clearAllNotifications();
     } 
-    // 互換性コードは削除 - 旧バージョンのことは考慮不要とのこと
     else {
       console.warn('clearAllNotifications method not available');
     }
@@ -107,7 +69,7 @@ onMounted(async () => {
 </script>
 
 <style>
-/* 既存のスタイルに加えて、ページ遷移アニメーションを強化 */
+/* ページ遷移アニメーション */
 .page-enter-active,
 .page-leave-active {
   transition: opacity 0.4s ease, transform 0.4s ease;
@@ -124,49 +86,9 @@ onMounted(async () => {
 }
 
 .tech-dark-theme {
-  background-color: var(--color-background);
+  background-color: rgb(var(--color-background));
   min-height: 100vh;
   position: relative;
-}
-
-.container {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
-}
-
-/* スクロールバーのカスタマイズ */
-::-webkit-scrollbar {
-  width: 12px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--color-background);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-primary-dark);
-  border-radius: 6px;
-  border: 3px solid var(--color-background);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary);
-}
-
-:root {
-  --primary-color: #4f46e5;
-  --primary-hover: #4338ca;
-  --secondary-color: #64748b;
-  --background-color: #f8fafc;
-  --content-background: #ffffff;
-  --color-text: #1e293b;
-  --color-heading: #0f172a;
-  --color-border: #e2e8f0;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #3b82f6;
 }
 
 * {
@@ -176,10 +98,10 @@ onMounted(async () => {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+  font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  color: var(--color-text);
-  background-color: var(--background-color);
+  color: rgb(var(--color-text));
+  background-color: rgb(var(--color-background));
   line-height: 1.5;
 }
 
@@ -201,12 +123,12 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: var(--color-heading);
+  color: rgb(var(--color-heading));
   margin-bottom: 1rem;
 }
 
 a {
-  color: var(--primary-color);
+  color: rgb(var(--color-primary));
   text-decoration: none;
 }
 

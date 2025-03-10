@@ -112,14 +112,14 @@
             <div v-if="isOwnProfile" class="flex gap-3 justify-center md:justify-start mt-4">
               <router-link 
                 to="/profile/edit" 
-                class="btn btn-primary-outline px-4 py-2"
+                class="btn btn-primary px-4 py-2"
               >
                 プロフィールを編集
               </router-link>
               
               <router-link 
                 to="/dashboard" 
-                class="btn btn-secondary-outline px-4 py-2"
+                class="btn btn-secondary px-4 py-2"
               >
                 ダッシュボードを表示
               </router-link>
@@ -127,7 +127,7 @@
               <!-- 削除ボタンを追加 -->
               <button 
                 @click="showDeleteConfirmation = true" 
-                class="btn btn-danger-outline px-4 py-2"
+                class="px-4 py-2 rounded font-medium transition-all bg-red-500 text-white hover:bg-red-600"
               >
                 プロフィールを削除
               </button>
@@ -209,7 +209,7 @@
           
           <button 
             @click="deleteProfile" 
-            class="btn btn-danger px-4 py-2"
+            class="px-4 py-2 rounded font-medium transition-all bg-red-500 text-white hover:bg-red-600"
             :disabled="isDeleting"
           >
             <span v-if="isDeleting">削除中...</span>
@@ -534,23 +534,5 @@ async function deleteProfile() {
 /* ソーシャルボタン */
 .btn-social {
   @apply flex items-center justify-center px-4 py-2 rounded-lg transition-colors text-sm font-medium;
-}
-
-/* アウトラインボタン */
-.btn-primary-outline {
-  @apply rounded-lg border border-primary text-primary hover:bg-primary/10 transition-colors;
-}
-
-.btn-secondary-outline {
-  @apply rounded-lg border border-gray-500 text-gray-300 hover:bg-gray-700 transition-colors;
-}
-
-/* 危険操作用ボタン */
-.btn-danger-outline {
-  @apply rounded-lg border border-red-500 text-red-400 hover:bg-red-500/10 transition-colors;
-}
-
-.btn-danger {
-  @apply rounded-lg bg-red-500 text-white hover:bg-red-600 transition-colors;
 }
 </style> 

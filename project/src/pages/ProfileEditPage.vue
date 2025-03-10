@@ -4,12 +4,12 @@
       <h1 class="text-2xl font-bold mb-6">プロフィール設定</h1>
       
       <!-- エラーメッセージ -->
-      <div v-if="error" class="bg-red-900/30 border border-red-700 text-red-400 px-4 py-3 rounded mb-6">
+      <div v-if="error" class="alert alert-error px-4 py-3 rounded mb-6">
         {{ error }}
       </div>
       
       <!-- 成功メッセージ -->
-      <div v-if="successMessage" class="bg-green-900/30 border border-green-700 text-green-400 px-4 py-3 rounded mb-6">
+      <div v-if="successMessage" class="success-alert px-4 py-3 rounded mb-6">
         {{ successMessage }}
       </div>
       
@@ -42,7 +42,7 @@
                 v-if="avatarPreview || profileData.avatar_data" 
                 type="button" 
                 @click="removeAvatar"
-                class="mt-2 text-red-500 hover:text-red-600 text-sm flex items-center"
+                class="mt-2 text-error hover:text-error/80 text-sm flex items-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
@@ -53,7 +53,7 @@
             
             <!-- アップロードボタン -->
             <div class="flex flex-col">
-              <label class="btn btn-outline">
+              <label class="btn btn-secondary">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
@@ -66,20 +66,20 @@
                   ref="avatarInput"
                 />
               </label>
-              <p class="text-sm text-gray-400 mt-2">推奨サイズ: 200x200px (2MB以下)</p>
+              <p class="text-sm text-hint mt-2">推奨サイズ: 200x200px (2MB以下)</p>
             </div>
           </div>
         </div>
         
         <!-- 表示名 -->
         <div>
-          <label for="nickname" class="block text-sm font-medium mb-1">表示名 <span class="text-red-500">*</span></label>
+          <label for="nickname" class="block text-sm font-medium mb-1">表示名 <span class="text-required">*</span></label>
           <input 
             id="nickname" 
             v-model="profileData.nickname" 
             type="text" 
             required
-            class="w-full px-4 py-2 rounded border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full px-4 py-2 rounded form-input"
           />
         </div>
         
@@ -87,16 +87,16 @@
         <div>
           <label for="account_id" class="block text-sm font-medium mb-1">アカウントID</label>
           <div class="flex">
-            <span class="inline-flex items-center px-3 py-2 rounded-l border border-r-0 border-gray-300 bg-gray-100 text-gray-600">@</span>
+            <span class="inline-flex items-center px-3 py-2 rounded-l border border-r-0 input-addon">@</span>
             <input 
               id="account_id" 
               v-model="profileData.account_id" 
               type="text" 
-              class="flex-1 px-4 py-2 rounded-r border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary"
+              class="flex-1 px-4 py-2 rounded-r form-input"
               placeholder="account_id"
             />
           </div>
-          <p class="text-xs text-gray-400 mt-1">
+          <p class="text-xs text-hint mt-1">
             半角英数字とアンダースコアのみ使用可能です
           </p>
         </div>
@@ -107,7 +107,7 @@
           <textarea 
             id="bio" 
             v-model="profileData.bio" 
-            class="w-full px-4 py-2 rounded border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full px-4 py-2 rounded form-input"
             rows="3"
             placeholder="自己紹介を入力してください"
           ></textarea>
@@ -119,7 +119,7 @@
           <select 
             id="disability_type" 
             v-model="profileData.disability_type_id"
-            class="w-full px-4 py-2 rounded border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full px-4 py-2 rounded form-input"
           >
             <option value="">選択しない</option>
             <option v-for="type in disabilityTypes" :key="type.id" :value="type.id">
@@ -134,7 +134,7 @@
           <textarea 
             id="disability_description" 
             v-model="profileData.disability_description" 
-            class="w-full px-4 py-2 rounded border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full px-4 py-2 rounded form-input"
             rows="3"
             placeholder="お持ちの障害について、共有したい情報があればご記入ください"
           ></textarea>
@@ -392,14 +392,14 @@ function getAvatarUrl(path: string): string {
 :deep(input), 
 :deep(textarea), 
 :deep(select) {
-  background-color: #1e293b;
-  color: #f1f5f9;
-  border-color: #475569;
+  background-color: rgb(var(--color-surface));
+  color: rgb(var(--color-text));
+  border-color: rgb(var(--color-border));
 }
 
 :deep(.input-group-text),
 :deep(.inline-flex) {
-  background-color: #2d3748;
-  color: #f1f5f9;
+  background-color: rgb(var(--color-surface-accent));
+  color: rgb(var(--color-text));
 }
 </style> 

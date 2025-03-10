@@ -6,21 +6,21 @@
         :key="notification.id" 
         class="notification glass-card p-4 shadow-lg flex"
         :class="{
-          'bg-[rgb(var(--color-success)/0.1)] border-[rgb(var(--color-success))]': notification.type === 'success',
-          'bg-[rgb(var(--color-error)/0.1)] border-[rgb(var(--color-error))]': notification.type === 'error',
-          'bg-[rgb(var(--color-info)/0.1)] border-[rgb(var(--color-info))]': notification.type === 'info',
-          'bg-[rgb(var(--color-warning)/0.1)] border-[rgb(var(--color-warning))]': notification.type === 'warning'
+          'bg-[rgb(var(--color-success)/0.1)] border border-[rgb(var(--color-success))]': notification.type === 'success',
+          'bg-[rgb(var(--color-error)/0.1)] border border-[rgb(var(--color-error))]': notification.type === 'error',
+          'bg-[rgb(var(--color-info)/0.1)] border border-[rgb(var(--color-info))]': notification.type === 'info',
+          'bg-[rgb(var(--color-warning)/0.1)] border border-[rgb(var(--color-warning))]': notification.type === 'warning'
         }"
       >
         <!-- アイコン部分 -->
         <div class="mr-3">
           <!-- 成功アイコン -->
-          <svg v-if="notification.type === 'success'" class="h-6 w-6 text-[rgb(var(--color-success))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg v-if="notification.type === 'success'" class="h-6 w-6 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           
           <!-- エラーアイコン -->
-          <svg v-else-if="notification.type === 'error'" class="h-6 w-6 text-[rgb(var(--color-error))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg v-else-if="notification.type === 'error'" class="h-6 w-6 text-error" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           
@@ -44,7 +44,7 @@
         <!-- 閉じるボタン -->
         <button 
           @click="removeNotification(notification.id)" 
-          class="ml-4 text-gray-500 hover:text-gray-700 focus:outline-none"
+          class="ml-4 text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text))] focus:outline-none"
         >
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

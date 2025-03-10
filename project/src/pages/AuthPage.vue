@@ -177,7 +177,7 @@
                 v-model="registerData.agreeToTerms" 
                 type="checkbox" 
                 required
-                class="form-checkbox"
+                class="form-input"
               />
             </div>
             <label for="terms" class="form-label ml-2 text-sm">

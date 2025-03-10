@@ -14,7 +14,7 @@
         class="py-2 px-4 font-medium text-sm focus:outline-none"
         :class="activeLikeType === 'post' 
           ? 'border-b-2 border-primary text-primary' 
-          : 'text-gray-400 hover:text-gray-300'"
+          : 'text-text-muted hover:text-text'"
       >
         投稿のいいね
       </button>
@@ -23,7 +23,7 @@
         class="py-2 px-4 font-medium text-sm focus:outline-none"
         :class="activeLikeType === 'comment' 
           ? 'border-b-2 border-primary text-primary' 
-          : 'text-gray-400 hover:text-gray-300'"
+          : 'text-text-muted hover:text-text'"
       >
         コメントのいいね
       </button>
@@ -41,7 +41,7 @@
     <div v-else-if="activeLikeType === 'post'">
       <!-- いいねがない場合 -->
       <div v-if="postLikes.length === 0" class="glass-card p-8 text-center">
-        <p class="text-gray-400">
+        <p class="text-text-muted">
           まだいいねした投稿はありません
         </p>
       </div>
@@ -82,7 +82,7 @@
             <div class="flex justify-end mt-3 md:mt-0 md:ml-4">
               <button 
                 @click="confirmUnlikePost(like)" 
-                class="btn btn-sm btn-outline text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
+                class="px-3 py-1 rounded text-sm font-medium transition-all flex items-center text-error border border-error hover:bg-error hover:text-text-white"
               >
                 <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
@@ -98,7 +98,8 @@
           <div class="flex space-x-2">
             <button 
               @click="changePostPage(currentPostPage - 1)" 
-              class="btn btn-sm btn-outline"
+              class="px-3 py-1 rounded text-sm font-medium border transition-all"
+              :class="currentPostPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-text-white'"
               :disabled="currentPostPage === 1"
             >
               前へ
@@ -107,14 +108,15 @@
               v-for="page in getPostPageNumbers()" 
               :key="page"
               @click="changePostPage(page)" 
-              class="btn btn-sm" 
-              :class="page === currentPostPage ? 'btn-primary' : 'btn-outline'"
+              class="px-3 py-1 rounded text-sm font-medium transition-all" 
+              :class="page === currentPostPage ? 'bg-primary text-text-white' : 'border hover:bg-primary hover:text-text-white'"
             >
               {{ page }}
             </button>
             <button 
               @click="changePostPage(currentPostPage + 1)" 
-              class="btn btn-sm btn-outline"
+              class="px-3 py-1 rounded text-sm font-medium border transition-all"
+              :class="currentPostPage === totalPostPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-text-white'"
               :disabled="currentPostPage === totalPostPages"
             >
               次へ
@@ -128,7 +130,7 @@
     <div v-else-if="activeLikeType === 'comment'">
       <!-- いいねがない場合 -->
       <div v-if="commentLikes.length === 0" class="glass-card p-8 text-center">
-        <p class="text-gray-400">
+        <p class="text-text-muted">
           まだいいねしたコメントはありません
         </p>
       </div>
@@ -139,7 +141,7 @@
           <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div class="flex-1">
               <!-- コメント情報 -->
-              <div class="mb-2 p-3 bg-gray-800 rounded">
+              <div class="mb-2 p-3 bg-surface-variant rounded">
                 <p class="text-sm whitespace-pre-wrap">{{ like.comments[0]?.content || '不明なコメント' }}</p>
               </div>
               
@@ -176,7 +178,7 @@
             <div class="flex justify-end mt-3 md:mt-0 md:ml-4">
               <button 
                 @click="confirmUnlikeComment(like)" 
-                class="btn btn-sm btn-outline text-red-500 border-red-500 hover:bg-red-500 hover:text-white"
+                class="px-3 py-1 rounded text-sm font-medium transition-all flex items-center text-error border border-error hover:bg-error hover:text-text-white"
               >
                 <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
@@ -192,7 +194,8 @@
           <div class="flex space-x-2">
             <button 
               @click="changeCommentPage(currentCommentPage - 1)" 
-              class="btn btn-sm btn-outline"
+              class="px-3 py-1 rounded text-sm font-medium border transition-all"
+              :class="currentCommentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-text-white'"
               :disabled="currentCommentPage === 1"
             >
               前へ
@@ -201,14 +204,15 @@
               v-for="page in getCommentPageNumbers()" 
               :key="page"
               @click="changeCommentPage(page)" 
-              class="btn btn-sm" 
-              :class="page === currentCommentPage ? 'btn-primary' : 'btn-outline'"
+              class="px-3 py-1 rounded text-sm font-medium transition-all" 
+              :class="page === currentCommentPage ? 'bg-primary text-text-white' : 'border hover:bg-primary hover:text-text-white'"
             >
               {{ page }}
             </button>
             <button 
               @click="changeCommentPage(currentCommentPage + 1)" 
-              class="btn btn-sm btn-outline"
+              class="px-3 py-1 rounded text-sm font-medium border transition-all"
+              :class="currentCommentPage === totalCommentPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-primary hover:text-text-white'"
               :disabled="currentCommentPage === totalCommentPages"
             >
               次へ
@@ -222,14 +226,14 @@
     <div v-if="showUnlikeModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="glass-card p-6 max-w-md mx-auto">
         <h3 class="text-xl font-bold mb-4">いいねを解除しますか？</h3>
-        <p class="mb-6 text-gray-400">
+        <p class="mb-6 text-text-muted">
           {{ activeLikeType === 'post' ? 'この投稿' : 'このコメント' }}のいいねを解除しますか？
         </p>
         <div class="flex justify-end space-x-3">
           <button @click="showUnlikeModal = false" class="btn btn-ghost">キャンセル</button>
           <button 
             @click="unlikeItem" 
-            class="btn bg-red-500 hover:bg-red-600 text-white"
+            class="btn bg-error hover:bg-error-dark text-text-white"
             :disabled="unlikeSubmitting"
           >
             <svg v-if="unlikeSubmitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">

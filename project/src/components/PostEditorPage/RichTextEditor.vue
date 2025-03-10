@@ -184,13 +184,13 @@
       <div class="flex justify-end space-x-2">
         <button 
           @click="showLinkMenu = false"
-          class="px-2 py-1 text-xs rounded bg-gray-700 hover:bg-gray-600"
+          class="px-2 py-1 text-xs rounded bg-gray-800 hover:bg-gray-700"
         >
           キャンセル
         </button>
         <button 
           @click="removeLink"
-          class="px-2 py-1 text-xs rounded bg-red-900/30 text-red-400 hover:bg-red-900/50"
+          class="px-2 py-1 text-xs rounded bg-error/30 text-error hover:bg-error/50"
           :disabled="!editor?.isActive('link')"
         >
           リンク解除
@@ -434,7 +434,7 @@ function uploadImage(event: Event) {
 
 <style lang="postcss">
 .menu-button {
-  @apply p-1.5 rounded hover:bg-gray-700 text-gray-300;
+  @apply p-1.5 rounded hover:bg-gray-700 text-gray-400;
 }
 
 .menu-button.is-active {
@@ -453,7 +453,7 @@ function uploadImage(event: Event) {
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
-  color: #adb5bd;
+  color: rgb(var(--color-text-muted));
   pointer-events: none;
   height: 0;
 }
@@ -490,15 +490,15 @@ function uploadImage(event: Event) {
 }
 
 .ProseMirror blockquote {
-  border-left: 3px solid #e5e7eb;
+  border-left: 3px solid rgb(var(--color-border-light));
   padding-left: 1rem;
-  color: #6b7280;
+  color: rgb(var(--color-text-muted));
   margin: 1rem 0;
 }
 
 .ProseMirror hr {
   border: none;
-  border-top: 2px solid #e5e7eb;
+  border-top: 2px solid rgb(var(--color-border-light));
   margin: 1.5rem 0;
 }
 
@@ -510,7 +510,7 @@ function uploadImage(event: Event) {
 }
 
 .ProseMirror a {
-  color: #3b82f6;
+  color: rgb(var(--color-primary));
   text-decoration: underline;
 }
 </style> 
