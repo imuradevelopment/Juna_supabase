@@ -4,47 +4,47 @@
 
 /* テーマ変数（20色に集約） */
 :root {
-  /* メインカラー */
-  --color-primary: 167 139 250;
-  --color-primary-dark: 139 92 246;
-  --color-primary-light: 196 181 253;
+  /* メインカラー - アプリケーションの主要テーマカラー */
+  --color-primary: 167 139 250; /* ブランドの主要カラー、CTA要素に使用 */
+  --color-primary-dark: 139 92 246; /* ホバー状態やアクティブ状態に使用 */
+  --color-primary-light: 196 181 253; /* ハイライトやアクセント効果に使用 */
   
-  /* 背景色 */
-  --color-background: 15 17 24;
-  --color-surface: 30 41 59;
-  --color-surface-variant: 31 41 65;
-  --color-surface-accent: 45 55 72;
+  /* 背景色 - 階層構造を持つUI要素の背景 */
+  --color-background: 15 17 24; /* アプリケーション全体の基本背景色 */
+  --color-surface: 30 41 59; /* カードやモーダルなどのUI要素の背景 */
+  --color-surface-variant: 31 41 65; /* 表示階層の異なる表面要素に使用 */
+  --color-surface-accent: 45 55 72; /* 強調したいUI要素の背景として使用 */
   
-  /* テキスト色 */
-  --color-text: 241 245 249;
-  --color-heading: 248 250 252;
-  --color-text-muted: 148 163 184;
-  --color-text-white: 255 255 255;
+  /* テキスト色 - 読みやすさと階層構造を確保 */
+  --color-text: 241 245 249; /* 本文テキストの標準色 */
+  --color-heading: 248 250 252; /* 見出しテキストに使用（より明るい） */
+  --color-text-muted: 148 163 184; /* 補足情報や二次的なテキストに使用 */
+  --color-text-white: 255 255 255; /* コントラストの高い要素のテキストに使用 */
   
-  /* ボーダー */
-  --color-border: 71 85 105;
-  --color-border-light: 76 85 101;
+  /* ボーダー - 要素間の境界や区切りに使用 */
+  --color-border: 71 85 105; /* 標準的なボーダーライン */
+  --color-border-light: 76 85 101; /* より軽いエンファシスのボーダー */
   
-  /* セカンダリカラー */
-  --color-secondary: 203 213 225;
-  --color-secondary-light: 226 232 240;
+  /* セカンダリカラー - 補助的な要素に使用 */
+  --color-secondary: 203 213 225; /* 二次的なボタンや要素に使用 */
+  --color-secondary-light: 226 232 240; /* より明るい補助的要素に使用 */
   
-  /* ステータスカラー */
-  --color-error: 248 113 113;
-  --color-error-dark: 239 68 68;
-  --color-success: 74 222 128;
-  --color-success-dark: 16 185 129;
-  --color-warning: 251 191 36;
-  --color-info: 56 189 248;
+  /* ステータスカラー - 機能的な状態を表す色 */
+  --color-error: 248 113 113; /* エラー・警告用の赤 */
+  --color-error-dark: 239 68 68; /* エラーアクションや重要警告に使用 */
+  --color-success: 74 222 128; /* 成功・完了用の緑 */
+  --color-success-dark: 16 185 129; /* 成功アクションやポジティブな状態に使用 */
+  --color-warning: 251 191 36; /* 注意喚起用のオレンジ */
+  --color-info: 59 130 246; /* 情報表示用の青 - より鮮明な青に調整 */
   
-  /* アクセントカラー */
-  --color-accent1: 96 165 250;
-  --color-accent2: 244 114 182;
-  --color-accent3: 52 211 153;
+  /* アクセントカラー - UIの装飾や差別化のための色 */
+  --color-accent1: 125 211 252; /* 明るいシアン - infoと区別、装飾要素に使用 */
+  --color-accent2: 244 114 182; /* ピンク/マゼンタ - 特徴的な要素や強調に使用 */
+  --color-accent3: 14 165 233; /* 鮮やかな青 - アクション要素や特別なUIコンポーネントに使用 */
   
-  /* シャドウ */
-  --shadow-glass: 0 4px 6px rgba(0, 0, 0, 0.3);
-  --shadow-card: 0 0 0;
+  /* シャドウ - 要素の立体感と階層を表現 */
+  --shadow-glass: 0 4px 6px rgba(0, 0, 0, 0.3); /* グラスモーフィズム効果用のシャドウ */
+  --shadow-card: 0 0 0; /* カード要素用のシャドウベース（調整可能） */
 }
 
 /* リセット */
