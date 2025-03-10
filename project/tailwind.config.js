@@ -9,83 +9,81 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: 'rgba(167, 139, 250, 1)',
-          dark: 'rgba(139, 92, 246, 1)',
-          light: 'rgba(196, 181, 253, 1)'
+          DEFAULT: 'rgb(var(--primary) / <alpha-value>)',
+          dark: 'rgb(var(--primary-dark) / <alpha-value>)',
+          light: 'rgb(var(--primary-light) / <alpha-value>)'
         },
         secondary: {
-          DEFAULT: 'rgba(203, 213, 225, 1)',
-          dark: 'rgba(148, 163, 184, 1)',
-          light: 'rgba(226, 232, 240, 1)'
+          DEFAULT: 'rgb(var(--secondary) / <alpha-value>)',
+          dark: 'rgb(var(--secondary-dark) / <alpha-value>)',
+          light: 'rgb(var(--secondary-light) / <alpha-value>)'
         },
         dark: {
-          bg: 'rgba(15, 23, 42, 1)',
-          card: 'rgba(30, 41, 59, 1)',
-          border: 'rgba(71, 85, 105, 1)'
+          bg: 'rgb(var(--dark-bg) / <alpha-value>)',
+          card: 'rgb(var(--dark-card) / <alpha-value>)',
+          border: 'rgb(var(--dark-border) / <alpha-value>)'
         },
         glass: {
-          bg: 'rgba(31, 41, 65, 0.7)',
-          border: 'rgba(76, 85, 101, 0.6)'
+          bg: 'rgb(var(--glass-bg) / <alpha-value>)',
+          border: 'rgb(var(--glass-border) / <alpha-value>)'
         },
         input: {
-          bg: 'var(--input-bg)',
-          text: 'var(--input-text)',
-          border: 'var(--input-border)',
-          'focus-border': 'var(--input-focus-border)',
-          placeholder: 'var(--input-placeholder)',
+          bg: 'rgb(var(--input-bg) / <alpha-value>)',
+          text: 'rgb(var(--input-text) / <alpha-value>)',
+          border: 'rgb(var(--input-border) / <alpha-value>)',
+          'focus-border': 'rgb(var(--input-focus-border) / <alpha-value>)',
+          placeholder: 'rgb(var(--input-placeholder) / <alpha-value>)',
           addon: {
-            bg: 'var(--input-addon-bg)',
-            text: 'var(--input-addon-text)'
+            bg: 'rgb(var(--input-addon-bg) / <alpha-value>)',
+            text: 'rgb(var(--input-addon-text) / <alpha-value>)'
           }
         },
         error: {
-          bg: 'var(--error-bg)',
-          border: 'var(--error-border)',
-          text: 'var(--error-text)',
-          DEFAULT: 'var(--error-color)'
+          bg: 'rgb(var(--error-bg) / <alpha-value>)',
+          border: 'rgb(var(--error-border) / <alpha-value>)',
+          text: 'rgb(var(--error-text) / <alpha-value>)',
+          DEFAULT: 'rgb(var(--error-color) / <alpha-value>)'
         },
         success: {
-          bg: 'var(--success-bg)',
-          border: 'var(--success-border)',
-          text: 'var(--success-text)',
-          DEFAULT: 'var(--success-color)'
+          bg: 'rgb(var(--success-bg) / <alpha-value>)',
+          border: 'rgb(var(--success-border) / <alpha-value>)',
+          text: 'rgb(var(--success-text) / <alpha-value>)',
+          DEFAULT: 'rgb(var(--success-color) / <alpha-value>)'
         },
         warning: {
-          DEFAULT: 'var(--warning-color)'
+          DEFAULT: 'rgb(var(--warning-color) / <alpha-value>)'
         },
         info: {
-          DEFAULT: 'var(--info-color)'
+          DEFAULT: 'rgb(var(--info-color) / <alpha-value>)'
         },
         text: {
-          hint: 'var(--text-hint)',
-          required: 'var(--text-required)',
-          DEFAULT: 'var(--text-color)',
-          heading: 'var(--heading-color)'
+          hint: 'rgb(var(--text-hint) / <alpha-value>)',
+          required: 'rgb(var(--text-required) / <alpha-value>)',
+          DEFAULT: 'rgb(var(--text-color) / <alpha-value>)',
+          heading: 'rgb(var(--heading-color) / <alpha-value>)'
         },
         link: {
-          primary: 'var(--link-primary)',
-          'primary-hover': 'var(--link-primary-hover)'
+          primary: 'rgb(var(--link-primary) / <alpha-value>)',
+          'primary-hover': 'rgb(var(--link-primary-hover) / <alpha-value>)'
         },
         btn: {
-          'primary-bg': 'var(--btn-primary-bg)',
-          'primary-text': 'var(--btn-primary-text)',
-          'primary-hover': 'var(--btn-primary-hover)'
+          'primary-bg': 'rgb(var(--btn-primary-bg) / <alpha-value>)',
+          'primary-text': 'rgb(var(--btn-primary-text) / <alpha-value>)',
+          'primary-hover': 'rgb(var(--btn-primary-hover) / <alpha-value>)'
         },
         card: {
-          bg: 'var(--card-bg)',
-          border: 'var(--card-border)',
-          shadow: 'var(--card-shadow)'
+          bg: 'rgb(var(--card-bg) / <alpha-value>)',
+          border: 'rgb(var(--card-border) / <alpha-value>)',
+          shadow: 'rgb(var(--card-shadow) / <alpha-value>)'
         },
-        accent1: 'var(--accent1)',
-        accent2: 'var(--accent2)',
-        accent3: 'var(--accent3)',
-        'input-bg': 'var(--input-bg)',
-        'input-text': 'var(--input-text)',
-        'input-border': 'var(--input-border)',
-        'addon-bg': 'var(--input-addon-bg)',
-        'addon-text': 'var(--input-addon-text)',
-        'input-dark': 'rgba(30, 41, 59, 1)',
-        'input-light': 'rgba(241, 245, 249, 1)',
+        accent1: 'rgb(var(--accent1) / <alpha-value>)',
+        accent2: 'rgb(var(--accent2) / <alpha-value>)',
+        accent3: 'rgb(var(--accent3) / <alpha-value>)',
+        'input-dark': 'rgb(var(--input-bg) / <alpha-value>)',
+        'input-light': 'rgb(var(--input-text) / <alpha-value>)',
+        'input-border': 'rgb(var(--input-border) / <alpha-value>)',
+        'addon-bg': 'rgb(var(--input-addon-bg) / <alpha-value>)',
+        'addon-text': 'rgb(var(--input-addon-text) / <alpha-value>)',
       },
       backdropFilter: {
         'none': 'none',
@@ -94,20 +92,11 @@ export default {
       fontFamily: {
         sans: ['"Noto Sans JP"', 'sans-serif']
       },
-      backgroundColor: {
-        'input-dark': 'rgba(30, 41, 59, 1)',
-      },
-      textColor: {
-        'input-light': 'rgba(241, 245, 249, 1)',
-      },
-      borderColor: {
-        'input-border': 'rgba(71, 85, 105, 1)',
-      },
       boxShadow: {
         'glass': 'var(--glass-shadow)',
-        'card': '0 4px 6px var(--card-shadow)',
-        'glow': '0 0 15px rgba(139, 92, 246, 0.4)',
-        'glow-hover': '0 0 25px rgba(139, 92, 246, 0.6)'
+        'card': '0 4px 6px rgb(var(--card-shadow) / <alpha-value>)',
+        'glow': '0 0 15px rgb(var(--primary-dark) / 0.4)',
+        'glow-hover': '0 0 25px rgb(var(--primary-dark) / 0.6)'
       }
     }
   },

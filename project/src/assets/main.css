@@ -5,67 +5,74 @@
 /* テーマ変数 */
 :root {
   /* 基本カラー */
-  --bg-color: rgba(15, 17, 24, 1);
-  --text-color: rgba(241, 245, 249, 1);
-  --heading-color: rgba(248, 250, 252, 1);
-  --border-color: rgba(71, 85, 105, 1);
+  --bg-color: 15 17 24;
+  --text-color: 241 245 249;
+  --heading-color: 248 250 252;
+  --border-color: 71 85 105;
   
   /* プライマリカラー */
-  --primary: rgba(167, 139, 250, 1);
-  --primary-dark: rgba(139, 92, 246, 1);
-  --primary-light: rgba(196, 181, 253, 1);
-  --secondary: rgba(203, 213, 225, 1);
+  --primary: 167 139 250;
+  --primary-dark: 139 92 246;
+  --primary-light: 196 181 253;
+  --secondary: 203 213 225;
+  --secondary-dark: 148 163 184;
+  --secondary-light: 226 232 240;
   
-  /* ステータスカラー */
-  --error-color: rgba(248, 113, 113, 1);
-  --success-color: rgba(74, 222, 128, 1);
-  --warning-color: rgba(251, 191, 36, 1);
-  --info-color: rgba(56, 189, 248, 1);
-  
-  /* アクセントカラー */
-  --accent1: rgba(96, 165, 250, 1);
-  --accent2: rgba(244, 114, 182, 1);
-  --accent3: rgba(52, 211, 153, 1);
-  
-  /* 入力フィールド */
-  --input-bg: rgba(30, 41, 59, 1);
-  --input-text: rgba(241, 245, 249, 1);
-  --input-border: rgba(71, 85, 105, 1);
-  --input-focus-border: rgba(167, 139, 250, 1);
-  --input-placeholder: rgba(148, 163, 184, 1);
-  --input-addon-bg: rgba(45, 55, 72, 1);
-  --input-addon-text: rgba(241, 245, 249, 1);
-  
-  /* アラート */
-  --error-bg: rgba(239, 68, 68, 0.2);
-  --error-border: rgba(239, 68, 68, 0.5); 
-  --error-text: rgba(248, 113, 113, 1);
-  --success-bg: rgba(16, 185, 129, 0.2);
-  --success-border: rgba(16, 185, 129, 0.5);
-  --success-text: rgba(16, 185, 129, 1);
-  
-  /* テキスト */
-  --text-hint: rgba(148, 163, 184, 1);
-  --text-required: rgba(248, 113, 113, 1);
-  
-  /* リンク */
-  --link-primary: rgba(167, 139, 250, 1);
-  --link-primary-hover: rgba(139, 92, 246, 1);
-  
-  /* ボタン */
-  --btn-primary-bg: rgba(167, 139, 250, 1);
-  --btn-primary-text: rgba(255, 255, 255, 1);
-  --btn-primary-hover: rgba(139, 92, 246, 1);
-  
-  /* カード */
-  --card-bg: rgba(30, 41, 59, 0.8);
-  --card-border: rgba(76, 85, 101, 0.6);
-  --card-shadow: rgba(0, 0, 0, 0.3);
+  /* ダークテーマ色 */
+  --dark-bg: 15 23 42;
+  --dark-card: 30 41 59;
+  --dark-border: 71 85 105;
   
   /* グラス効果 */
-  --glass-bg: rgba(31, 41, 65, 0.7);
-  --glass-border: rgba(76, 85, 101, 0.6);
+  --glass-bg: 31 41 65;
+  --glass-border: 76 85 101;
   --glass-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  
+  /* ステータスカラー */
+  --error-color: 248 113 113;
+  --success-color: 74 222 128;
+  --warning-color: 251 191 36;
+  --info-color: 56 189 248;
+  
+  /* アクセントカラー */
+  --accent1: 96 165 250;
+  --accent2: 244 114 182;
+  --accent3: 52 211 153;
+  
+  /* 入力フィールド */
+  --input-bg: 30 41 59;
+  --input-text: 241 245 249;
+  --input-border: 71 85 105;
+  --input-focus-border: 167 139 250;
+  --input-placeholder: 148 163 184;
+  --input-addon-bg: 45 55 72;
+  --input-addon-text: 241 245 249;
+  
+  /* アラート */
+  --error-bg: 239 68 68;
+  --error-border: 239 68 68; 
+  --error-text: 248 113 113;
+  --success-bg: 16 185 129;
+  --success-border: 16 185 129;
+  --success-text: 16 185 129;
+  
+  /* テキスト */
+  --text-hint: 148 163 184;
+  --text-required: 248 113 113;
+  
+  /* リンク */
+  --link-primary: 167 139 250;
+  --link-primary-hover: 139 92 246;
+  
+  /* ボタン */
+  --btn-primary-bg: 167 139 250;
+  --btn-primary-text: 255 255 255;
+  --btn-primary-hover: 139 92 246;
+  
+  /* カード */
+  --card-bg: 30 41 59;
+  --card-border: 76 85 101;
+  --card-shadow: 0 0 0;
 }
 
 /* リセット */
@@ -95,14 +102,14 @@ html {
 
 body {
   @apply font-sans;
-  background-color: var(--bg-color);
-  color: var(--text-color);
+  background-color: rgb(var(--bg-color));
+  color: rgb(var(--text-color));
   transition: background-color 0.3s, color 0.3s;
   font-family: 'Noto Sans JP', sans-serif;
   background-image: radial-gradient(
     circle at 50% 0%, 
-    rgba(139, 92, 246, 0.07) 0%, 
-    rgba(30, 35, 48, 0) 50%
+    rgb(var(--primary-dark) / 0.07) 0%, 
+    rgb(30 35 48 / 0) 50%
   );
 }
 
@@ -129,17 +136,17 @@ body {
 
 /* グラスモーフィズム */
 .glass {
-  background: var(--glass-bg);
+  background: rgb(var(--glass-bg) / 0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid var(--glass-border);
+  border: 1px solid rgb(var(--glass-border) / 0.6);
   box-shadow: var(--glass-shadow);
 }
 
 .glass-card {
   @apply glass rounded-lg p-6;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
+  background: rgb(var(--card-bg) / 0.8);
+  border: 1px solid rgb(var(--card-border) / 0.6);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 
               0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
@@ -150,15 +157,15 @@ body {
 }
 
 .btn-primary {
-  background-color: var(--primary);
-  color: white;
-  box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background-color: rgb(var(--primary));
+  color: rgb(var(--btn-primary-text));
+  box-shadow: 0 0 15px rgb(var(--primary-dark) / 0.3);
+  border: 1px solid rgb(var(--primary-dark) / 0.3);
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-dark);
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  background-color: rgb(var(--primary-dark));
+  box-shadow: 0 0 20px rgb(var(--primary-dark) / 0.5);
 }
 
 .btn-primary:disabled {
@@ -260,9 +267,15 @@ input[type="checkbox"] {
 }
 
 .alert-error {
-  background-color: var(--error-bg);
-  border-color: var(--error-border);
-  color: var(--error-text);
+  background-color: rgb(var(--error-bg) / 0.2);
+  border-color: rgb(var(--error-border) / 0.5);
+  color: rgb(var(--error-text));
+}
+
+.success-alert {
+  background-color: rgb(var(--success-bg) / 0.2);
+  border-color: rgb(var(--success-border) / 0.5);
+  color: rgb(var(--success-text));
 }
 
 /* テキスト色 */
