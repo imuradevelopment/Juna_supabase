@@ -5,42 +5,42 @@
 /* theme.cssとreset.cssからの変数とスタイリングを統合 */
 :root {
   /* テーマカラーとスタイリング（theme.cssから） */
-  --bg-color: #0f1118;
-  --text-color: #f1f5f9;
-  --heading-color: #f8fafc;
-  --border-color: #475569;
+  --bg-color: rgba(15, 17, 24, 1);
+  --text-color: rgba(241, 245, 249, 1);
+  --heading-color: rgba(248, 250, 252, 1);
+  --border-color: rgba(71, 85, 105, 1);
   
   /* フォーム要素カラー */
-  --input-bg: #1e293b;
-  --input-text: #f1f5f9;
-  --input-border: #475569;
-  --input-focus-border: #a78bfa;
-  --input-placeholder: #94a3b8;
+  --input-bg: rgba(30, 41, 59, 1);
+  --input-text: rgba(241, 245, 249, 1);
+  --input-border: rgba(71, 85, 105, 1);
+  --input-focus-border: rgba(167, 139, 250, 1);
+  --input-placeholder: rgba(148, 163, 184, 1);
   
   /* プレフィックス/サフィックス要素 */
-  --input-addon-bg: #2d3748;
-  --input-addon-text: #f1f5f9;
+  --input-addon-bg: rgba(45, 55, 72, 1);
+  --input-addon-text: rgba(241, 245, 249, 1);
   
   /* アラートカラー */
   --error-bg: rgba(239, 68, 68, 0.2);
   --error-border: rgba(239, 68, 68, 0.5); 
-  --error-text: #f87171;
+  --error-text: rgba(248, 113, 113, 1);
   --success-bg: rgba(16, 185, 129, 0.2);
   --success-border: rgba(16, 185, 129, 0.5);
-  --success-text: #10b981;
+  --success-text: rgba(16, 185, 129, 1);
   
   /* テキストカラー */
-  --text-hint: #94a3b8;
-  --text-required: #f87171;
+  --text-hint: rgba(148, 163, 184, 1);
+  --text-required: rgba(248, 113, 113, 1);
   
   /* リンクカラー */
-  --link-primary: #a78bfa;
-  --link-primary-hover: #8b5cf6;
+  --link-primary: rgba(167, 139, 250, 1);
+  --link-primary-hover: rgba(139, 92, 246, 1);
   
   /* ボタンカラー */
-  --btn-primary-bg: #a78bfa;
-  --btn-primary-text: #ffffff;
-  --btn-primary-hover: #8b5cf6;
+  --btn-primary-bg: rgba(167, 139, 250, 1);
+  --btn-primary-text: rgba(255, 255, 255, 1);
+  --btn-primary-hover: rgba(139, 92, 246, 1);
   
   /* カードカラー */
   --card-bg: rgba(30, 41, 59, 0.8);
@@ -48,38 +48,38 @@
   --card-shadow: rgba(0, 0, 0, 0.3);
   
   /* プライマリーカラー */
-  --primary: #a78bfa;
-  --primary-dark: #8b5cf6;
-  --primary-light: #c4b5fd;
+  --primary: rgba(167, 139, 250, 1);
+  --primary-dark: rgba(139, 92, 246, 1);
+  --primary-light: rgba(196, 181, 253, 1);
   
   /* テック系ダークテーマのカラー - コントラスト改善 */
-  --secondary: #cbd5e1;       /* より明るいグレーに変更 */
-  --error-color: #f87171;
-  --success-color: #4ade80;
-  --warning-color: #fbbf24;
-  --info-color: #38bdf8;      /* 明るい青 */
+  --secondary: rgba(203, 213, 225, 1);
+  --error-color: rgba(248, 113, 113, 1);
+  --success-color: rgba(74, 222, 128, 1);
+  --warning-color: rgba(251, 191, 36, 1);
+  --info-color: rgba(56, 189, 248, 1);
   
   /* アクセントカラー - コントラスト改善 */
-  --accent1: #60a5fa;         /* より明るいブルー */
-  --accent2: #f472b6;         /* より明るいピンク */
-  --accent3: #34d399;         /* ターコイズ */
+  --accent1: rgba(96, 165, 250, 1);
+  --accent2: rgba(244, 114, 182, 1);
+  --accent3: rgba(52, 211, 153, 1);
   
   /* ガラス効果 */
-  --glass-bg: rgba(31, 41, 65, 0.7); /* 不透明度を上げる */
-  --glass-border: rgba(76, 85, 101, 0.6); /* 境界線の可視性向上 */
-  --glass-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* 影を強くする */
+  --glass-bg: rgba(31, 41, 65, 0.7);
+  --glass-border: rgba(76, 85, 101, 0.6);
+  --glass-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 :root.dark {
-  --primary: #a78bfa;
-  --primary-dark: #8b5cf6;
-  --primary-light: #c4b5fd;
-  --secondary: #cbd5e1;
-  --bg-color: #0f172a;        /* 若干青みがかった暗い背景に変更 */
-  --card-bg: #1e293b;         /* カードの背景も明るめに */
-  --text-color: #f1f5f9;      /* テキストをより明るく */
-  --heading-color: #ffffff;   /* 見出しは純白に */
-  --border-color: #475569;    /* 境界線を明るく */
+  --primary: rgba(167, 139, 250, 1);
+  --primary-dark: rgba(139, 92, 246, 1);
+  --primary-light: rgba(196, 181, 253, 1);
+  --secondary: rgba(203, 213, 225, 1);
+  --bg-color: rgba(15, 23, 42, 1);
+  --card-bg: rgba(30, 41, 59, 1);
+  --text-color: rgba(241, 245, 249, 1);
+  --heading-color: rgba(255, 255, 255, 1);
+  --border-color: rgba(71, 85, 105, 1);
   --glass-bg: rgba(30, 41, 59, 0.7);
   --glass-border: rgba(71, 85, 105, 0.65);
   --glass-shadow: 0 4px 8px rgba(0, 0, 0, 0.25);

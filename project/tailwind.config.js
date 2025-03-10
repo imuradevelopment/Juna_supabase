@@ -9,24 +9,24 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#a78bfa',
-          dark: '#8b5cf6',
-          light: '#c4b5fd'
+          DEFAULT: 'rgba(167, 139, 250, 1)',
+          dark: 'rgba(139, 92, 246, 1)',
+          light: 'rgba(196, 181, 253, 1)'
         },
         secondary: {
-          DEFAULT: '#cbd5e1',
-          dark: '#94a3b8',
-          light: '#e2e8f0'
+          DEFAULT: 'rgba(203, 213, 225, 1)',
+          dark: 'rgba(148, 163, 184, 1)',
+          light: 'rgba(226, 232, 240, 1)'
         },
         dark: {
-          bg: '#0f172a',
-          card: '#1e293b',
-          border: '#475569'
+          bg: 'rgba(15, 23, 42, 1)',
+          card: 'rgba(30, 41, 59, 1)',
+          border: 'rgba(71, 85, 105, 1)'
         },
         light: {
-          bg: '#f8fafc',
-          card: '#ffffff',
-          border: '#e2e8f0'
+          bg: 'rgba(248, 250, 252, 1)',
+          card: 'rgba(255, 255, 255, 1)',
+          border: 'rgba(226, 232, 240, 1)'
         },
         glass: {
           bg: 'rgba(31, 41, 65, 0.7)',
@@ -89,8 +89,8 @@ export default {
         'input-border': 'var(--input-border)',
         'addon-bg': 'var(--input-addon-bg)',
         'addon-text': 'var(--input-addon-text)',
-        'input-dark': '#1e293b',
-        'input-light': '#f1f5f9',
+        'input-dark': 'rgba(30, 41, 59, 1)',
+        'input-light': 'rgba(241, 245, 249, 1)',
       },
       backdropFilter: {
         'none': 'none',
@@ -100,13 +100,13 @@ export default {
         sans: ['"Noto Sans JP"', 'sans-serif']
       },
       backgroundColor: {
-        'input-dark': '#1e293b',
+        'input-dark': 'rgba(30, 41, 59, 1)',
       },
       textColor: {
-        'input-light': '#f1f5f9',
+        'input-light': 'rgba(241, 245, 249, 1)',
       },
       borderColor: {
-        'input-border': '#475569',
+        'input-border': 'rgba(71, 85, 105, 1)',
       },
       boxShadow: {
         'glass': 'var(--glass-shadow)',
