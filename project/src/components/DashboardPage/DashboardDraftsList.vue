@@ -40,18 +40,18 @@
           
           <!-- アクションボタン -->
           <div class="flex space-x-2 mt-3 md:mt-0">
-            <router-link :to="`/posts/${draft.id}/edit`" class="btn btn-sm btn-outline">
+            <router-link :to="`/posts/${draft.id}/edit`" class="btn">
               編集
             </router-link>
             <button 
               @click="confirmPublish(draft)" 
-              class="btn btn-sm btn-primary"
+              class="btn btn-primary"
             >
               公開
             </button>
             <button 
               @click="confirmDelete(draft)" 
-              class="btn btn-sm btn-outline btn-error"
+              class="btn"
             >
               削除
             </button>
@@ -64,7 +64,7 @@
         <div class="flex space-x-2">
           <button 
             @click="changePage(currentPage - 1)" 
-            class="btn btn-sm btn-outline"
+            class="btn"
             :disabled="currentPage === 1"
           >
             前へ
@@ -73,14 +73,14 @@
             v-for="page in getPageNumbers()" 
             :key="page"
             @click="changePage(typeof page === 'number' ? page : currentPage)" 
-            class="btn btn-sm" 
-            :class="page === currentPage ? 'btn-primary' : 'btn-outline'"
+            class="btn" 
+            :class="page === currentPage ? 'btn-primary' : ''"
           >
             {{ page }}
           </button>
           <button 
             @click="changePage(currentPage + 1)" 
-            class="btn btn-sm btn-outline"
+            class="btn"
             :disabled="currentPage === totalPages"
           >
             次へ
@@ -95,10 +95,11 @@
         <h3 class="text-xl font-bold mb-4">下書きを削除しますか？</h3>
         <p class="mb-6 text-gray-400">この操作は取り消せません。本当にこの下書きを削除しますか？</p>
         <div class="flex justify-end space-x-3">
-          <button @click="showDeleteModal = false" class="btn btn-ghost">キャンセル</button>
+          <button @click="showDeleteModal = false" class="btn">キャンセル</button>
           <button 
             @click="deleteDraft" 
-            class="btn bg-red-500 hover:bg-red-600 text-white"
+            class="btn"
+            style="background-color: rgb(var(--color-error)); color: rgb(var(--color-text-white));"
             :disabled="actionSubmitting"
           >
             <svg v-if="actionSubmitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
@@ -117,7 +118,7 @@
         <h3 class="text-xl font-bold mb-4">下書きを公開しますか？</h3>
         <p class="mb-6 text-gray-400">この下書きを公開すると、すべてのユーザーが閲覧できるようになります。</p>
         <div class="flex justify-end space-x-3">
-          <button @click="showPublishModal = false" class="btn btn-ghost">キャンセル</button>
+          <button @click="showPublishModal = false" class="btn">キャンセル</button>
           <button 
             @click="publishDraft" 
             class="btn btn-primary"

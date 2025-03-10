@@ -15,7 +15,7 @@
         <div class="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
           <router-link 
             to="/create-post"
-            class="btn-primary-gradient px-8 py-3 rounded-full text-white font-medium inline-flex items-center justify-center shadow-lg"
+            class="btn btn-primary px-8 py-3 rounded-full text-white font-medium inline-flex items-center justify-center shadow-lg"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -25,7 +25,7 @@
           
           <router-link 
             to="/about"
-            class="btn-secondary-outline px-8 py-3 rounded-full font-medium inline-flex items-center justify-center"
+            class="btn btn-ghost px-8 py-3 rounded-full font-medium inline-flex items-center justify-center border border-primary"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -349,7 +349,7 @@ async function fetchCategories() {
 }
 
 .hero-title {
-  color: var(--color-primary-light);
+  color: rgb(var(--color-primary-light));
   text-shadow: 0 0 20px rgba(196, 181, 253, 0.6);
   animation: fadeInUp 1s ease-out;
 }
@@ -391,40 +391,32 @@ async function fetchCategories() {
 }
 
 /* プライマリボタンのスタイル改善 */
-.btn-primary-gradient {
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.btn.btn-primary {
+  background: linear-gradient(135deg, rgb(var(--color-primary)), rgb(var(--color-primary-dark)));
+  box-shadow: 0 0 15px rgb(var(--color-primary-dark) / 0.3);
+  animation: pulse 3s infinite ease-in-out;
 }
 
-.btn-primary-gradient:hover {
-  background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary-dark) 100%);
-  box-shadow: 0 10px 20px -10px var(--color-primary-dark);
+.btn.btn-primary:hover {
+  background: rgb(var(--color-primary-dark));
+  box-shadow: 0 0 20px rgb(var(--color-primary-dark) / 0.5);
 }
 
 /* セカンダリボタンもプライマリカラーを使ったスタイルに変更 */
-.btn-secondary-outline {
-  border: 2px solid var(--color-primary); 
-  color: var(--color-primary-light);
+.btn.btn-ghost {
+  color: rgb(var(--color-primary-light));
   background-color: rgba(139, 92, 246, 0.08);
-  transition: all 0.3s ease;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.btn-secondary-outline:hover {
+.btn.btn-ghost:hover {
   background-color: rgba(139, 92, 246, 0.15);
-  border-color: var(--color-primary-light);
   box-shadow: 0 0 15px rgba(196, 181, 253, 0.3);
 }
 
 /* レスポンシブ対応とアニメーション */
 @media (max-width: 640px) {
-  .btn-primary-gradient, 
-  .btn-secondary-outline {
+  .btn.btn-primary, 
+  .btn.btn-ghost {
     width: 100%; /* モバイルでは幅いっぱい */
   }
 }
@@ -435,13 +427,8 @@ async function fetchCategories() {
   100% { transform: scale(1); }
 }
 
-/* カテゴリーカードのスタイル（追加） */
+/* カテゴリーカードのスタイル */
 .category-card {
   border-radius: 0.75rem;
-}
-
-/* 主要なCTAボタンに注目を集めるための控えめなアニメーション */
-.btn-primary-gradient {
-  animation: pulse 3s infinite ease-in-out;
 }
 </style> 

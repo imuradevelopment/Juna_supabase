@@ -248,7 +248,7 @@
             </button>
             <button 
               @click="deletePost" 
-              class="btn btn-danger"
+              class="btn btn-primary bg-error text-white hover:bg-error/90"
               :disabled="deleteSubmitting"
             >
               {{ deleteSubmitting ? '削除中...' : '削除する' }}
@@ -591,7 +591,7 @@ watch(() => route.params.id, (newId) => {
 }
 
 .delete-btn {
-  @apply hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/30;
+  @apply hover:bg-error/10 hover:text-error hover:border-error/30;
 }
 
 /* ソーシャルボタン */
@@ -611,7 +611,7 @@ watch(() => route.params.id, (newId) => {
   height: 40px;
   border-radius: 50%;
   border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top-color: var(--color-primary);
+  border-top-color: rgb(var(--color-primary));
   animation: spin 1s ease-in-out infinite;
 }
 
@@ -619,77 +619,59 @@ watch(() => route.params.id, (newId) => {
   to { transform: rotate(360deg); }
 }
 
-/* コメントフォーム関連のスタイル */
+/* コメントフォーム関連のスタイル - ダークモード対応修正 */
 .comment-form-wrapper :deep(.comment-form) {
   @apply transition-all duration-300 shadow-sm hover:shadow rounded-lg overflow-hidden;
   max-width: 100%;
-}
-
-/* ダークモード用に別のセレクタを定義 */
-:global(.dark) .comment-form-wrapper :deep(.comment-form) {
-  @apply bg-gray-900/90;
+  background-color: rgb(var(--color-surface));
 }
 
 .comment-form-wrapper :deep(.comment-form textarea) {
-  @apply transition-all duration-200 focus:shadow-inner bg-white
-    text-gray-800 border-gray-200
-    focus:ring-2 focus:ring-primary/30;
-}
-
-/* ダークモード用に別のセレクタを定義 */
-:global(.dark) .comment-form-wrapper :deep(.comment-form textarea) {
-  @apply bg-gray-900 text-gray-50 border-gray-800 focus:ring-primary-light/30;
+  @apply transition-all duration-200 focus:shadow-inner 
+    focus:ring-2;
+  background-color: rgb(var(--color-surface));
+  color: rgb(var(--color-text));
+  border-color: rgb(var(--color-border));
 }
 
 .comment-form-wrapper :deep(.comment-form .submit-button) {
-  @apply transition-transform duration-200 bg-primary text-white
-    hover:bg-primary-dark;
+  @apply transition-transform duration-200;
+  background-color: rgb(var(--color-primary));
+  color: rgb(var(--color-text-white));
 }
 
-/* ダークモード用に別のセレクタを定義 */
-:global(.dark) .comment-form-wrapper :deep(.comment-form .submit-button) {
-  @apply bg-primary-dark hover:bg-primary/90;
+.comment-form-wrapper :deep(.comment-form .submit-button:hover) {
+  background-color: rgb(var(--color-primary-dark));
 }
 
 /* 記事本文のスタイル強化 - 修正版 */
 .prose-container :deep(h2) {
-  @apply text-xl font-bold mt-6 mb-4 pb-2 border-b border-gray-200;
-}
-
-:global(.dark) .prose-container :deep(h2) {
-  @apply border-gray-700;
+  @apply text-xl font-bold mt-6 mb-4 pb-2;
+  border-bottom: 1px solid rgb(var(--color-border-light));
 }
 
 .prose-container :deep(a) {
-  @apply text-primary hover:underline;
+  color: rgb(var(--color-primary));
 }
 
-:global(.dark) .prose-container :deep(a) {
-  @apply text-primary-light;
+.prose-container :deep(a:hover) {
+  @apply underline;
 }
 
 .prose-container :deep(blockquote) {
-  @apply pl-4 border-l-4 border-primary italic my-4 text-gray-700;
-}
-
-:global(.dark) .prose-container :deep(blockquote) {
-  @apply text-gray-300;
+  @apply pl-4 italic my-4;
+  border-left: 4px solid rgb(var(--color-primary));
+  color: rgb(var(--color-text-muted));
 }
 
 .prose-container :deep(pre) {
-  @apply bg-gray-100 p-4 rounded-lg overflow-x-auto my-4;
-}
-
-:global(.dark) .prose-container :deep(pre) {
-  @apply bg-gray-800;
+  @apply p-4 rounded-lg overflow-x-auto my-4;
+  background-color: rgb(var(--color-surface-variant));
 }
 
 .prose-container :deep(code) {
-  @apply bg-gray-100 px-1.5 py-0.5 rounded text-sm font-mono;
-}
-
-:global(.dark) .prose-container :deep(code) {
-  @apply bg-gray-800;
+  @apply px-1.5 py-0.5 rounded text-sm font-mono;
+  background-color: rgb(var(--color-surface-variant));
 }
 
 /* アニメーション */
@@ -724,35 +706,15 @@ watch(() => route.params.id, (newId) => {
   }
 }
 
-/* スタイルを追加 */
+/* カード・コメントフォームのスタイル修正 */
 .glass-card {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgb(var(--color-surface) / 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgb(var(--color-border-light) / 0.6);
+  box-shadow: var(--shadow-glass);
 }
 
-@media (prefers-color-scheme: dark) {
-  .glass-card {
-    background-color: #1a1e2d !important;
-  }
-  
-  .comment-form-wrapper, 
-  .comment-form-wrapper .comment-form,
-  .comment-form-wrapper + div {
-    background-color: #1a1e2d !important;
-  }
-}
-
-.dark .glass-card {
-  background-color: #1a1e2d !important;
-}
-
-/* コメントフォームのスタイル強化（修正版） */
 .comment-form-wrapper {
-  background-color: #1a1e2d !important;
-}
-
-.dark .comment-form-wrapper :deep(.comment-form),
-.dark .comment-form-wrapper + div {
-  background-color: #1a1e2d !important;
-  border-color: #2d3748 !important;
+  background-color: rgb(var(--color-surface)) !important;
 }
 </style> 

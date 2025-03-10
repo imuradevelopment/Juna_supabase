@@ -60,13 +60,13 @@
           <div class="flex justify-end space-x-2 mt-3">
             <button 
               @click="confirmEditComment(comment)" 
-              class="btn btn-sm btn-outline"
+              class="btn"
             >
               編集
             </button>
             <button 
               @click="confirmDeleteComment(comment)" 
-              class="btn btn-sm btn-danger"
+              class="btn"
             >
               削除
             </button>
@@ -79,7 +79,7 @@
         <div class="flex space-x-2">
           <button 
             @click="changePage(currentPage - 1)" 
-            class="btn btn-sm btn-outline"
+            class="btn"
             :disabled="currentPage === 1"
           >
             前へ
@@ -88,14 +88,14 @@
             v-for="page in getPageNumbers()" 
             :key="page"
             @click="changePage(typeof page === 'number' ? page : currentPage)" 
-            class="btn btn-sm" 
-            :class="page === currentPage ? 'btn-primary' : 'btn-outline'"
+            class="btn" 
+            :class="page === currentPage ? 'btn-primary' : ''"
           >
             {{ page }}
           </button>
           <button 
             @click="changePage(currentPage + 1)" 
-            class="btn btn-sm btn-outline"
+            class="btn"
             :disabled="currentPage === totalPages"
           >
             次へ
@@ -139,7 +139,7 @@
           <button @click="showDeleteModal = false" class="btn btn-ghost">キャンセル</button>
           <button 
             @click="deleteComment" 
-            class="btn bg-red-500 hover:bg-red-600 text-white"
+            class="btn btn-primary"
             :disabled="actionSubmitting"
           >
             <svg v-if="actionSubmitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">

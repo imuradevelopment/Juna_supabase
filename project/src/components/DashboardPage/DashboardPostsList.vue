@@ -2,7 +2,7 @@
   <div class="dashboard-posts-list">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">投稿管理</h2>
-      <div class="text-sm text-gray-400">
+      <div class="text-sm text-hint">
         全 {{ totalPosts }} 件
       </div>
     </div>
@@ -17,7 +17,7 @@
     
     <!-- 投稿がない場合 -->
     <div v-else-if="posts.length === 0" class="glass-card p-8 text-center">
-      <p class="text-gray-400 mb-4">
+      <p class="text-hint mb-4">
         まだ投稿はありません
       </p>
       <router-link to="/create-post" class="btn btn-primary">
@@ -36,14 +36,14 @@
               </router-link>
             </h3>
             <div class="badge-container">
-              <div class="badge badge-primary">
+              <div class="px-2 py-1 text-xs rounded-full bg-primary text-white inline-flex">
                 {{ post.published ? '公開中' : '下書き' }}
               </div>
               <div class="ml-2">
                 <span class="text-sm">{{ formatDate(post.updated_at || post.created_at) }}</span>
               </div>
             </div>
-            <p class="text-sm text-gray-400 mb-2">
+            <p class="text-sm text-hint mb-2">
               {{ formatDate(post.created_at) }} · {{ post.views || 0 }} 閲覧
             </p>
             <div class="flex flex-wrap gap-1 mb-2">
@@ -60,12 +60,12 @@
           
           <!-- アクションボタン -->
           <div class="flex space-x-2 mt-3 md:mt-0">
-            <router-link :to="`/posts/${post.id}/edit`" class="btn btn-sm btn-outline">
+            <router-link :to="`/posts/${post.id}/edit`" class="btn px-3 py-1 text-sm bg-transparent text-primary hover:bg-primary hover:bg-opacity-10">
               編集
             </router-link>
             <button 
               @click="confirmDeletePost(post)" 
-              class="btn btn-sm btn-outline btn-error"
+              class="btn px-3 py-1 text-sm bg-transparent text-error hover:bg-error hover:bg-opacity-10"
             >
               削除
             </button>
@@ -78,7 +78,7 @@
         <div class="flex space-x-2">
           <button 
             @click="changePage(currentPage - 1)" 
-            class="btn btn-sm btn-outline"
+            class="btn px-3 py-1 text-sm bg-transparent text-primary hover:bg-primary hover:bg-opacity-10"
             :disabled="currentPage === 1"
           >
             前へ
@@ -87,14 +87,14 @@
             v-for="page in getPageNumbers()" 
             :key="page"
             @click="changePage(page)" 
-            class="btn btn-sm" 
-            :class="page === currentPage ? 'btn-primary' : 'btn-outline'"
+            class="btn px-3 py-1 text-sm" 
+            :class="page === currentPage ? 'btn-primary' : 'bg-transparent text-primary hover:bg-primary hover:bg-opacity-10'"
           >
             {{ page }}
           </button>
           <button 
             @click="changePage(currentPage + 1)" 
-            class="btn btn-sm btn-outline"
+            class="btn px-3 py-1 text-sm bg-transparent text-primary hover:bg-primary hover:bg-opacity-10"
             :disabled="currentPage === totalPages"
           >
             次へ
@@ -107,12 +107,12 @@
     <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="glass-card p-6 max-w-md mx-auto">
         <h3 class="text-xl font-bold mb-4">投稿を削除しますか？</h3>
-        <p class="mb-6 text-gray-400">この操作は取り消せません。本当にこの投稿を削除しますか？</p>
+        <p class="mb-6 text-hint">この操作は取り消せません。本当にこの投稿を削除しますか？</p>
         <div class="flex justify-end space-x-3">
           <button @click="showDeleteModal = false" class="btn btn-ghost">キャンセル</button>
           <button 
             @click="deletePost" 
-            class="btn bg-red-500 hover:bg-red-600 text-white"
+            class="btn bg-error text-white hover:bg-opacity-80"
             :disabled="deleteSubmitting"
           >
             <svg v-if="deleteSubmitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">

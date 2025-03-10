@@ -49,16 +49,18 @@
         <h3 
           :class="[
             layout === 'vertical' ? 'text-xl font-semibold mb-2 card-title' : 'text-lg font-semibold mb-2',
-            'line-clamp-2'
+            'overflow-hidden'
           ]"
+          :style="layout === 'vertical' ? {} : {'-webkit-line-clamp': 2, display: '-webkit-box', '-webkit-box-orient': 'vertical'}"
           v-if="post.title_highlight" 
           v-html="post.title_highlight"
         ></h3>
         <h3 
           :class="[
             layout === 'vertical' ? 'text-xl font-semibold mb-2 card-title' : 'text-lg font-semibold mb-2',
-            'line-clamp-2'
+            'overflow-hidden'
           ]"
+          :style="layout === 'vertical' ? {} : {'-webkit-line-clamp': 2, display: '-webkit-box', '-webkit-box-orient': 'vertical'}"
           v-else
         >{{ post.title }}</h3>
         
@@ -66,23 +68,25 @@
         <p 
           v-if="post.excerpt_highlight" 
           :class="[
-            layout === 'vertical' ? 'text-sm mb-4 card-description' : 'text-sm text-gray-400 mb-2',
-            'line-clamp-' + (layout === 'vertical' ? 3 : 2)
+            layout === 'vertical' ? 'text-sm mb-4 card-description' : 'text-sm text-text-muted mb-2',
+            'overflow-hidden'
           ]"
+          :style="{'-webkit-line-clamp': layout === 'vertical' ? 3 : 2, display: '-webkit-box', '-webkit-box-orient': 'vertical'}"
           v-html="post.excerpt_highlight"
         ></p>
         <p 
           v-else-if="post.excerpt" 
           :class="[
-            layout === 'vertical' ? 'text-sm mb-4 card-description' : 'text-sm text-gray-400 mb-2',
-            'line-clamp-' + (layout === 'vertical' ? 3 : 2)
+            layout === 'vertical' ? 'text-sm mb-4 card-description' : 'text-sm text-text-muted mb-2',
+            'overflow-hidden'
           ]"
+          :style="{'-webkit-line-clamp': layout === 'vertical' ? 3 : 2, display: '-webkit-box', '-webkit-box-orient': 'vertical'}"
         >
           {{ post.excerpt }}
         </p>
         
         <!-- フッター部分 -->
-        <div v-if="layout === 'vertical'" class="flex items-center mt-auto pt-3 border-t">
+        <div v-if="layout === 'vertical'" class="flex items-center mt-auto pt-3" style="border-top: 1px solid rgb(var(--color-border-light))">
           <!-- ユーザーアバター -->
           <div class="w-8 h-8 rounded-full avatar-container flex items-center justify-center mr-3 overflow-hidden">
             <img 
@@ -122,7 +126,7 @@
         </div>
         
         <!-- 横型レイアウト用フッター -->
-        <div v-else class="flex justify-between items-center text-xs text-gray-400">
+        <div v-else class="flex justify-between items-center text-xs text-text-muted">
           <div class="flex items-center">
             <span class="mr-3">{{ formatDate(post.published_at || post.created_at) }}</span>
             <span class="mr-1">{{ getUserName() }}</span>
@@ -250,7 +254,7 @@ function getAvatarUrl(path: string): string {
 }
 
 .card-accent {
-  background: linear-gradient(to right, var(--accent-color, theme('colors.indigo.500')), var(--accent-secondary, theme('colors.purple.500')));
+  background: linear-gradient(to right, rgb(var(--color-primary)), rgb(var(--color-primary-light)));
 }
 
 .image-placeholder {
@@ -258,8 +262,8 @@ function getAvatarUrl(path: string): string {
 }
 
 .avatar-placeholder {
-  background-color: rgba(128, 128, 128, 0.2);
-  color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(var(--color-surface-accent), 0.3);
+  color: rgb(var(--color-text));
   font-weight: bold;
 }
 

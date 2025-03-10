@@ -310,7 +310,7 @@
           </button>
           <button 
             @click="deleteComment" 
-            class="btn btn-danger"
+            class="btn bg-error text-white hover:bg-error/80"
             :disabled="deleteSubmitting"
           >
             {{ deleteSubmitting ? '削除中...' : '削除する' }}

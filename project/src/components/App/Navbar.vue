@@ -111,7 +111,7 @@
                 
                 <button 
                   @click="handleLogout" 
-                  class="dropdown-item text-red-400 hover:text-red-300"
+                  class="dropdown-item text-[rgb(var(--color-error))] hover:text-[rgb(var(--color-error-dark))]"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -126,13 +126,13 @@
           <template v-else>
             <router-link
               to="/auth?mode=login"
-              class="btn-outline-primary px-4 py-1.5 rounded-full border-2 border-primary text-primary-light hover:bg-primary/10 transition-all"
+              class="px-4 py-1.5 rounded-full border-2 border-primary text-primary-light hover:bg-primary/10 transition-all"
             >
               ログイン
             </router-link>
             <router-link
               to="/auth?mode=register"
-              class="hidden sm:block btn-primary gradient-bg px-4 py-1.5 rounded-full text-white shadow-sm shadow-primary/30 transition-all hover:shadow-md"
+              class="hidden sm:block btn-primary px-4 py-1.5 rounded-full text-[rgb(var(--color-text-white))] shadow-sm shadow-primary/30 transition-all hover:shadow-md"
             >
               会員登録
             </router-link>
@@ -173,16 +173,16 @@
     <!-- モバイルメニュー -->
     <div 
       v-if="isMenuOpen" 
-      class="md:hidden fixed inset-0 z-40 bg-black bg-opacity-80 backdrop-blur-sm"
+      class="md:hidden fixed inset-0 z-40 bg-[rgb(var(--color-background))] bg-opacity-80 backdrop-blur-sm"
       @click="isMenuOpen = false"
     >
       <div 
-        class="bg-gray-900 w-64 h-full p-5 transform transition-transform"
+        class="bg-[rgb(var(--color-surface))] w-64 h-full p-5 transform transition-transform"
         @click.stop
       >
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-xl font-bold">メニュー</h2>
-          <button @click="isMenuOpen = false" class="rounded-full p-1 hover:bg-gray-800">
+          <button @click="isMenuOpen = false" class="rounded-full p-1 hover:bg-[rgb(var(--color-surface-variant))]">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -193,7 +193,7 @@
           <router-link to="/" class="block py-2" @click="isMenuOpen = false">ホーム</router-link>
           <router-link to="/posts" class="block py-2" @click="isMenuOpen = false">投稿一覧</router-link>
           
-          <div class="border-t border-gray-800 my-2 pt-2">
+          <div class="border-t border-[rgb(var(--color-border))] my-2 pt-2">
             <template v-if="authStore.isAuthenticated">
               <div class="flex items-center py-2 mb-2">
                 <div class="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center text-white mr-3">
@@ -211,7 +211,7 @@
               <router-link to="/dashboard" class="block py-2" @click="isMenuOpen = false">ダッシュボード</router-link>
               <router-link :to="`/profile/${authStore.user?.id}`" class="block py-2" @click="isMenuOpen = false">プロフィール</router-link>
               <router-link to="/profile/edit" class="block py-2" @click="isMenuOpen = false">設定</router-link>
-              <button @click="handleLogout" class="block w-full text-left py-2 text-red-400">ログアウト</button>
+              <button @click="handleLogout" class="block w-full text-left py-2 text-[rgb(var(--color-error))]">ログアウト</button>
             </template>
             <template v-else>
               <router-link to="/auth?mode=login" class="block py-2" @click="isMenuOpen = false">ログイン</router-link>
@@ -329,7 +329,7 @@ function getInitials(name: string | undefined): string {
   left: 50%;
   width: 100%;
   height: 0;
-  background: radial-gradient(circle, var(--color-primary-light) 0%, transparent 70%);
+  background: radial-gradient(circle, rgb(var(--color-primary-light)) 0%, transparent 70%);
   opacity: 0;
   transform: translate(-50%, -50%);
   transition: height 0.5s ease, opacity 0.3s ease;
@@ -344,14 +344,14 @@ function getInitials(name: string | undefined): string {
 
 /* ドロップダウンメニューの視認性向上 */
 .dropdown-menu {
-  background-color: rgba(15, 17, 24, 0.95);
-  border: 1px solid rgba(75, 85, 99, 0.2);
+  background-color: rgba(var(--color-surface-variant), 0.95);
+  border: 1px solid rgba(var(--color-border-light), 0.2);
   backdrop-filter: blur(12px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .dropdown-item {
-  @apply flex items-center px-4 py-2.5 text-sm text-gray-300 hover:bg-primary/15 transition-colors duration-150;
+  @apply flex items-center px-4 py-2.5 text-sm text-[rgb(var(--color-text))] hover:bg-primary/15 transition-colors duration-150;
 }
 
 /* ドロップダウンアニメーション */

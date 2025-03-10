@@ -73,7 +73,7 @@
         
         <!-- フィルターリセットボタン -->
         <div class="w-full sm:w-auto mt-auto ml-auto">
-          <button @click="resetFilters" class="btn btn-outline btn-sm">
+          <button @click="resetFilters" class="btn btn-ghost btn-sm">
             フィルターをリセット
           </button>
         </div>
@@ -93,7 +93,7 @@
           </div>
           
           <!-- カテゴリーエラー -->
-          <div v-else-if="categoriesError" class="text-red-500 text-sm mb-2">
+          <div v-else-if="categoriesError" class="text-error text-sm mb-2">
             {{ categoriesError }}
             <button @click="fetchCategories" class="text-primary hover:underline ml-2">再試行</button>
           </div>
@@ -167,7 +167,7 @@
         </div>
         
         <!-- エラー表示 -->
-        <div v-else-if="error" class="glass-card p-4 text-red-500">
+        <div v-else-if="error" class="glass-card p-4 text-error">
           <p>{{ error }}</p>
           <button @click="refreshData" class="mt-2 btn btn-primary btn-sm">再試行</button>
         </div>
@@ -225,7 +225,7 @@
             <div class="flex space-x-2">
               <button 
                 @click="changePage(currentPage - 1)" 
-                class="btn btn-sm btn-outline"
+                class="btn btn-sm btn-secondary"
                 :disabled="currentPage === 1"
               >
                 前へ
@@ -236,14 +236,14 @@
                 :key="page"
                 @click="changePage(Number(page))"
                 class="btn btn-sm"
-                :class="currentPage === page ? 'btn-primary' : 'btn-outline'"
+                :class="currentPage === page ? 'btn-primary' : 'btn-secondary'"
               >
                 {{ page }}
               </button>
               
               <button 
                 @click="changePage(currentPage + 1)" 
-                class="btn btn-sm btn-outline"
+                class="btn btn-sm btn-secondary"
                 :disabled="currentPage === totalPages"
               >
                 次へ
@@ -775,7 +775,7 @@ function getPageNumbers(): (number | string)[] {
 <style scoped>
 .loader {
   border: 4px solid #f3f3f3;
-  border-top: 4px solid #3498db;
+  border-top: 4px solid rgb(var(--color-primary));
   border-radius: 50%;
   width: 32px;
   height: 32px;
@@ -809,5 +809,11 @@ select {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
+}
+
+/* ボタンのサイズバリエーション追加 */
+.btn-sm {
+  font-size: 0.875rem;
+  padding: 0.25rem 0.75rem;
 }
 </style> 

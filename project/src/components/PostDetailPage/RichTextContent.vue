@@ -1,5 +1,5 @@
 <template>
-  <div class="rich-text-content prose prose-invert prose-sm sm:prose-base lg:prose-lg xl:prose-xl max-w-none" v-html="content"></div>
+  <div class="rich-text-content max-w-none" v-html="content"></div>
 </template>
 
 <script setup lang="ts">
@@ -44,15 +44,70 @@ const content = computed(() => sanitizedContent.value);
 </script>
 
 <style>
+.rich-text-content {
+  /* proseの代わりに基本的なリッチテキスト用スタイルを追加 */
+  color: rgb(var(--color-text));
+  line-height: 1.75;
+  font-size: 1rem;
+}
+
+.rich-text-content h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  color: rgb(var(--color-heading));
+}
+
+.rich-text-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: rgb(var(--color-heading));
+}
+
+.rich-text-content h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: rgb(var(--color-heading));
+}
+
+.rich-text-content p {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.rich-text-content ul, .rich-text-content ol {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.rich-text-content ul {
+  list-style-type: disc;
+}
+
+.rich-text-content ol {
+  list-style-type: decimal;
+}
+
+.rich-text-content li {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
 .rich-text-content img {
   max-width: 100%;
-  border-radius: 0.5rem; /* rounded-lg */
+  border-radius: 0.5rem;
   margin-top: 1rem;
-  margin-bottom: 1rem; /* my-4 */
+  margin-bottom: 1rem;
 }
 
 .rich-text-content a {
-  color: var(--color-primary); /* text-primary */
+  color: rgb(var(--color-primary));
 }
 .rich-text-content a:hover {
   text-decoration: underline;
@@ -60,28 +115,30 @@ const content = computed(() => sanitizedContent.value);
 
 .rich-text-content blockquote {
   border-left-width: 4px;
-  border-left-color: var(--color-primary);
+  border-left-color: rgb(var(--color-primary));
   padding-left: 1rem;
   font-style: italic;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .rich-text-content code {
-  background-color: rgba(243, 244, 246, 1); /* bg-gray-100 */
+  background-color: rgb(var(--color-surface-variant));
   padding-left: 0.25rem;
   padding-right: 0.25rem;
   border-radius: 0.25rem;
-}
-.dark .rich-text-content code {
-  background-color: rgba(31, 41, 55, 1); /* bg-gray-800 */
+  font-family: monospace;
 }
 
 .rich-text-content pre {
-  background-color: rgba(243, 244, 246, 1); /* bg-gray-100 */
+  background-color: rgb(var(--color-surface-variant));
   padding: 1rem;
   border-radius: 0.25rem;
   overflow-x: auto;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  font-family: monospace;
 }
-.dark .rich-text-content pre {
-  background-color: rgba(31, 41, 55, 1); /* bg-gray-800 */
-}
+
+/* ダークモード固有のスタイルは不要（すでにダークテーマがデフォルト） */
 </style> 
