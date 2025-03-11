@@ -488,38 +488,6 @@ CREATE POLICY "自分の通知のみ削除可能"
   ON notifications FOR DELETE USING (auth.uid() = user_id);
 
 -- トリガー関数
-CREATE OR REPLACE FUNCTION update_profile_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION update_category_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION update_post_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION update_comment_updated_at()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.updated_at = NOW();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
 CREATE OR REPLACE FUNCTION link_post_images_on_post_create()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -666,15 +634,6 @@ FOR EACH ROW
 EXECUTE FUNCTION process_comment_deletion();
 
 -- ユーティリティ関数
-CREATE OR REPLACE FUNCTION increment_post_views(post_id UUID)
-RETURNS void AS $$
-BEGIN
-  UPDATE posts 
-  SET views = coalesce(views, 0) + 1 
-  WHERE id = post_id;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
 CREATE OR REPLACE FUNCTION search_posts(search_term TEXT)
 RETURNS SETOF posts AS $$
 BEGIN
@@ -704,41 +663,6 @@ BEGIN
     (SELECT COUNT(*) FROM post_categories pc2 
      WHERE pc2.post_id = p.id AND pc2.category_id IN (SELECT category_id FROM post_categories)) DESC,
     p.published_at DESC
-  LIMIT limit_count;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE OR REPLACE FUNCTION get_popular_posts(days_range INTEGER DEFAULT 30, limit_count INTEGER DEFAULT 10)
-RETURNS SETOF posts AS $$
-BEGIN
-  RETURN QUERY
-  SELECT p.*
-  FROM posts p
-  LEFT JOIN (
-    SELECT post_id, COUNT(*) AS like_count
-    FROM post_likes
-    WHERE created_at > NOW() - INTERVAL '1 day' * days_range
-    GROUP BY post_id
-  ) l ON p.id = l.post_id
-  WHERE p.published = true
-    AND p.published_at > NOW() - INTERVAL '1 day' * days_range
-  ORDER BY 
-    COALESCE(l.like_count, 0) * 10 + COALESCE(p.views, 0) DESC,
-    p.published_at DESC
-  LIMIT limit_count;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE OR REPLACE FUNCTION get_posts_by_disability_type(disability_type_id INTEGER, limit_count INTEGER DEFAULT 20)
-RETURNS SETOF posts AS $$
-BEGIN
-  RETURN QUERY
-  SELECT p.*
-  FROM posts p
-  JOIN profiles pr ON p.author_id = pr.id
-  WHERE p.published = true
-    AND pr.disability_type_id = get_posts_by_disability_type.disability_type_id
-  ORDER BY p.published_at DESC
   LIMIT limit_count;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
