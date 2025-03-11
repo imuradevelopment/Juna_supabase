@@ -181,15 +181,11 @@ interface Category {
   description: string | null;
 }
 
-// Propsの定義を更新
+// Propsの定義をルーターのパラメーター名と一致させる
 const props = defineProps({
-  postId: {
+  id: {  // postId から id に変更
     type: String,
     default: null
-  },
-  isEditMode: {
-    type: Boolean,
-    default: false
   }
 });
 
@@ -211,7 +207,7 @@ const featuredImageFile = ref<File | null>(null);
 const featuredImagePreview = ref<string | null>(null);
 const submitting = ref(false);
 const formError = ref('');
-const isEditMode = computed(() => !!props.postId);
+const isEditMode = computed(() => !!props.id);  // postId から id に変更
 const isFormValid = computed(() => {
   return formData.title.trim() !== '' && 
          (typeof formData.content === 'string' ? formData.content.trim() !== '' : true) &&
@@ -227,8 +223,8 @@ onMounted(async () => {
   await fetchCategories();
   
   // 編集モードの場合、既存の投稿を取得
-  if (props.postId) {
-    await fetchPost(props.postId);
+  if (props.id) {  // postId から id に変更
+    await fetchPost(props.id);  // postId から id に変更
   }
 });
 
@@ -270,7 +266,24 @@ async function fetchPost(postId: string) {
     // フォームに値を設定
     formData.title = post.title;
     formData.excerpt = post.excerpt;
-    formData.content = post.content;
+    
+    // content処理の修正 - JSONBデータを適切に処理
+    if (post.content) {
+      if (typeof post.content === 'object') {
+        // JSONBオブジェクトをHTMLに変換（tiptapが理解できる形式）
+        if (post.content.type === 'doc') {
+          // tiptapのJSONデータの場合はそのまま
+          formData.content = post.content;
+        } else if (post.content.text) {
+          // text属性がある場合（古い形式）
+          formData.content = post.content.text;
+        }
+      } else if (typeof post.content === 'string') {
+        // 文字列（HTML）の場合はそのまま
+        formData.content = post.content;
+      }
+    }
+    
     formData.cover_image_path = post.cover_image_path;
     formData.published = post.published;
     
@@ -311,9 +324,9 @@ async function handleSubmit() {
       const fileName = `${uuidv4()}.${fileExt}`;
       const filePath = `${userId}/${fileName}`;
       
-      // アップロード
+      // アップロード - バケット名を'post_images'から'cover_images'に修正
       const { error: uploadError } = await supabase.storage
-        .from('post_images')
+        .from('cover_images')  // 'post_images'から修正
         .upload(filePath, featuredImageFile.value);
       
       if (uploadError) throw uploadError;
@@ -323,9 +336,9 @@ async function handleSubmit() {
     }
     
     // 編集モードの場合は更新、そうでなければ新規作成
-    if (props.postId) {
+    if (props.id) {  // postId から id に変更
       await updatePost(formData);
-      router.push(`/posts/${props.postId}`);
+      router.push(`/posts/${props.id}`);  // postId から id に変更
     } else {
       const newPost = await createPost(formData);
       router.push(`/posts/${newPost.id}`);
@@ -487,7 +500,7 @@ async function updatePost(postData: any) {
         updated_at: new Date().toISOString(),
         last_edited_by: authStore.user!.id
       })
-      .eq('id', props.postId)
+      .eq('id', props.id)  // postId から id に変更
       .eq('author_id', authStore.user!.id);
     
     if (updateError) throw updateError;
@@ -495,7 +508,7 @@ async function updatePost(postData: any) {
     // アップロードされた新しい画像があれば、投稿IDと関連付ける
     if (uploadedImages.value.length > 0) {
       const postImagesData = uploadedImages.value.map((img) => ({
-        post_id: props.postId,
+        post_id: props.id,
         image_path: img.path,
         author_id: img.userId
       }));
@@ -513,14 +526,14 @@ async function updatePost(postData: any) {
     const { error: deleteError } = await supabase
       .from('post_categories')
       .delete()
-      .eq('post_id', props.postId);
+      .eq('post_id', props.id);
     
     if (deleteError) throw deleteError;
     
     // 新しいカテゴリ関連を追加
     if (formData.categories.length > 0) {
       const categoryRelations = formData.categories.map(categoryId => ({
-        post_id: props.postId,
+        post_id: props.id,
         category_id: parseInt(categoryId)
       }));
       

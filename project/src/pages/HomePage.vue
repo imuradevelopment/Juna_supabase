@@ -14,7 +14,7 @@
         <p class="text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed">経験を共有し、互いに学び、支え合うコミュニティへようこそ</p>
         <div class="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
           <router-link 
-            to="/create-post"
+            to="/editor"
             class="btn btn-primary px-8 py-3 rounded-full text-white font-medium inline-flex items-center justify-center shadow-lg"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -24,26 +24,105 @@
           </router-link>
           
           <router-link 
-            to="/about"
+            to="/posts"
             class="btn btn-ghost px-8 py-3 rounded-full font-medium inline-flex items-center justify-center border border-primary"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span class="inline-block align-middle">詳しく見る</span>
+            <span class="inline-block align-middle">投稿一覧</span>
           </router-link>
         </div>
       </div>
     </section>
 
-    <!-- フィーチャー投稿 - グリッドレイアウト改善 -->
+    <!-- Aboutセクション（新規追加） -->
+    <section class="mb-16">
+      <div class="section-header mb-8">
+        <h2 class="text-2xl md:text-3xl font-bold flex items-center">
+          <span class="inline-block w-2 h-6 bg-primary rounded-full mr-3"></span>
+          当サイトについて
+        </h2>
+      </div>
+      
+      <div class="glass-card p-6 md:p-8">
+        <div class="max-w-4xl mx-auto">
+          <p class="text-lg mb-6 leading-relaxed">
+            「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々の経験を共有し、
+            互いに支え合うためのコミュニティプラットフォームです。
+          </p>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 my-10">
+            <!-- 特徴1 -->
+            <div class="text-center">
+              <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold mb-2">経験の共有</h3>
+              <p>日常生活での工夫や対処法、成功体験や困難を乗り越えた経験を共有できます。</p>
+            </div>
+            
+            <!-- 特徴2 -->
+            <div class="text-center">
+              <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold mb-2">コミュニティ</h3>
+              <p>同じ障害や似た経験を持つ人とつながり、理解し合える関係を築けます。</p>
+            </div>
+            
+            <!-- 特徴3 -->
+            <div class="text-center">
+              <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h3 class="text-xl font-semibold mb-2">安心できる場所</h3>
+              <p>理解されにくい障害や症状について偏見なく話せる安全な環境を提供します。</p>
+            </div>
+          </div>
+          
+          <div class="bg-primary/10 p-6 rounded-lg border border-primary/20 mb-8">
+            <h3 class="text-xl font-semibold mb-3 text-primary-light">対象となる障害・症状</h3>
+            <ul class="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2">
+              <li class="flex items-center"><span class="w-2 h-2 bg-primary-light rounded-full mr-2"></span>発達障害（ASD、ADHD、LD等）</li>
+              <li class="flex items-center"><span class="w-2 h-2 bg-primary-light rounded-full mr-2"></span>精神障害（うつ病、統合失調症等）</li>
+              <li class="flex items-center"><span class="w-2 h-2 bg-primary-light rounded-full mr-2"></span>慢性疲労症候群</li>
+              <li class="flex items-center"><span class="w-2 h-2 bg-primary-light rounded-full mr-2"></span>線維筋痛症</li>
+              <li class="flex items-center"><span class="w-2 h-2 bg-primary-light rounded-full mr-2"></span>内部障害</li>
+              <li class="flex items-center"><span class="w-2 h-2 bg-primary-light rounded-full mr-2"></span>その他の見えない障害</li>
+            </ul>
+          </div>
+          
+          <div class="text-center">
+            <p class="mb-6">あなたの経験は、誰かの助けになります。<br>このコミュニティに参加して、あなたの物語を共有しませんか？</p>
+            <router-link 
+              to="/editor" 
+              class="btn btn-primary inline-flex items-center px-6 py-3 rounded-full"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+              </svg>
+              今すぐ投稿を始める
+            </router-link>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 注目の投稿 - そのまま保持 -->
     <section class="mb-16">
       <div class="section-header flex items-center justify-between mb-8">
         <h2 class="text-2xl md:text-3xl font-bold flex items-center">
           <span class="inline-block w-2 h-6 bg-primary rounded-full mr-3"></span>
           注目の投稿
         </h2>
-        <router-link to="/posts" class="text-primary-light hover:underline flex items-center">
+        <router-link to="/posts?sort=views.desc" class="text-primary-light hover:underline flex items-center">
           すべて見る
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
             <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
@@ -77,88 +156,12 @@
         </div>
       </div>
     </section>
-
-    <!-- カテゴリ一覧 - インライン化 -->
-    <section class="mb-16">
-      <div class="section-header flex items-center justify-between mb-8">
-        <h2 class="text-2xl md:text-3xl font-bold flex items-center">
-          <span class="inline-block w-2 h-6 bg-primary rounded-full mr-3"></span>
-          カテゴリから探す
-        </h2>
-        <router-link to="/categories" class="text-primary-light hover:underline flex items-center">
-          すべてのカテゴリ
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 ml-1" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
-        </router-link>
-      </div>
-      
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <!-- カテゴリカード（インライン化） -->
-        <router-link 
-          v-for="category in categories.slice(0, 4)" 
-          :key="category.id"
-          :to="`/categories/${category.id}`" 
-          class="category-card glass-card p-6 text-center transition-all hover:shadow-lg hover:scale-105 duration-300 rounded-xl group relative overflow-hidden"
-        >
-          <!-- 装飾的な背景 -->
-          <div class="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          
-          <!-- アイコンと名前を含むコンテンツ -->
-          <div class="relative z-10">
-            <!-- アイコン部分 -->
-            <div class="w-16 h-16 rounded-full bg-primary/30 flex items-center justify-center text-primary-light shadow-md shadow-primary/20 mx-auto mb-4 transform group-hover:scale-110 transition-transform">
-              <svg v-if="category.name === '身体障害'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-              
-              <svg v-else-if="category.name === '発達障害'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-              
-              <svg v-else-if="category.name === '精神障害'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h.5A2.5 2.5 0 0020 5.5v-1.65" />
-              </svg>
-              
-              <svg v-else-if="category.name === '難病'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              
-              <svg v-else-if="category.name === '日常生活'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              
-              <svg v-else-if="category.name === '就労'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-              
-              <svg v-else-if="category.name === '福祉制度'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-              
-              <svg v-else-if="category.name === '恋愛・結婚'" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-              
-              <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-              </svg>
-            </div>
-            
-            <h3 class="font-medium text-lg text-white group-hover:text-primary-light transition-colors">{{ category.name }}</h3>
-          </div>
-          
-          <!-- ホバー時のアクセント -->
-          <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary-light transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
-        </router-link>
-      </div>
-    </section>
     
-    <!-- 最新の投稿 -->
+    <!-- 最新の投稿 - そのまま保持 -->
     <section class="mb-10">
       <div class="section-header flex items-center justify-between mb-6">
         <h2 class="text-2xl font-bold">最新の投稿</h2>
-        <router-link to="/posts?sort=newest" class="text-primary hover:underline">すべて見る</router-link>
+        <router-link to="/posts?sort=created_at.desc" class="text-primary hover:underline">すべて見る</router-link>
       </div>
       
       <div class="space-y-6">

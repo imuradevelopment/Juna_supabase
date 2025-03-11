@@ -410,9 +410,10 @@ async function submitComment() {
       content: commentText.value.trim(),
       post_id: props.postId,
       author_id: authStore.user.id,
-      parent_comment_id: parentCommentId.value || null,
-      created_at: new Date().toISOString()
+      parent_comment_id: parentCommentId.value || null
     };
+    
+    console.log('送信するコメント:', newComment);
     
     // コメントの作成
     const { data: newCommentData, error } = await supabase
@@ -421,7 +422,10 @@ async function submitComment() {
       .select('*, profiles:author_id(*)')
       .single();
     
-    if (error) throw error;
+    if (error) {
+      console.error('コメント投稿エラー詳細:', error);
+      throw error;
+    }
     
     // コメント一覧に追加
     comments.value.push(newCommentData);
@@ -429,14 +433,14 @@ async function submitComment() {
     likedComments.value[newCommentData.id] = false;
     
     // 親コンポーネントに通知
-    emit('comments-updated');
+    emit('comments-updated', comments.value.length);
     
     // フォームをリセット
     commentText.value = '';
     parentCommentId.value = null;
   } catch (err: any) {
     console.error('コメント投稿エラー:', err);
-    alert('コメントの投稿に失敗しました');
+    alert('コメントの投稿に失敗しました: ' + err.message);
   } finally {
     submitting.value = false;
   }
@@ -587,7 +591,7 @@ async function checkIfLiked(commentId: string) {
 // いいねの切り替え
 async function toggleLike(comment: any) {
   if (!authStore.isAuthenticated || !authStore.user) {
-    router.push('/login');
+    router.push('/auth');
     return;
   }
   

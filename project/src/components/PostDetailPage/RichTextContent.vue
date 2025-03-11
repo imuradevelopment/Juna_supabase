@@ -13,17 +13,30 @@ const props = defineProps({
   }
 });
 
-// XSS対策のため、コンテンツをサニタイズ
+// コンテンツ処理を改善：JSONBオブジェクトの構造をより適切に処理する
 const sanitizedContent = computed(() => {
   if (!props.content) return '';
   
   // コンテンツがJSONBオブジェクトの場合
   if (typeof props.content === 'object') {
     try {
-      // Tiptapのコンテンツからテキスト抽出（例）
-      if (props.content.text) {
+      // スキーマのpostsテーブルからJSONB形式のコンテンツを処理
+      if (props.content.type === 'doc' && props.content.content) {
+        // ProseMirror/Tiptap形式の処理
+        return DOMPurify.sanitize(renderTiptapContent(props.content));
+      } else if (props.content.html) {
+        // html形式をそのまま利用
+        return DOMPurify.sanitize(props.content.html, {
+          ADD_ATTR: ['target'],
+          ADD_TAGS: ['iframe'],
+          ALLOWED_ATTR: ['src', 'allowfullscreen', 'frameborder', 'width', 'height']
+        });
+      } else if (props.content.text) {
+        // テキスト形式
         return DOMPurify.sanitize(props.content.text);
       }
+      
+      // その他の形式：JSON文字列として表示
       return DOMPurify.sanitize(JSON.stringify(props.content));
     } catch (e) {
       console.error('コンテンツ処理エラー:', e);
@@ -38,6 +51,52 @@ const sanitizedContent = computed(() => {
     ALLOWED_ATTR: ['src', 'allowfullscreen', 'frameborder', 'width', 'height']
   });
 });
+
+// TiptapコンテンツをHTML文字列に変換する補助関数
+function renderTiptapContent(doc: any): string {
+  // シンプルなテキストを抽出する基本実装
+  // 実際のプロジェクトでは、より高度なTiptap/ProseMirror処理が必要になる場合あり
+  try {
+    let html = '';
+    
+    if (Array.isArray(doc.content)) {
+      doc.content.forEach((node: any) => {
+        if (node.type === 'paragraph') {
+          html += '<p>';
+          if (Array.isArray(node.content)) {
+            node.content.forEach((textNode: any) => {
+              if (textNode.type === 'text') {
+                let text = textNode.text || '';
+                if (textNode.marks) {
+                  textNode.marks.forEach((mark: any) => {
+                    if (mark.type === 'bold') text = `<strong>${text}</strong>`;
+                    if (mark.type === 'italic') text = `<em>${text}</em>`;
+                  });
+                }
+                html += text;
+              }
+            });
+          }
+          html += '</p>';
+        } else if (node.type === 'heading') {
+          const level = node.attrs?.level || 1;
+          html += `<h${level}>`;
+          if (node.content) {
+            node.content.forEach((textNode: any) => {
+              if (textNode.type === 'text') html += textNode.text || '';
+            });
+          }
+          html += `</h${level}>`;
+        }
+      });
+    }
+    
+    return html;
+  } catch (e) {
+    console.error('Tiptapコンテンツレンダリングエラー:', e);
+    return '';
+  }
+}
 
 // コンテンツを表示
 const content = computed(() => sanitizedContent.value);

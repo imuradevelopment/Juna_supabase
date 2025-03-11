@@ -253,8 +253,11 @@ const props = defineProps({
 // エディター初期化
 onMounted(() => {
   try {
+    // モデル値が空の場合の対応
+    const initialContent = props.modelValue || '';
+    
     editor.value = new Editor({
-      content: props.modelValue,
+      content: initialContent,
       extensions: [
         StarterKit,
         Placeholder.configure({
@@ -296,11 +299,21 @@ onMounted(() => {
 
 // watch for external changes
 watch(() => props.modelValue, (newValue) => {
-  const editorContent = editor.value?.getJSON();
-  if (editor.value && newValue !== editorContent) {
+  if (!editor.value || !newValue) return;
+  
+  const editorContent = editor.value.getHTML();
+  // 現在のエディタ内容と新しい値が異なる場合のみ更新
+  if (typeof newValue === 'object') {
+    // JSONBオブジェクトの場合
+    const currentJson = editor.value.getJSON();
+    if (JSON.stringify(currentJson) !== JSON.stringify(newValue)) {
+      editor.value.commands.setContent(newValue);
+    }
+  } else if (typeof newValue === 'string' && newValue !== editorContent) {
+    // 文字列（HTML）の場合
     editor.value.commands.setContent(newValue);
   }
-});
+}, { deep: true });
 
 // リンク挿入モーダルを表示
 function showLinkModalDialog() {

@@ -31,14 +31,14 @@
             <div class="flex items-center">
               <div class="w-6 h-6 rounded-full bg-primary-light flex items-center justify-center text-white overflow-hidden mr-2">
                 <img 
-                  v-if="comment.posts?.[0]?.profiles?.[0]?.avatar_data" 
-                  :src="getAvatarUrl(comment.posts[0].profiles[0].avatar_data)" 
-                  :alt="comment.posts?.[0]?.profiles?.[0]?.nickname || ''"
+                  v-if="comment.post?.author?.avatar_data" 
+                  :src="getAvatarUrl(comment.post.author.avatar_data)" 
+                  :alt="comment.post?.author?.nickname || ''"
                   class="w-full h-full object-cover"
                 />
-                <span v-else>{{ getInitials(comment.posts?.[0]?.profiles?.[0]?.nickname || '') }}</span>
+                <span v-else>{{ getInitials(comment.post?.author?.nickname || '') }}</span>
               </div>
-              <span class="text-sm">{{ comment.posts?.[0]?.profiles?.[0]?.nickname || '不明なユーザー' }}</span>
+              <span class="text-sm">{{ comment.post?.author?.nickname || '不明なユーザー' }}</span>
             </div>
             
             <p class="whitespace-pre-wrap mb-2">{{ comment.content }}</p>
@@ -162,7 +162,7 @@ import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { getProfileImageUrl } from '../../lib/storage';
 
-// 型定義を修正
+// インターフェース定義を修正
 interface Comment {
   id: string;
   post_id: string;
@@ -170,14 +170,15 @@ interface Comment {
   content: string;
   created_at: string;
   updated_at: string;
-  posts?: {
+  post?: {
     id: string;
     title: string;
-    profiles: {
+    author?: {
+      id: string;
       nickname: string | null;
       avatar_data?: string | null;
-    }[];
-  }[];  // 配列として定義
+    };
+  };
 }
 
 const authStore = useAuthStore();
@@ -226,16 +227,17 @@ async function fetchComments() {
     const { data, error: commentsError } = await supabase
       .from('comments')
       .select(`
-        id,
+        id, 
         content,
         created_at,
         updated_at,
         post_id,
         parent_comment_id,
-        posts (
+        posts:post_id (
           id,
           title,
           profiles:author_id (
+            id,
             nickname,
             avatar_data
           )
@@ -246,7 +248,29 @@ async function fetchComments() {
       .range(from, to);
     
     if (commentsError) throw commentsError;
-    comments.value = data || [];
+
+    // データを正しい形式に変換
+    const formattedData = (data || []).map((item: any) => {
+      return {
+        id: item.id,
+        content: item.content,
+        created_at: item.created_at,
+        updated_at: item.updated_at,
+        post_id: item.post_id,
+        parent_comment_id: item.parent_comment_id,
+        post: {
+          id: item.posts.id,
+          title: item.posts.title,
+          author: {
+            id: item.posts.profiles.id,
+            nickname: item.posts.profiles.nickname,
+            avatar_data: item.posts.profiles.avatar_data
+          }
+        }
+      } as Comment;
+    });
+
+    comments.value = formattedData;
   } catch (err) {
     console.error('コメント取得エラー:', err);
   } finally {
@@ -291,7 +315,7 @@ function getPageNumbers(): (number | string)[] {
 
 // 投稿タイトルを取得
 function getPostTitle(comment: Comment): string {
-  return comment.posts?.[0]?.title || '不明な投稿';
+  return comment.post?.title || '不明な投稿';
 }
 
 // コメント編集確認

@@ -131,7 +131,7 @@
                 <!-- 投稿の編集/削除 (投稿者または管理者のみ) -->
                 <div v-if="isAuthor" class="flex space-x-2">
                   <router-link 
-                    :to="`/posts/${post.id}/edit`" 
+                    :to="`/editor/${post.id}`" 
                     class="action-btn edit-btn"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -430,7 +430,7 @@ async function checkIfLiked() {
 async function toggleLike() {
   if (!authStore.isAuthenticated) {
     // ログインページにリダイレクト
-    router.push('/login');
+    router.push('/auth');
     return;
   }
   
@@ -443,7 +443,10 @@ async function toggleLike() {
         .eq('post_id', postId)
         .eq('user_id', authStore.user!.id);
       
-      if (deleteError) throw deleteError;
+      if (deleteError) {
+        console.error('いいね解除エラー:', deleteError);
+        throw deleteError;
+      }
       
       isLiked.value = false;
       likeCount.value -= 1;
@@ -456,7 +459,10 @@ async function toggleLike() {
           user_id: authStore.user!.id
         });
       
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error('いいね追加エラー:', insertError.message);
+        throw insertError;
+      }
       
       isLiked.value = true;
       likeCount.value += 1;

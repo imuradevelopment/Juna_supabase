@@ -54,7 +54,7 @@
               <!-- 投稿情報 -->
               <h3 class="font-bold text-lg mb-1">
                 <router-link :to="`/posts/${like.post_id}`" class="hover:text-primary">
-                  {{ like.posts[0]?.title || '不明な投稿' }}
+                  {{ like.post?.title || '不明な投稿' }}
                 </router-link>
               </h3>
               
@@ -62,19 +62,19 @@
               <div class="flex items-center mb-2">
                 <div class="w-6 h-6 rounded-full bg-primary-light flex items-center justify-center text-white overflow-hidden mr-2">
                   <img 
-                    v-if="like.posts[0]?.profiles[0]?.avatar_data" 
-                    :src="getAvatarUrl(like.posts[0].profiles[0].avatar_data)" 
-                    :alt="like.posts[0]?.profiles[0]?.nickname || ''"
+                    v-if="like.post?.author?.avatar_data" 
+                    :src="getAvatarUrl(like.post.author.avatar_data)" 
+                    :alt="like.post?.author?.nickname || ''"
                     class="w-full h-full object-cover"
                   />
-                  <span v-else>{{ getInitials(like.posts[0]?.profiles[0]?.nickname || '') }}</span>
+                  <span v-else>{{ getInitials(like.post?.author?.nickname || '') }}</span>
                 </div>
-                <span class="text-sm">{{ like.posts[0]?.profiles[0]?.nickname || '不明なユーザー' }}</span>
+                <span class="text-sm">{{ like.post?.author?.nickname || '不明なユーザー' }}</span>
               </div>
               
               <!-- 投稿の抜粋 -->
-              <p v-if="like.posts[0]?.excerpt" class="text-sm text-gray-400 line-clamp-2 mb-2">
-                {{ like.posts[0].excerpt }}
+              <p v-if="like.post?.excerpt" class="text-sm text-gray-400 line-clamp-2 mb-2">
+                {{ like.post.excerpt }}
               </p>
             </div>
             
@@ -142,17 +142,17 @@
             <div class="flex-1">
               <!-- コメント情報 -->
               <div class="mb-2 p-3 bg-surface-variant rounded">
-                <p class="text-sm whitespace-pre-wrap">{{ like.comments[0]?.content || '不明なコメント' }}</p>
+                <p class="text-sm whitespace-pre-wrap">{{ like.comment?.content || '不明なコメント' }}</p>
               </div>
               
               <!-- 投稿情報 -->
               <div class="flex items-center justify-between">
                 <router-link 
-                  v-if="like.comments[0]?.post_id" 
-                  :to="`/posts/${like.comments[0].post_id}`" 
+                  v-if="like.comment?.post_id" 
+                  :to="`/posts/${like.comment.post_id}`" 
                   class="text-sm text-primary hover:underline"
                 >
-                  {{ like.comments[0]?.posts[0]?.title || '不明な投稿' }}
+                  {{ like.comment?.post?.title || '不明な投稿' }}
                 </router-link>
                 <span class="text-xs text-gray-400">
                   {{ formatDate(like.created_at) }}
@@ -163,14 +163,14 @@
               <div class="flex items-center mt-2">
                 <div class="w-5 h-5 rounded-full bg-primary-light flex items-center justify-center text-white overflow-hidden mr-2">
                   <img 
-                    v-if="like.comments[0]?.profiles[0]?.avatar_data" 
-                    :src="getAvatarUrl(like.comments[0].profiles[0].avatar_data)" 
-                    :alt="like.comments[0]?.profiles[0]?.nickname || ''"
+                    v-if="like.comment?.author?.avatar_data" 
+                    :src="getAvatarUrl(like.comment.author.avatar_data)" 
+                    :alt="like.comment?.author?.nickname || ''"
                     class="w-full h-full object-cover"
                   />
-                  <span v-else>{{ getInitials(like.comments[0]?.profiles[0]?.nickname || '') }}</span>
+                  <span v-else>{{ getInitials(like.comment?.author?.nickname || '') }}</span>
                 </div>
-                <span class="text-xs">{{ like.comments[0]?.profiles[0]?.nickname || '不明なユーザー' }}</span>
+                <span class="text-xs">{{ like.comment?.author?.nickname || '不明なユーザー' }}</span>
               </div>
             </div>
             
@@ -263,37 +263,39 @@ interface PostLike {
   user_id: string;
   post_id: string;
   created_at: string;
-  posts: {
+  post?: {
     id: string;
     title: string;
     excerpt?: string | null;
     published_at?: string | null;
     views?: number;
-    profiles: {
+    author?: {
+      id: string;
       nickname: string | null;
       avatar_data?: string | null;
-    }[];
-  }[];
+    };
+  };
 }
 
 interface CommentLike {
   user_id: string;
   comment_id: string;
   created_at: string;
-  comments: {
+  comment?: {
     id: string;
     content: string;
     post_id: string;
     created_at: string;
-    profiles: {
+    author?: {
+      id: string;
       nickname: string | null;
       avatar_data?: string | null;
-    }[];
-    posts: {
+    };
+    post?: {
       id: string;
       title: string;
-    }[];
-  }[];
+    };
+  };
 }
 
 // タブ状態
@@ -367,13 +369,14 @@ async function fetchPostLikes() {
         user_id,
         post_id,
         created_at,
-        posts (
+        posts:post_id (
           id,
           title,
           excerpt,
           published_at,
           views,
           profiles:author_id (
+            id,
             nickname,
             avatar_data
           )
@@ -384,7 +387,27 @@ async function fetchPostLikes() {
       .range(from, to);
     
     if (likesError) throw likesError;
-    postLikes.value = data || [];
+    // データを正しい形式に変換
+    const formattedData = (data || []).map((item: any) => {
+      return {
+        user_id: item.user_id,
+        post_id: item.post_id,
+        created_at: item.created_at,
+        post: {
+          id: item.posts.id,
+          title: item.posts.title,
+          excerpt: item.posts.excerpt,
+          published_at: item.posts.published_at,
+          views: item.posts.views,
+          author: {
+            id: item.posts.profiles.id,
+            nickname: item.posts.profiles.nickname,
+            avatar_data: item.posts.profiles.avatar_data
+          }
+        }
+      } as PostLike;
+    });
+    postLikes.value = formattedData;
   } catch (err) {
     console.error('投稿いいね取得エラー:', err);
   } finally {
@@ -419,16 +442,17 @@ async function fetchCommentLikes() {
         user_id,
         comment_id,
         created_at,
-        comments (
+        comments:comment_id (
           id,
           content,
           post_id,
           created_at,
           profiles:author_id (
+            id,
             nickname,
             avatar_data
           ),
-          posts (
+          posts:post_id (
             id,
             title
           )
@@ -439,7 +463,30 @@ async function fetchCommentLikes() {
       .range(from, to);
     
     if (likesError) throw likesError;
-    commentLikes.value = data || [];
+    // データを正しい形式に変換
+    const formattedData = (data || []).map((item: any) => {
+      return {
+        user_id: item.user_id,
+        comment_id: item.comment_id,
+        created_at: item.created_at,
+        comment: item.comments ? {
+          id: item.comments.id,
+          content: item.comments.content,
+          post_id: item.comments.post_id,
+          created_at: item.comments.created_at,
+          author: item.comments.profiles ? {
+            id: item.comments.profiles.id,
+            nickname: item.comments.profiles.nickname,
+            avatar_data: item.comments.profiles.avatar_data
+          } : undefined,
+          post: item.comments.posts ? {
+            id: item.comments.posts.id,
+            title: item.comments.posts.title
+          } : undefined
+        } : undefined
+      } as CommentLike;
+    });
+    commentLikes.value = formattedData;
   } catch (err) {
     console.error('コメントいいね取得エラー:', err);
   } finally {
