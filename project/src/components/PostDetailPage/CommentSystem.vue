@@ -413,8 +413,6 @@ async function submitComment() {
       parent_comment_id: parentCommentId.value || null
     };
     
-    console.log('送信するコメント:', newComment);
-    
     // コメントの作成
     const { data: newCommentData, error } = await supabase
       .from('comments')
