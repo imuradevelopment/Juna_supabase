@@ -480,6 +480,13 @@ CREATE POLICY "自分の通知のみ参照可能"
 CREATE POLICY "自分の通知のみ更新可能" 
   ON notifications FOR UPDATE USING (auth.uid() = user_id);
 
+-- 以下を追加：通知の作成・削除ポリシー
+CREATE POLICY "システムによる通知作成を許可" 
+  ON notifications FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "自分の通知のみ削除可能"
+  ON notifications FOR DELETE USING (auth.uid() = user_id);
+
 -- トリガー関数
 CREATE OR REPLACE FUNCTION update_profile_updated_at()
 RETURNS TRIGGER AS $$
@@ -564,7 +571,7 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER create_comment_notification
 AFTER INSERT ON comments
@@ -584,7 +591,7 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER create_post_like_notification
 AFTER INSERT ON post_likes
@@ -604,7 +611,7 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER create_comment_like_notification
 AFTER INSERT ON comment_likes
@@ -636,7 +643,7 @@ BEGIN
   
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER on_comment_reply_added
 AFTER INSERT ON comments
@@ -651,7 +658,7 @@ BEGIN
   
   RETURN OLD;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE TRIGGER on_comment_deleted
 BEFORE DELETE ON comments
