@@ -1,6 +1,6 @@
 <template>
   <footer>
-    <div class="glass border-t border-gray-700">
+    <div class="bg-[rgb(var(--color-surface-variant)/0.7)] backdrop-blur-md border border-[rgb(var(--color-border-light)/0.6)] shadow-[var(--shadow-glass)] border-t border-gray-700">
       <div class="container mx-auto py-8 px-5 md:px-6">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-6">
           <!-- ロゴと説明 -->
@@ -11,7 +11,7 @@
               </svg>
               <span class="text-lg font-bold text-primary">Juna</span>
             </div>
-            <p class="text-sm text-hint mb-4 leading-relaxed">
+            <p class="text-sm text-[rgb(var(--color-text-muted))] mb-4 leading-relaxed">
               見えない障害を持つ人々のための、経験や情報を共有するブログプラットフォームです。互いに支え合い、理解を深めるコミュニティを目指しています。
             </p>
           </div>
@@ -41,12 +41,12 @@
         </div>
 
         <div class="border-t border-gray-700 pt-5 pb-3 flex flex-col md:flex-row justify-between items-center">
-          <p class="text-sm text-hint mb-3 md:mb-0">
+          <p class="text-sm text-[rgb(var(--color-text-muted))] mb-3 md:mb-0">
             &copy; {{ currentYear }} Juna. All rights reserved.
           </p>
           <div class="flex space-x-6">
-            <router-link to="/privacy" class="text-sm text-hint hover:text-primary-light transition-colors">プライバシーポリシー</router-link>
-            <router-link to="/terms" class="text-sm text-hint hover:text-primary-light transition-colors">利用規約</router-link>
+            <router-link to="/privacy" class="text-sm text-[rgb(var(--color-text-muted))] hover:text-primary-light transition-colors">プライバシーポリシー</router-link>
+            <router-link to="/terms" class="text-sm text-[rgb(var(--color-text-muted))] hover:text-primary-light transition-colors">利用規約</router-link>
           </div>
         </div>
       </div>

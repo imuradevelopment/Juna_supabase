@@ -6,7 +6,7 @@
         <div class="flex items-center justify-between">
           <!-- ロゴ -->
           <router-link to="/" class="flex items-center group">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8 logo-icon transition-transform group-hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8 text-primary-light transition-transform group-hover:scale-110">
               <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-12h2v6h-2zm0 8h2v2h-2z" />
             </svg>
             <span class="text-xl font-bold ml-2 logo-text tracking-wide">Juna</span>
@@ -313,6 +313,11 @@ function getInitials(name: string | undefined): string {
 </script>
 
 <style scoped>
+.avatar-placeholder {
+  background-color: rgba(var(--color-primary-dark), 0.3);
+  color: var(--color-text);
+}
+
 .nav-link {
   @apply relative text-secondary hover:text-primary-light transition-colors duration-300 py-1;
   letter-spacing: 0.02em;

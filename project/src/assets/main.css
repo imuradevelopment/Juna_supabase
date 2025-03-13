@@ -1,8 +1,13 @@
+/* ====================================
+ * ベーステールウィンドインポート
+ * ==================================== */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* テーマ変数（20色に集約） */
+/* ====================================
+ * グローバルカラー変数
+ * ==================================== */
 :root {
   /* メインカラー - アプリケーションの主要テーマカラー */
   --color-primary: 167 139 250; /* ブランドの主要カラー、CTA要素に使用 */
@@ -44,90 +49,33 @@
   
   /* シャドウ - 要素の立体感と階層を表現 */
   --shadow-glass: 0 4px 6px rgba(0, 0, 0, 0.3); /* グラスモーフィズム効果用のシャドウ */
-  --shadow-card: 0 0 0; /* カード要素用のシャドウベース（調整可能） */
 }
 
-/* リセット */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+/* ====================================
+ * コンポーネントスタイル
+ * ==================================== */
 
-body, h1, h2, h3, h4, h5, h6, p, ul, ol {
-  margin: 0;
-  padding: 0;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-button, input, select, textarea {
-  font-family: inherit;
-  font-size: 100%;
-}
-
-/* 基本スタイル */
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  @apply font-sans;
-  background-color: rgb(var(--color-background));
-  color: rgb(var(--color-text));
-  transition: background-color 0.3s, color 0.3s;
-  font-family: 'Noto Sans JP', sans-serif;
-  background-image: radial-gradient(
-    circle at 50% 0%, 
-    rgb(var(--color-primary-dark) / 0.07) 0%, 
-    rgb(30 35 48 / 0) 50%
-  );
-}
-
-/* コンテナ */
-.container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-/* アクセシビリティ */
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-
-/* グラスモーフィズム */
-.glass {
-  background: rgb(var(--color-surface-variant) / 0.7);
+/* グラスモーフィズム効果 - モダンUIのための半透明効果 */
+.glass-card {
+  @apply rounded-lg p-6;
+  background: rgb(var(--color-surface) / 0.8);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgb(var(--color-border-light) / 0.6);
-  box-shadow: var(--shadow-glass);
-}
-
-.glass-card {
-  @apply glass rounded-lg p-6;
-  background: rgb(var(--color-surface) / 0.8);
   border: 1px solid rgb(var(--color-border-light) / 0.6);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 
               0 0 0 1px rgba(255, 255, 255, 0.05) inset;
 }
 
-/* ボタン */
+/* ====================================
+ * ボタンスタイル
+ * ==================================== */
+
+/* 基本ボタンスタイル */
 .btn {
   @apply px-4 py-2 rounded font-medium transition-all;
 }
 
+/* プライマリーボタン - 主要アクション用 */
 .btn-primary {
   background-color: rgb(var(--color-primary));
   color: rgb(var(--color-text-white));
@@ -135,59 +83,34 @@ body {
   border: 1px solid rgb(var(--color-primary-dark) / 0.3);
 }
 
+/* プライマリーボタンのホバー状態 */
 .btn-primary:hover {
   background-color: rgb(var(--color-primary-dark));
   box-shadow: 0 0 20px rgb(var(--color-primary-dark) / 0.5);
 }
 
+/* プライマリーボタンの無効状態 */
 .btn-primary:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
+/* セカンダリーボタン - 補助的アクション用 */
 .btn-secondary {
   @apply bg-secondary text-white hover:bg-secondary/80;
 }
 
+/* ゴーストボタン - 目立たないアクション用 */
 .btn-ghost {
   @apply bg-transparent text-primary hover:bg-primary hover:bg-opacity-10;
 }
 
-/* スクロールバー */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
+/* ====================================
+ * フォーム要素スタイル
+ * ==================================== */
 
-::-webkit-scrollbar-track {
-  background: var(--color-background);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-secondary);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary);
-}
-
-/* フォーム */
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select,
-.form-input,
-input:not([type="radio"]):not([type="checkbox"]) {
+/* 入力フィールド基本スタイル */
+input {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid var(--color-border);
@@ -197,19 +120,12 @@ input:not([type="radio"]):not([type="checkbox"]) {
   border-color: var(--color-border) !important;
 }
 
-.input-addon {
-  background-color: var(--color-surface-accent);
-  color: var(--color-text);
-  border-color: var(--color-border);
-}
-
-/* プレースホルダー */
+/* プレースホルダーテキストスタイル */
 ::placeholder {
   color: var(--color-text-muted);
 }
 
-/* フォーカス時のスタイル */
-.form-input:focus,
+/* フォーカス時のスタイル強調 */
 input:focus,
 textarea:focus,
 select:focus {
@@ -218,180 +134,22 @@ select:focus {
   box-shadow: 0 0 0 1px var(--color-primary) !important;
 }
 
-.form-checkbox,
-input[type="checkbox"] {
-  accent-color: var(--color-primary) !important;
-}
-
-.form-error {
-  color: var(--color-error);
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
-
-.form-label {
-  color: var(--color-text);
-}
-
-/* アラート */
-.alert {
-  border: 1px solid;
-}
-
-.alert-error {
-  background-color: rgb(var(--color-error-dark) / 0.2);
-  border-color: rgb(var(--color-error-dark) / 0.5);
-  color: rgb(var(--color-error));
-}
-
-.success-alert {
-  background-color: rgb(var(--color-success-dark) / 0.2);
-  border-color: rgb(var(--color-success-dark) / 0.5);
-  color: rgb(var(--color-success-dark));
-}
-
-/* テキスト色 */
-.text-hint {
-  color: var(--color-text-muted);
-}
-
-.text-required {
-  color: var(--color-error);
-}
-
-/* リンク */
-.link-primary {
-  color: var(--color-primary);
-  text-decoration: none;
-}
-
-.link-primary:hover {
-  color: var(--color-primary-dark);
-  text-decoration: underline;
-}
-
-/* アイコン */
-.logo-icon {
-  color: var(--color-primary-light);
-}
-
-.icon-search {
-  color: var(--color-text-muted);
-}
-
-.icon-search:hover {
-  color: var(--color-primary-light);
-}
-
-/* ナビゲーション */
-.nav-link {
-  color: var(--color-text);
-  position: relative;
-}
-
-.nav-link::after {
-  content: '';
-  position: absolute;
-  width: 0;
-  height: 2px;
-  bottom: -4px;
-  left: 0;
-  background-color: var(--color-primary);
-  transition: width 0.3s ease;
-}
-
-.nav-link:hover::after {
-  width: 100%;
-}
-
-/* ドロップダウン */
-.dropdown-menu {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border-light);
-}
-
-.dropdown-item {
-  color: var(--color-text);
-}
-
-.dropdown-item:hover {
-  background-color: rgba(139, 92, 246, 0.1);
-  color: var(--color-primary-light);
-}
-
-.dropdown-divider {
-  border-top: 1px solid var(--color-border);
-}
-
-/* カード要素 */
-.card-accent {
-  background-image: linear-gradient(to right, var(--color-primary), var(--color-primary-light));
-}
-
-.card-title {
-  color: var(--color-heading);
-}
-
-.card-description {
-  color: var(--color-text-muted);
-}
-
-.post-meta {
-  color: var(--color-text-muted);
-}
-
-.author-name {
-  color: var(--color-text);
-}
-
-.avatar-placeholder {
-  background-color: rgba(139, 92, 246, 0.3);
-  color: var(--color-text);
-}
-
-/* 特殊な入力フィールド */
+/* 特殊な入力フィールド - フレックスレイアウト内など */
 .flex input,
 input.flex-1,
 .flex-1,
-[class*="rounded-r"],
-input[type="text"], 
-input[type="email"], 
-input[type="password"],
-input[type="number"],
-input[type="search"],
-input[type="tel"],
-input[type="url"] {
+[class*="rounded-r"] {
   background-color: #1e293b !important;
   color: #f1f5f9 !important;
   border: 1px solid #475569 !important;
 }
 
-/* プレフィックス要素 */
-.inline-flex,
-span[class*="bg-gray-100"],
-span[class*="dark:bg-gray-700"] {
-  background-color: #2d3748 !important;
-  color: #f1f5f9 !important;
-  border-color: #475569 !important;
-}
+/* ====================================
+ * レスポンシブデザイン
+ * ==================================== */
 
-/* ブラウザ自動入力の上書き */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px #1e293b inset !important;
-  -webkit-text-fill-color: #f1f5f9 !important;
-  transition: background-color 5000s ease-in-out 0s;
-  caret-color: #f1f5f9;
-}
-
-/* レスポンシブデザイン */
+/* タブレット向け調整 (768px以下) */
 @media (max-width: 768px) {
-  .container {
-    padding: 0 0.75rem;
-  }
-  
   .glass-card {
     padding: 1rem;
   }
@@ -399,29 +157,10 @@ input:-webkit-autofill:active {
   .btn {
     padding: 0.5rem 1rem;
   }
-  
-  body {
-    font-size: 0.9375rem;
-  }
-  
-  h1 {
-    font-size: 1.5rem;
-  }
-  
-  h2 {
-    font-size: 1.25rem;
-  }
-  
-  .form-group {
-    margin-bottom: 1rem;
-  }
 }
 
+/* モバイル向け調整 (480px以下) */
 @media (max-width: 480px) {
-  .container {
-    padding: 0 0.5rem;
-  }
-  
   .glass-card {
     padding: 0.75rem;
   }
@@ -431,24 +170,9 @@ input:-webkit-autofill:active {
     font-size: 0.875rem;
   }
   
-  .glass {
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-  }
-  
-  .form-group label {
-    margin-bottom: 0.25rem;
-    font-size: 0.875rem;
-  }
-  
+  /* タッチターゲットサイズ確保 */
   button, 
-  .btn,
-  input[type="submit"],
-  input[type="button"] {
+  .btn {
     min-height: 44px;
-  }
-  
-  body {
-    line-height: 1.6;
   }
 }

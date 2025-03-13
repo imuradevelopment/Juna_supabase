@@ -4,14 +4,14 @@
       <h1 class="text-2xl font-bold mb-6">{{ isEditMode ? '投稿を編集' : '新しい投稿を作成' }}</h1>
       
       <!-- エラーメッセージ -->
-      <div v-if="formError" class="alert alert-error px-4 py-3 rounded mb-6">
+      <div v-if="formError" class="bg-[rgb(var(--color-error-dark)/0.2)] border border-[rgb(var(--color-error-dark)/0.5)] text-[rgb(var(--color-error))] px-4 py-3 rounded mb-6">
         {{ formError }}
       </div>
       
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- タイトル -->
         <div>
-          <label for="title" class="block text-sm font-medium mb-1">タイトル <span class="text-required">*</span></label>
+          <label for="title" class="block text-sm font-medium mb-1">タイトル <span class="text-[rgb(var(--color-error))]">*</span></label>
           <input
             id="title"
             v-model="formData.title"
@@ -87,7 +87,7 @@
         
         <!-- カテゴリー -->
         <div>
-          <label class="block text-sm font-medium mb-1">カテゴリー <span class="text-required">*</span></label>
+          <label class="block text-sm font-medium mb-1">カテゴリー <span class="text-[rgb(var(--color-error))]">*</span></label>
           <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
             <div 
               v-for="category in availableCategories" 
@@ -99,7 +99,7 @@
                 :id="`category-${category.id}`" 
                 :value="category.id" 
                 v-model="formData.categories"
-                class="form-checkbox h-4 w-4 focus:ring-primary rounded"
+                class="h-4 w-4 focus:ring-primary rounded"
               />
               <label :for="`category-${category.id}`" class="ml-2 block text-sm">
                 {{ category.name }}

@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-md mx-auto py-8">
-    <div class="auth-form glass-card p-6">
+    <div class="glass-card p-6">
       <!-- タブ切り替えボタン -->
       <div class="flex border-b border-gray-700 mb-6">
         <button 
@@ -33,30 +33,30 @@
         
         <form @submit.prevent="handleLoginSubmit" class="space-y-6">
           <!-- アラートメッセージ -->
-          <div v-if="loginFormError" class="alert alert-error px-4 py-3 rounded">
+          <div v-if="loginFormError" class="bg-red-900/30 border border-red-800 text-red-200 px-4 py-3 rounded">
             {{ loginFormError }}
           </div>
           
           <!-- メールアドレス/アカウントID -->
           <div>
-            <label for="identifier" class="form-label block text-sm font-medium mb-1">メールアドレスまたはアカウントID</label>
+            <label for="identifier" class="text-gray-200 block text-sm font-medium mb-1">メールアドレスまたはアカウントID</label>
             <input 
               type="text" 
               id="identifier" 
               v-model="loginData.identifier" 
-              class="form-input w-full px-4 py-2 rounded border focus:outline-none focus:ring-2"
+              class="w-full px-4 py-2 rounded border border-gray-600 bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </div>
           
           <!-- パスワード -->
           <div>
-            <label for="password" class="form-label block text-sm font-medium mb-1">パスワード</label>
+            <label for="password" class="text-gray-200 block text-sm font-medium mb-1">パスワード</label>
             <input 
               type="password" 
               id="password" 
               v-model="loginData.password" 
-              class="form-input w-full px-4 py-2 rounded border focus:outline-none focus:ring-2"
+              class="w-full px-4 py-2 rounded border border-gray-600 bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </div>
@@ -65,7 +65,7 @@
           <div>
             <button 
               type="submit" 
-              class="w-full btn btn-primary flex justify-center items-center py-2"
+              class="w-full bg-primary hover:bg-primary-dark text-white font-medium rounded py-2 flex justify-center items-center transition-colors"
               :disabled="loginLoading"
             >
               <svg v-if="loginLoading" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
@@ -78,7 +78,7 @@
           
           <!-- パスワード忘れた場合 -->
           <div class="text-center">
-            <router-link to="/forgot-password" class="text-sm link-primary">
+            <router-link to="/forgot-password" class="text-sm text-primary hover:text-primary-light">
               パスワードをお忘れですか？
             </router-link>
           </div>
@@ -86,8 +86,8 @@
         
         <!-- 登録リンク -->
         <div class="mt-6 text-center text-sm">
-          <span class="text-hint">アカウントをお持ちでないですか？</span>
-          <button @click="activeTab = 'register'" class="link-primary ml-1">会員登録</button>
+          <span class="text-gray-400">アカウントをお持ちでないですか？</span>
+          <button @click="activeTab = 'register'" class="text-primary hover:text-primary-light ml-1">会員登録</button>
         </div>
       </div>
       
@@ -97,74 +97,74 @@
         
         <form @submit.prevent="handleRegisterSubmit" class="space-y-6">
           <!-- アラートメッセージ -->
-          <div v-if="registerFormError" class="alert alert-error p-3 rounded">
+          <div v-if="registerFormError" class="bg-red-900/30 border border-red-800 text-red-200 p-3 rounded">
             {{ registerFormError }}
           </div>
           
           <!-- 表示名 -->
-          <div class="form-field">
-            <label for="displayName" class="form-label block mb-1">表示名 <span class="text-required">*</span></label>
+          <div class="mb-4">
+            <label for="displayName" class="text-gray-200 block mb-1">表示名 <span class="text-red-500">*</span></label>
             <input 
               type="text" 
               id="displayName" 
               v-model="registerData.displayName" 
-              class="form-input w-full p-2 rounded"
+              class="w-full p-2 rounded border border-gray-600 bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </div>
           
           <!-- アカウントID -->
-          <div class="form-field">
-            <label for="accountId" class="form-label block mb-1">アカウントID</label>
+          <div class="mb-4">
+            <label for="accountId" class="text-gray-200 block mb-1">アカウントID</label>
             <div class="flex">
-              <span class="input-addon px-3 py-2 rounded-l border border-gray-700 bg-gray-800 text-gray-300 flex items-center justify-center">@</span>
+              <span class="bg-gray-700 text-gray-200 px-3 py-2 rounded-l border border-gray-600 flex items-center justify-center">@</span>
               <input 
                 type="text" 
                 id="accountId" 
                 v-model="registerData.accountId" 
-                class="form-input flex-1 p-2 rounded-r"
+                class="flex-1 p-2 rounded-r border border-gray-600 bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
                 pattern="[a-zA-Z0-9_]+"
                 placeholder="英数字とアンダースコアのみ"
               />
             </div>
-            <p class="text-xs mt-1 text-hint">
+            <p class="text-xs mt-1 text-gray-400">
               空欄の場合は自動的に生成されます
             </p>
           </div>
           
           <!-- メールアドレス -->
-          <div class="form-field">
-            <label for="email" class="form-label block mb-1">メールアドレス <span class="text-required">*</span></label>
+          <div class="mb-4">
+            <label for="email" class="text-gray-200 block mb-1">メールアドレス <span class="text-red-500">*</span></label>
             <input 
               type="email" 
               id="email" 
               v-model="registerData.email" 
-              class="form-input w-full p-2 rounded"
+              class="w-full p-2 rounded border border-gray-600 bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </div>
           
           <!-- パスワード -->
-          <div class="form-field">
-            <label for="registerPassword" class="form-label block mb-1">パスワード <span class="text-required">*</span></label>
+          <div class="mb-4">
+            <label for="registerPassword" class="text-gray-200 block mb-1">パスワード <span class="text-red-500">*</span></label>
             <input 
               type="password" 
               id="registerPassword" 
               v-model="registerData.password" 
-              class="form-input w-full p-2 rounded"
+              class="w-full p-2 rounded border border-gray-600 bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
               required
               minlength="8"
             />
           </div>
           
           <!-- パスワード確認 -->
-          <div class="form-field">
-            <label for="passwordConfirm" class="form-label block mb-1">パスワード（確認）</label>
+          <div class="mb-4">
+            <label for="passwordConfirm" class="text-gray-200 block mb-1">パスワード（確認）</label>
             <input 
               id="passwordConfirm" 
               v-model="registerData.passwordConfirm" 
               type="password" 
-              class="form-input w-full p-2 rounded"
+              class="w-full p-2 rounded border border-gray-600 bg-gray-800 text-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
               required
             />
           </div>
@@ -177,13 +177,13 @@
                 v-model="registerData.agreeToTerms" 
                 type="checkbox" 
                 required
-                class="form-input"
+                class="bg-gray-800 border-gray-600 rounded focus:ring-primary h-4 w-4"
               />
             </div>
-            <label for="terms" class="form-label ml-2 text-sm">
+            <label for="terms" class="text-gray-200 ml-2 text-sm">
               <span>
-                <router-link to="/terms" class="link-primary">利用規約</router-link>と
-                <router-link to="/privacy" class="link-primary">プライバシーポリシー</router-link>に同意します
+                <router-link to="/terms" class="text-primary hover:text-primary-light">利用規約</router-link>と
+                <router-link to="/privacy" class="text-primary hover:text-primary-light">プライバシーポリシー</router-link>に同意します
               </span>
             </label>
           </div>
@@ -192,7 +192,7 @@
           <div>
             <button 
               type="submit" 
-              class="btn btn-primary w-full py-2 flex justify-center items-center"
+              class="bg-primary hover:bg-primary-dark text-white w-full py-2 rounded font-medium flex justify-center items-center transition-colors"
               :disabled="registerLoading || !isRegisterFormValid"
             >
               <svg v-if="registerLoading" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
@@ -206,8 +206,8 @@
         
         <!-- ログインリンク -->
         <div class="mt-6 text-center text-sm">
-          <span class="text-hint">すでにアカウントをお持ちですか？</span>
-          <button @click="activeTab = 'login'" class="link-primary ml-1">ログイン</button>
+          <span class="text-gray-400">すでにアカウントをお持ちですか？</span>
+          <button @click="activeTab = 'login'" class="text-primary hover:text-primary-light ml-1">ログイン</button>
         </div>
       </div>
     </div>

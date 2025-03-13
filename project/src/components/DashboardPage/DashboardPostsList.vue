@@ -2,7 +2,7 @@
   <div class="dashboard-posts-list">
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold">投稿管理</h2>
-      <div class="text-sm text-hint">
+      <div class="text-sm text-[rgb(var(--color-text-muted))]">
         全 {{ totalPosts }} 件
       </div>
     </div>
@@ -17,7 +17,7 @@
     
     <!-- 投稿がない場合 -->
     <div v-else-if="posts.length === 0" class="glass-card p-8 text-center">
-      <p class="text-hint mb-4">
+      <p class="text-[rgb(var(--color-text-muted))] mb-4">
         まだ投稿はありません
       </p>
       <router-link to="/create-post" class="btn btn-primary">
@@ -43,7 +43,7 @@
                 <span class="text-sm">{{ formatDate(post.updated_at || post.created_at) }}</span>
               </div>
             </div>
-            <p class="text-sm text-hint mb-2">
+            <p class="text-sm text-[rgb(var(--color-text-muted))] mb-2">
               {{ formatDate(post.created_at) }} · {{ post.views || 0 }} 閲覧
             </p>
             <div class="flex flex-wrap gap-1 mb-2">
@@ -107,7 +107,7 @@
     <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="glass-card p-6 max-w-md mx-auto">
         <h3 class="text-xl font-bold mb-4">投稿を削除しますか？</h3>
-        <p class="mb-6 text-hint">この操作は取り消せません。本当にこの投稿を削除しますか？</p>
+        <p class="mb-6 text-[rgb(var(--color-text-muted))]">この操作は取り消せません。本当にこの投稿を削除しますか？</p>
         <div class="flex justify-end space-x-3">
           <button @click="showDeleteModal = false" class="btn btn-ghost">キャンセル</button>
           <button 

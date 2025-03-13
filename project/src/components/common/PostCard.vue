@@ -99,7 +99,7 @@
               {{ getInitials(getUserName()) }}
             </div>
           </div>
-          <span class="text-sm author-name">{{ getUserName() }}</span>
+          <span class="text-sm text-[rgb(var(--color-text))]">{{ getUserName() }}</span>
           
           <!-- 統計情報（オプション） -->
           <div v-if="showStats" class="ml-auto flex space-x-3">
@@ -249,6 +249,19 @@ function getAvatarUrl(path: string): string {
 </script>
 
 <style scoped>
+.avatar-placeholder {
+  background-color: rgba(var(--color-primary-dark), 0.3);
+  color: var(--color-text);
+}
+
+.card-title {
+  color: var(--color-heading);
+}
+
+.card-description {
+  color: var(--color-text-muted);
+}
+
 .post-card {
   border-radius: 0.75rem;
 }
@@ -261,22 +274,8 @@ function getAvatarUrl(path: string): string {
   background-color: rgba(128, 128, 128, 0.1);
 }
 
-.avatar-placeholder {
-  background-color: rgba(var(--color-surface-accent), 0.3);
-  color: rgb(var(--color-text));
-  font-weight: bold;
-}
-
 .timestamp-overlay {
   background-color: rgba(0, 0, 0, 0.3);
   color: rgba(255, 255, 255, 0.9);
-}
-
-/* ダークモード対応 */
-@media (prefers-color-scheme: dark) {
-  .avatar-placeholder {
-    background-color: rgba(200, 200, 200, 0.2);
-    color: rgba(255, 255, 255, 0.8);
-  }
 }
 </style> 

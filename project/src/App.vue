@@ -91,58 +91,22 @@ onMounted(async () => {
   position: relative;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* スクロールバー */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-body {
-  font-family: 'Noto Sans JP', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  color: rgb(var(--color-text));
-  background-color: rgb(var(--color-background));
-  line-height: 1.5;
+::-webkit-scrollbar-track {
+  background: var(--color-background);
 }
 
-.app-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+::-webkit-scrollbar-thumb {
+  background: var(--color-secondary);
+  border-radius: 3px;
 }
 
-.main-content {
-  flex: 1;
-}
-
-.content {
-  padding: 2rem;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  color: rgb(var(--color-heading));
-  margin-bottom: 1rem;
-}
-
-a {
-  color: rgb(var(--color-primary));
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-button {
-  cursor: pointer;
-}
-
-@media (max-width: 768px) {
-  .content {
-    padding: 1rem;
-  }
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
 }
 </style> 
