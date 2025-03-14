@@ -1,9 +1,9 @@
 <template>
-  <div class="flex flex-col min-h-screen tech-dark-theme relative">
+  <div class="flex flex-col min-h-screen bg-[rgb(var(--color-background))] relative">
     <!-- 背景装飾 -->
     <div class="fixed inset-0 z-0 pointer-events-none">
-      <div class="absolute top-0 right-0 w-1/3 h-1/3 bg-primary/5 rounded-full blur-3xl"></div>
-      <div class="absolute bottom-0 left-0 w-1/2 h-1/2 bg-primary/5 rounded-full blur-3xl"></div>
+      <div class="absolute top-0 right-0 w-1/3 h-1/3 bg-[rgb(var(--color-primary)/0.05)] rounded-full blur-3xl shadow-[0_0_50px_rgb(var(--color-primary)/0.2)]"></div>
+      <div class="absolute bottom-0 left-0 w-1/2 h-1/2 bg-[rgb(var(--color-primary)/0.05)] rounded-full blur-3xl shadow-[0_0_50px_rgb(var(--color-primary)/0.2)]"></div>
     </div>
     
     <Navbar />
@@ -69,7 +69,6 @@ onMounted(async () => {
 </script>
 
 <style>
-/* ページ遷移アニメーション */
 .page-enter-active,
 .page-leave-active {
   transition: opacity 0.4s ease, transform 0.4s ease;
@@ -85,28 +84,21 @@ onMounted(async () => {
   transform: translateY(-20px);
 }
 
-.tech-dark-theme {
-  background-color: rgb(var(--color-background));
-  min-height: 100vh;
-  position: relative;
-}
-
-/* スクロールバー */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-background);
+  background: rgb(var(--color-background));
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-secondary);
+  background: rgb(var(--color-secondary));
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary);
+  background: rgb(var(--color-primary));
 }
 </style> 

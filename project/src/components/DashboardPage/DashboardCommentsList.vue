@@ -1,15 +1,15 @@
 <template>
-  <div class="dashboard-comments-list">
+  <div>
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold">コメント管理</h2>
-      <div class="text-sm text-gray-400">
+      <h2 class="text-xl font-bold text-[rgb(var(--color-heading))]">コメント管理</h2>
+      <div class="text-sm text-[rgb(var(--color-text-muted))]">
         全 {{ totalComments }} 件
       </div>
     </div>
     
     <!-- ローディング状態 -->
     <div v-if="loading" class="flex justify-center p-6">
-      <svg class="animate-spin h-8 w-8 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <svg class="animate-spin h-8 w-8 text-[rgb(var(--color-primary))]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
@@ -17,19 +17,19 @@
     
     <!-- コメントがない場合 -->
     <div v-else-if="comments.length === 0" class="glass-card p-8 text-center">
-      <p class="text-gray-400">
+      <p class="text-[rgb(var(--color-text-muted))]">
         まだコメントはありません
       </p>
     </div>
     
     <!-- コメントリスト -->
     <div v-else class="space-y-4">
-      <div v-for="comment in comments" :key="comment.id" class="glass-card p-4">
+      <div v-for="comment in comments" :key="comment.id" class="glass-card p-4 shadow-[0_4px_10px_rgb(var(--color-background)/0.5)]">
         <div class="flex flex-col">
           <!-- コメント内容 -->
           <div>
             <div class="flex items-center">
-              <div class="w-6 h-6 rounded-full bg-primary-light flex items-center justify-center text-white overflow-hidden mr-2">
+              <div class="w-6 h-6 rounded-full bg-[rgb(var(--color-primary-light))] flex items-center justify-center text-[rgb(var(--color-text-white))] overflow-hidden mr-2">
                 <img 
                   v-if="comment.post?.author?.avatar_data" 
                   :src="getAvatarUrl(comment.post.author.avatar_data)" 
@@ -38,19 +38,19 @@
                 />
                 <span v-else>{{ getInitials(comment.post?.author?.nickname || '') }}</span>
               </div>
-              <span class="text-sm">{{ comment.post?.author?.nickname || '不明なユーザー' }}</span>
+              <span class="text-sm text-[rgb(var(--color-text))]">{{ comment.post?.author?.nickname || '不明なユーザー' }}</span>
             </div>
             
-            <p class="whitespace-pre-wrap mb-2">{{ comment.content }}</p>
+            <p class="whitespace-pre-wrap mb-2 text-[rgb(var(--color-text))]">{{ comment.content }}</p>
             
             <div class="flex justify-between items-center">
               <router-link 
                 :to="`/posts/${comment.post_id}`" 
-                class="text-sm text-primary hover:underline"
+                class="text-sm text-[rgb(var(--color-primary))] hover:underline"
               >
                 {{ getPostTitle(comment) }}
               </router-link>
-              <span class="text-xs text-gray-400">
+              <span class="text-xs text-[rgb(var(--color-text-muted))]">
                 {{ formatDate(comment.created_at) }}
               </span>
             </div>
@@ -60,13 +60,13 @@
           <div class="flex justify-end space-x-2 mt-3">
             <button 
               @click="confirmEditComment(comment)" 
-              class="btn"
+              class="px-4 py-2 rounded font-medium transition-all bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] hover:bg-[rgb(var(--color-surface-variant))] shadow-[0_2px_4px_rgb(var(--color-background)/0.3)] hover:shadow-[0_3px_6px_rgb(var(--color-background)/0.4)]"
             >
               編集
             </button>
             <button 
               @click="confirmDeleteComment(comment)" 
-              class="btn"
+              class="px-4 py-2 rounded font-medium transition-all bg-[rgb(var(--color-error))] text-[rgb(var(--color-text-white))] hover:bg-[rgb(var(--color-error-dark))] shadow-[0_2px_4px_rgb(var(--color-background)/0.3)] hover:shadow-[0_3px_6px_rgb(var(--color-background)/0.4)]"
             >
               削除
             </button>
@@ -79,8 +79,9 @@
         <div class="flex space-x-2">
           <button 
             @click="changePage(currentPage - 1)" 
-            class="btn"
+            class="px-4 py-2 rounded font-medium transition-all bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] hover:bg-[rgb(var(--color-surface-variant))] shadow-[0_2px_4px_rgb(var(--color-background)/0.3)]"
             :disabled="currentPage === 1"
+            :class="{'opacity-50 cursor-not-allowed': currentPage === 1}"
           >
             前へ
           </button>
@@ -88,15 +89,16 @@
             v-for="page in getPageNumbers()" 
             :key="page"
             @click="changePage(typeof page === 'number' ? page : currentPage)" 
-            class="btn" 
-            :class="page === currentPage ? 'btn-primary' : ''"
+            class="px-4 py-2 rounded font-medium transition-all shadow-[0_2px_4px_rgb(var(--color-background)/0.3)]"
+            :class="page === currentPage ? 'bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))]' : 'bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] hover:bg-[rgb(var(--color-surface-variant))]'"
           >
             {{ page }}
           </button>
           <button 
             @click="changePage(currentPage + 1)" 
-            class="btn"
+            class="px-4 py-2 rounded font-medium transition-all bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] hover:bg-[rgb(var(--color-surface-variant))] shadow-[0_2px_4px_rgb(var(--color-background)/0.3)]"
             :disabled="currentPage === totalPages"
+            :class="{'opacity-50 cursor-not-allowed': currentPage === totalPages}"
           >
             次へ
           </button>
@@ -105,22 +107,28 @@
     </div>
     
     <!-- 編集モーダル -->
-    <div v-if="showEditModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="glass-card p-6 max-w-md w-full mx-auto">
-        <h3 class="text-xl font-bold mb-4">コメントを編集</h3>
+    <div v-if="showEditModal" class="fixed inset-0 bg-[rgb(var(--color-background)/0.8)] flex items-center justify-center z-50">
+      <div class="glass-card p-6 max-w-md w-full mx-auto shadow-[0_8px_16px_rgb(var(--color-background)/0.7)]">
+        <h3 class="text-xl font-bold mb-4 text-[rgb(var(--color-heading))]">コメントを編集</h3>
         <textarea 
           v-model="editedContent" 
-          class="w-full px-3 py-2 rounded border border-gray-700 bg-gray-800 focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+          class="w-full px-3 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))] focus:border-[rgb(var(--color-primary))] mb-4"
           rows="3"
         ></textarea>
         <div class="flex justify-end space-x-3">
-          <button @click="showEditModal = false" class="btn btn-ghost">キャンセル</button>
+          <button 
+            @click="showEditModal = false" 
+            class="btn btn-ghost"
+          >
+            キャンセル
+          </button>
           <button 
             @click="updateComment" 
             class="btn btn-primary"
             :disabled="actionSubmitting || !editedContent.trim()"
+            :class="{'opacity-70 cursor-not-allowed': actionSubmitting || !editedContent.trim()}"
           >
-            <svg v-if="actionSubmitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+            <svg v-if="actionSubmitting" class="animate-spin h-5 w-5 mr-2 inline" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
@@ -131,18 +139,24 @@
     </div>
     
     <!-- 削除確認モーダル -->
-    <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="glass-card p-6 max-w-md mx-auto">
-        <h3 class="text-xl font-bold mb-4">コメントを削除しますか？</h3>
-        <p class="mb-6 text-gray-400">この操作は取り消せません。本当にこのコメントを削除しますか？</p>
+    <div v-if="showDeleteModal" class="fixed inset-0 bg-[rgb(var(--color-background)/0.8)] flex items-center justify-center z-50">
+      <div class="glass-card p-6 max-w-md mx-auto shadow-[0_8px_16px_rgb(var(--color-background)/0.7)]">
+        <h3 class="text-xl font-bold mb-4 text-[rgb(var(--color-heading))]">コメントを削除しますか？</h3>
+        <p class="mb-6 text-[rgb(var(--color-text-muted))]">この操作は取り消せません。本当にこのコメントを削除しますか？</p>
         <div class="flex justify-end space-x-3">
-          <button @click="showDeleteModal = false" class="btn btn-ghost">キャンセル</button>
+          <button 
+            @click="showDeleteModal = false" 
+            class="btn btn-ghost"
+          >
+            キャンセル
+          </button>
           <button 
             @click="deleteComment" 
-            class="btn btn-primary"
+            class="px-4 py-2 rounded font-medium transition-all bg-[rgb(var(--color-error))] text-[rgb(var(--color-text-white))] hover:bg-[rgb(var(--color-error-dark))]"
             :disabled="actionSubmitting"
+            :class="{'opacity-70 cursor-not-allowed': actionSubmitting}"
           >
-            <svg v-if="actionSubmitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+            <svg v-if="actionSubmitting" class="animate-spin h-5 w-5 mr-2 inline" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>

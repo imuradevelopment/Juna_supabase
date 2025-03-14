@@ -1,5 +1,8 @@
 <template>
-  <div class="rich-text-content max-w-none" v-html="content"></div>
+  <div 
+    class="rich-text-content max-w-none text-[rgb(var(--color-text))] leading-[1.75] text-base prose dark:prose-invert prose-img:rounded-lg prose-img:shadow-[0_4px_8px_rgb(var(--color-background)/0.5)] prose-headings:text-[rgb(var(--color-heading))] prose-a:text-[rgb(var(--color-primary))] prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-4 prose-blockquote:border-[rgb(var(--color-primary))] prose-code:bg-[rgb(var(--color-surface-variant))] prose-pre:bg-[rgb(var(--color-surface-variant))] prose-ul:my-4 prose-ul:pl-6 prose-ul:list-disc prose-ol:my-4 prose-ol:pl-6 prose-ol:list-decimal prose-li:my-1"
+    v-html="content"
+  ></div>
 </template>
 
 <script setup lang="ts">
@@ -62,7 +65,7 @@ function renderTiptapContent(doc: any): string {
     if (Array.isArray(doc.content)) {
       doc.content.forEach((node: any) => {
         if (node.type === 'paragraph') {
-          html += '<p>';
+          html += '<p class="my-4">';
           if (Array.isArray(node.content)) {
             node.content.forEach((textNode: any) => {
               if (textNode.type === 'text') {
@@ -80,7 +83,11 @@ function renderTiptapContent(doc: any): string {
           html += '</p>';
         } else if (node.type === 'heading') {
           const level = node.attrs?.level || 1;
-          html += `<h${level}>`;
+          const headingClasses = level === 1 ? 'text-2xl font-bold mt-6 mb-4 text-[rgb(var(--color-heading))]' : 
+                                level === 2 ? 'text-xl font-semibold mt-6 mb-3 text-[rgb(var(--color-heading))]' : 
+                                'text-lg font-semibold mt-5 mb-2 text-[rgb(var(--color-heading))]';
+          
+          html += `<h${level} class="${headingClasses}">`;
           if (node.content) {
             node.content.forEach((textNode: any) => {
               if (textNode.type === 'text') html += textNode.text || '';
@@ -100,104 +107,4 @@ function renderTiptapContent(doc: any): string {
 
 // コンテンツを表示
 const content = computed(() => sanitizedContent.value);
-</script>
-
-<style>
-.rich-text-content {
-  /* proseの代わりに基本的なリッチテキスト用スタイルを追加 */
-  color: rgb(var(--color-text));
-  line-height: 1.75;
-  font-size: 1rem;
-}
-
-.rich-text-content h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-  color: rgb(var(--color-heading));
-}
-
-.rich-text-content h2 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-top: 1.5rem;
-  margin-bottom: 0.75rem;
-  color: rgb(var(--color-heading));
-}
-
-.rich-text-content h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-top: 1.25rem;
-  margin-bottom: 0.5rem;
-  color: rgb(var(--color-heading));
-}
-
-.rich-text-content p {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.rich-text-content ul, .rich-text-content ol {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  padding-left: 1.5rem;
-}
-
-.rich-text-content ul {
-  list-style-type: disc;
-}
-
-.rich-text-content ol {
-  list-style-type: decimal;
-}
-
-.rich-text-content li {
-  margin-top: 0.25rem;
-  margin-bottom: 0.25rem;
-}
-
-.rich-text-content img {
-  max-width: 100%;
-  border-radius: 0.5rem;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.rich-text-content a {
-  color: rgb(var(--color-primary));
-}
-.rich-text-content a:hover {
-  text-decoration: underline;
-}
-
-.rich-text-content blockquote {
-  border-left-width: 4px;
-  border-left-color: rgb(var(--color-primary));
-  padding-left: 1rem;
-  font-style: italic;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-}
-
-.rich-text-content code {
-  background-color: rgb(var(--color-surface-variant));
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
-  border-radius: 0.25rem;
-  font-family: monospace;
-}
-
-.rich-text-content pre {
-  background-color: rgb(var(--color-surface-variant));
-  padding: 1rem;
-  border-radius: 0.25rem;
-  overflow-x: auto;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  font-family: monospace;
-}
-
-/* ダークモード固有のスタイルは不要（すでにダークテーマがデフォルト） */
-</style> 
+</script> 

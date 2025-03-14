@@ -46,9 +46,6 @@
   --color-accent1: 125 211 252; /* 明るいシアン - infoと区別、装飾要素に使用 */
   --color-accent2: 244 114 182; /* ピンク/マゼンタ - 特徴的な要素や強調に使用 */
   --color-accent3: 14 165 233; /* 鮮やかな青 - アクション要素や特別なUIコンポーネントに使用 */
-  
-  /* シャドウ - 要素の立体感と階層を表現 */
-  --shadow-glass: 0 4px 6px rgba(0, 0, 0, 0.3); /* グラスモーフィズム効果用のシャドウ */
 }
 
 /* ====================================
@@ -62,8 +59,7 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgb(var(--color-border-light) / 0.6);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2), 
-              0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+  box-shadow: 0 4px 6px rgb(var(--color-background) / 0.3);
 }
 
 /* ====================================
@@ -97,12 +93,23 @@
 
 /* セカンダリーボタン - 補助的アクション用 */
 .btn-secondary {
-  @apply bg-secondary text-white hover:bg-secondary/80;
+  background-color: rgb(var(--color-secondary));
+  color: rgb(var(--color-text-white));
+  transition: background-color 0.2s;
+}
+
+.btn-secondary:hover {
+  background-color: rgb(var(--color-secondary) / 0.8);
 }
 
 /* ゴーストボタン - 目立たないアクション用 */
 .btn-ghost {
-  @apply bg-transparent text-primary hover:bg-primary hover:bg-opacity-10;
+  background-color: transparent;
+  color: rgb(var(--color-primary));
+}
+
+.btn-ghost:hover {
+  background-color: rgb(var(--color-primary) / 0.1);
 }
 
 /* ====================================

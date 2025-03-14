@@ -1,23 +1,23 @@
 <template>
-  <div class="dashboard-drafts-list">
+  <div>
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold">下書き</h2>
-      <div class="text-sm text-gray-400">
+      <h2 class="text-xl font-bold" style="color: rgb(var(--color-heading))">下書き</h2>
+      <div class="text-sm" style="color: rgb(var(--color-text-muted))">
         全 {{ totalDrafts }} 件
       </div>
     </div>
     
     <!-- ローディング状態 -->
     <div v-if="loading" class="flex justify-center p-6">
-      <svg class="animate-spin h-8 w-8 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <svg class="animate-spin h-8 w-8" style="color: rgb(var(--color-primary))" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
     </div>
     
     <!-- 下書きがない場合 -->
-    <div v-else-if="drafts.length === 0" class="glass-card p-8 text-center">
-      <p class="text-gray-400 mb-4">
+    <div v-else-if="drafts.length === 0" class="glass-card text-center">
+      <p class="mb-4" style="color: rgb(var(--color-text-muted))">
         下書きはありません
       </p>
       <router-link to="/create-post" class="btn btn-primary">
@@ -30,17 +30,18 @@
       <div v-for="draft in drafts" :key="draft.id" class="glass-card p-4">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div class="flex-1">
-            <h3 class="font-bold text-lg mb-1">
+            <h3 class="font-bold text-lg mb-1" style="color: rgb(var(--color-heading))">
               {{ draft.title || '(無題)' }}
             </h3>
-            <p class="text-sm text-gray-400 mb-2">
+            <p class="text-sm mb-2" style="color: rgb(var(--color-text-muted))">
               最終更新: {{ formatDate(draft.updated_at || draft.created_at) }}
             </p>
           </div>
           
           <!-- アクションボタン -->
           <div class="flex space-x-2 mt-3 md:mt-0">
-            <router-link :to="`/posts/${draft.id}/edit`" class="btn">
+            <router-link :to="`/posts/${draft.id}/edit`" class="btn" 
+                         style="background-color: transparent; color: rgb(var(--color-text)); border: 1px solid rgb(var(--color-border));">
               編集
             </router-link>
             <button 
@@ -52,6 +53,7 @@
             <button 
               @click="confirmDelete(draft)" 
               class="btn"
+              style="background-color: transparent; color: rgb(var(--color-text)); border: 1px solid rgb(var(--color-border));"
             >
               削除
             </button>
@@ -65,6 +67,13 @@
           <button 
             @click="changePage(currentPage - 1)" 
             class="btn"
+            :style="{
+              'background-color': currentPage === 1 ? 'rgb(var(--color-surface-variant))' : 'transparent',
+              'color': currentPage === 1 ? 'rgb(var(--color-text-muted))' : 'rgb(var(--color-text))',
+              'border': '1px solid rgb(var(--color-border))',
+              'cursor': currentPage === 1 ? 'not-allowed' : 'pointer',
+              'opacity': currentPage === 1 ? '0.7' : '1'
+            }"
             :disabled="currentPage === 1"
           >
             前へ
@@ -74,13 +83,24 @@
             :key="page"
             @click="changePage(typeof page === 'number' ? page : currentPage)" 
             class="btn" 
-            :class="page === currentPage ? 'btn-primary' : ''"
+            :style="{
+              'background-color': page === currentPage ? 'rgb(var(--color-primary))' : 'transparent',
+              'color': page === currentPage ? 'rgb(var(--color-text-white))' : 'rgb(var(--color-text))',
+              'border': page === currentPage ? '1px solid rgb(var(--color-primary-dark) / 0.3)' : '1px solid rgb(var(--color-border))'
+            }"
           >
             {{ page }}
           </button>
           <button 
             @click="changePage(currentPage + 1)" 
             class="btn"
+            :style="{
+              'background-color': currentPage === totalPages ? 'rgb(var(--color-surface-variant))' : 'transparent',
+              'color': currentPage === totalPages ? 'rgb(var(--color-text-muted))' : 'rgb(var(--color-text))',
+              'border': '1px solid rgb(var(--color-border))',
+              'cursor': currentPage === totalPages ? 'not-allowed' : 'pointer',
+              'opacity': currentPage === totalPages ? '0.7' : '1'
+            }"
             :disabled="currentPage === totalPages"
           >
             次へ
@@ -90,19 +110,28 @@
     </div>
     
     <!-- 削除確認モーダル -->
-    <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="glass-card p-6 max-w-md mx-auto">
-        <h3 class="text-xl font-bold mb-4">下書きを削除しますか？</h3>
-        <p class="mb-6 text-gray-400">この操作は取り消せません。本当にこの下書きを削除しますか？</p>
+    <div v-if="showDeleteModal" class="fixed inset-0 flex items-center justify-center z-50" style="background-color: rgb(var(--color-background) / 0.5);">
+      <div class="glass-card max-w-md mx-auto">
+        <h3 class="text-xl font-bold mb-4" style="color: rgb(var(--color-heading))">下書きを削除しますか？</h3>
+        <p class="mb-6" style="color: rgb(var(--color-text-muted))">この操作は取り消せません。本当にこの下書きを削除しますか？</p>
         <div class="flex justify-end space-x-3">
-          <button @click="showDeleteModal = false" class="btn">キャンセル</button>
+          <button @click="showDeleteModal = false" class="btn" 
+                  style="background-color: transparent; color: rgb(var(--color-text)); border: 1px solid rgb(var(--color-border));">
+            キャンセル
+          </button>
           <button 
             @click="deleteDraft" 
             class="btn"
-            style="background-color: rgb(var(--color-error)); color: rgb(var(--color-text-white));"
+            :style="{
+              'background-color': 'rgb(var(--color-error))',
+              'color': 'rgb(var(--color-text-white))',
+              'opacity': actionSubmitting ? '0.7' : '1',
+              'cursor': actionSubmitting ? 'not-allowed' : 'pointer',
+              'border': '1px solid rgb(var(--color-error-dark) / 0.3)'
+            }"
             :disabled="actionSubmitting"
           >
-            <svg v-if="actionSubmitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+            <svg v-if="actionSubmitting" class="animate-spin h-5 w-5 mr-2 inline-block" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
@@ -113,18 +142,25 @@
     </div>
     
     <!-- 公開確認モーダル -->
-    <div v-if="showPublishModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="glass-card p-6 max-w-md mx-auto">
-        <h3 class="text-xl font-bold mb-4">下書きを公開しますか？</h3>
-        <p class="mb-6 text-gray-400">この下書きを公開すると、すべてのユーザーが閲覧できるようになります。</p>
+    <div v-if="showPublishModal" class="fixed inset-0 flex items-center justify-center z-50" style="background-color: rgb(var(--color-background) / 0.5);">
+      <div class="glass-card max-w-md mx-auto">
+        <h3 class="text-xl font-bold mb-4" style="color: rgb(var(--color-heading))">下書きを公開しますか？</h3>
+        <p class="mb-6" style="color: rgb(var(--color-text-muted))">この下書きを公開すると、すべてのユーザーが閲覧できるようになります。</p>
         <div class="flex justify-end space-x-3">
-          <button @click="showPublishModal = false" class="btn">キャンセル</button>
+          <button @click="showPublishModal = false" class="btn"
+                  style="background-color: transparent; color: rgb(var(--color-text)); border: 1px solid rgb(var(--color-border));">
+            キャンセル
+          </button>
           <button 
             @click="publishDraft" 
             class="btn btn-primary"
+            :style="{
+              'opacity': actionSubmitting ? '0.7' : '1',
+              'cursor': actionSubmitting ? 'not-allowed' : 'pointer'
+            }"
             :disabled="actionSubmitting"
           >
-            <svg v-if="actionSubmitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+            <svg v-if="actionSubmitting" class="animate-spin h-5 w-5 mr-2 inline-block" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>

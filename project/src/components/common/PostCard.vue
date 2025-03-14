@@ -1,22 +1,25 @@
 <template>
   <router-link 
     :to="`/posts/${post.id}`" 
-    class="post-card glass-card overflow-hidden block transition-all relative"
+    class="rounded-xl glass-card overflow-hidden block transition-all relative"
     :class="[
       layout === 'vertical' ? 'flex-col' : 'p-4',
-      hoverEffect ? 'hover:shadow-lg duration-300' : '',
-      layout === 'vertical' && hoverEffect ? 'hover:translate-y-[-5px] hover:shadow-xl' : '',
+      hoverEffect ? 'hover:shadow-[0_10px_15px_-3px_rgb(var(--color-primary)/0.3)] duration-300' : '',
+      layout === 'vertical' && hoverEffect ? 'hover:-translate-y-[5px] hover:shadow-[0_20px_25px_-5px_rgb(var(--color-primary-dark)/0.4)]' : '',
       customClass
     ]"
   >
     <!-- 縦型レイアウト用アクセント装飾 -->
-    <div v-if="layout === 'vertical'" class="absolute top-0 left-0 w-full h-1 card-accent opacity-70"></div>
+    <div 
+      v-if="layout === 'vertical'" 
+      class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[rgb(var(--color-primary))] to-[rgb(var(--color-primary-light))] opacity-70"
+    ></div>
     
     <div :class="layout === 'vertical' ? 'relative h-full flex flex-col' : 'flex'">
       <!-- 画像コンテナ - レイアウトに応じてサイズ変更 -->
       <div 
         :class="[
-          'image-background relative overflow-hidden',
+          'relative overflow-hidden',
           layout === 'vertical' ? 'aspect-video' : 'flex-shrink-0 rounded-lg mr-4',
           layout === 'horizontal' ? 'w-24 h-24' : ''
         ]"
@@ -29,16 +32,22 @@
           :class="{ 'transition-transform duration-700 hover:scale-110': layout === 'vertical' }"
           loading="lazy"
         />
-        <div v-else class="w-full h-full flex items-center justify-center image-placeholder">
+        <div 
+          v-else 
+          class="w-full h-full flex items-center justify-center bg-[rgba(var(--color-surface-variant),0.5)]"
+        >
           <svg xmlns="http://www.w3.org/2000/svg" 
                :class="layout === 'vertical' ? 'h-12 w-12' : 'h-8 w-8'" 
-               class="text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               class="text-[rgb(var(--color-text-muted))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
         </div>
         
         <!-- 日付オーバーレイ - 縦型レイアウトのみ -->
-        <div v-if="layout === 'vertical'" class="absolute bottom-3 right-3 timestamp-overlay text-xs px-2 py-1 rounded backdrop-blur-sm">
+        <div 
+          v-if="layout === 'vertical'" 
+          class="absolute bottom-3 right-3 text-xs px-2 py-1 rounded backdrop-blur-sm bg-[rgba(0,0,0,0.4)] text-[rgb(var(--color-text-white))]"
+        >
           {{ formatDate(post.published_at || post.created_at) }}
         </div>
       </div>
@@ -48,7 +57,7 @@
         <!-- タイトル - ハイライト対応 -->
         <h3 
           :class="[
-            layout === 'vertical' ? 'text-xl font-semibold mb-2 card-title' : 'text-lg font-semibold mb-2',
+            layout === 'vertical' ? 'text-xl font-semibold mb-2 text-[rgb(var(--color-heading))]' : 'text-lg font-semibold mb-2 text-[rgb(var(--color-heading))]',
             'overflow-hidden'
           ]"
           :style="layout === 'vertical' ? {} : {'-webkit-line-clamp': 2, display: '-webkit-box', '-webkit-box-orient': 'vertical'}"
@@ -57,7 +66,7 @@
         ></h3>
         <h3 
           :class="[
-            layout === 'vertical' ? 'text-xl font-semibold mb-2 card-title' : 'text-lg font-semibold mb-2',
+            layout === 'vertical' ? 'text-xl font-semibold mb-2 text-[rgb(var(--color-heading))]' : 'text-lg font-semibold mb-2 text-[rgb(var(--color-heading))]',
             'overflow-hidden'
           ]"
           :style="layout === 'vertical' ? {} : {'-webkit-line-clamp': 2, display: '-webkit-box', '-webkit-box-orient': 'vertical'}"
@@ -68,7 +77,7 @@
         <p 
           v-if="post.excerpt_highlight" 
           :class="[
-            layout === 'vertical' ? 'text-sm mb-4 card-description' : 'text-sm text-text-muted mb-2',
+            layout === 'vertical' ? 'text-sm mb-4 text-[rgb(var(--color-text-muted))]' : 'text-sm text-[rgb(var(--color-text-muted))] mb-2',
             'overflow-hidden'
           ]"
           :style="{'-webkit-line-clamp': layout === 'vertical' ? 3 : 2, display: '-webkit-box', '-webkit-box-orient': 'vertical'}"
@@ -77,7 +86,7 @@
         <p 
           v-else-if="post.excerpt" 
           :class="[
-            layout === 'vertical' ? 'text-sm mb-4 card-description' : 'text-sm text-text-muted mb-2',
+            layout === 'vertical' ? 'text-sm mb-4 text-[rgb(var(--color-text-muted))]' : 'text-sm text-[rgb(var(--color-text-muted))] mb-2',
             'overflow-hidden'
           ]"
           :style="{'-webkit-line-clamp': layout === 'vertical' ? 3 : 2, display: '-webkit-box', '-webkit-box-orient': 'vertical'}"
@@ -86,16 +95,22 @@
         </p>
         
         <!-- フッター部分 -->
-        <div v-if="layout === 'vertical'" class="flex items-center mt-auto pt-3" style="border-top: 1px solid rgb(var(--color-border-light))">
+        <div 
+          v-if="layout === 'vertical'" 
+          class="flex items-center mt-auto pt-3 border-t border-[rgb(var(--color-border-light))]"
+        >
           <!-- ユーザーアバター -->
-          <div class="w-8 h-8 rounded-full avatar-container flex items-center justify-center mr-3 overflow-hidden">
+          <div class="w-8 h-8 rounded-full mr-3 overflow-hidden flex items-center justify-center">
             <img 
               v-if="post.profiles?.avatar_data || post.avatar_url" 
               :src="getAvatarUrl(post.profiles?.avatar_data || post.avatar_url!)" 
               :alt="getUserName()"
               class="w-full h-full rounded-full object-cover"
             />
-            <div v-else class="w-full h-full avatar-placeholder flex items-center justify-center">
+            <div 
+              v-else 
+              class="w-full h-full flex items-center justify-center bg-[rgba(var(--color-primary-dark),0.3)] text-[rgb(var(--color-text))]"
+            >
               {{ getInitials(getUserName()) }}
             </div>
           </div>
@@ -104,29 +119,29 @@
           <!-- 統計情報（オプション） -->
           <div v-if="showStats" class="ml-auto flex space-x-3">
             <div class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-[rgb(var(--color-text-muted))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
-              <span>{{ post.views || 0 }}</span>
+              <span class="text-[rgb(var(--color-text-muted))]">{{ post.views || 0 }}</span>
             </div>
             <div class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-[rgb(var(--color-accent2))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
-              <span>{{ post.like_count || post.likes_count || 0 }}</span>
+              <span class="text-[rgb(var(--color-text-muted))]">{{ post.like_count || post.likes_count || 0 }}</span>
             </div>
             <div class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-[rgb(var(--color-accent3))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
-              <span>{{ post.comment_count || post.comments_count || 0 }}</span>
+              <span class="text-[rgb(var(--color-text-muted))]">{{ post.comment_count || post.comments_count || 0 }}</span>
             </div>
           </div>
         </div>
         
         <!-- 横型レイアウト用フッター -->
-        <div v-else class="flex justify-between items-center text-xs text-text-muted">
+        <div v-else class="flex justify-between items-center text-xs text-[rgb(var(--color-text-muted))]">
           <div class="flex items-center">
             <span class="mr-3">{{ formatDate(post.published_at || post.created_at) }}</span>
             <span class="mr-1">{{ getUserName() }}</span>
@@ -135,20 +150,20 @@
           <!-- 統計情報（横型では常に表示） -->
           <div class="flex space-x-3">
             <div class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-[rgb(var(--color-text-muted))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
               </svg>
               <span>{{ post.views || 0 }}</span>
             </div>
             <div class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-[rgb(var(--color-accent2))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
               <span>{{ post.like_count || post.likes_count || 0 }}</span>
             </div>
             <div class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-[rgb(var(--color-accent3))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
               <span>{{ post.comment_count || post.comments_count || 0 }}</span>
@@ -246,36 +261,4 @@ function getImageUrl(path: string): string {
 function getAvatarUrl(path: string): string {
   return getProfileImageUrl(path);
 }
-</script>
-
-<style scoped>
-.avatar-placeholder {
-  background-color: rgba(var(--color-primary-dark), 0.3);
-  color: var(--color-text);
-}
-
-.card-title {
-  color: var(--color-heading);
-}
-
-.card-description {
-  color: var(--color-text-muted);
-}
-
-.post-card {
-  border-radius: 0.75rem;
-}
-
-.card-accent {
-  background: linear-gradient(to right, rgb(var(--color-primary)), rgb(var(--color-primary-light)));
-}
-
-.image-placeholder {
-  background-color: rgba(128, 128, 128, 0.1);
-}
-
-.timestamp-overlay {
-  background-color: rgba(0, 0, 0, 0.3);
-  color: rgba(255, 255, 255, 0.9);
-}
-</style> 
+</script> 
