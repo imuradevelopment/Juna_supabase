@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-posts-list">
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold">投稿管理</h2>
       <div class="text-sm text-[rgb(var(--color-text-muted))]">
         全 {{ totalPosts }} 件
@@ -9,7 +9,7 @@
     
     <!-- ローディング状態 -->
     <div v-if="loading" class="flex justify-center p-6">
-      <svg class="animate-spin h-8 w-8 text-[rgb(var(--color-primary))]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <svg class="w-8 h-8 animate-spin text-[rgb(var(--color-primary))]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
@@ -17,7 +17,7 @@
     
     <!-- 投稿がない場合 -->
     <div v-else-if="posts.length === 0" class="glass-card p-8 text-center">
-      <p class="text-[rgb(var(--color-text-muted))] mb-4">
+      <p class="mb-4 text-[rgb(var(--color-text-muted))]">
         まだ投稿はありません
       </p>
       <router-link to="/create-post" class="btn btn-primary">
@@ -30,20 +30,20 @@
       <div v-for="post in posts" :key="post.id" class="glass-card p-4">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div class="flex-1">
-            <h3 class="font-bold text-lg mb-1">
+            <h3 class="mb-1 text-lg font-bold">
               <router-link :to="`/posts/${post.id}`" class="hover:text-[rgb(var(--color-primary))]">
                 {{ post.title }}
               </router-link>
             </h3>
             <div class="flex items-center">
-              <div class="px-2 py-1 text-xs rounded-full bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] inline-flex">
+              <div class="inline-flex px-2 py-1 text-xs rounded-full bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))]">
                 {{ post.published ? '公開中' : '下書き' }}
               </div>
               <div class="ml-2">
                 <span class="text-sm">{{ formatDate(post.updated_at || post.created_at) }}</span>
               </div>
             </div>
-            <p class="text-sm text-[rgb(var(--color-text-muted))] mb-2">
+            <p class="mb-2 text-sm text-[rgb(var(--color-text-muted))]">
               {{ formatDate(post.created_at) }} · {{ post.views || 0 }} 閲覧
             </p>
             <div class="flex flex-wrap gap-1 mb-2">
@@ -51,7 +51,7 @@
                 v-for="category in post.categories" 
                 :key="category.id"
                 :to="`/categories/${category.id}`"
-                class="text-xs px-2 py-1 rounded-full bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]"
+                class="px-2 py-1 text-xs rounded-full bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]"
               >
                 {{ category.name }}
               </router-link>
@@ -59,8 +59,8 @@
           </div>
           
           <!-- アクションボタン -->
-          <div class="flex space-x-2 mt-3 md:mt-0">
-            <router-link :to="`/posts/${post.id}/edit`" class="btn px-3 py-1 text-sm bg-transparent text-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-primary)/0.1)]">
+          <div class="flex mt-3 space-x-2 md:mt-0">
+            <router-link :to="`/editor/${post.id}`" class="btn px-3 py-1 text-sm bg-transparent text-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-primary)/0.1)]">
               編集
             </router-link>
             <button 
@@ -104,9 +104,9 @@
     </div>
     
     <!-- 削除確認モーダル -->
-    <div v-if="showDeleteModal" class="fixed inset-0 bg-[rgb(var(--color-background))/0.8] flex items-center justify-center z-50">
-      <div class="glass-card p-6 max-w-md mx-auto">
-        <h3 class="text-xl font-bold mb-4">投稿を削除しますか？</h3>
+    <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--color-background))/0.8]">
+      <div class="glass-card p-6 mx-auto max-w-md">
+        <h3 class="mb-4 text-xl font-bold">投稿を削除しますか？</h3>
         <p class="mb-6 text-[rgb(var(--color-text-muted))]">この操作は取り消せません。本当にこの投稿を削除しますか？</p>
         <div class="flex justify-end space-x-3">
           <button @click="showDeleteModal = false" class="btn px-3 py-1 bg-transparent text-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-primary)/0.1)]">キャンセル</button>
@@ -115,7 +115,7 @@
             class="btn bg-[rgb(var(--color-error))] text-[rgb(var(--color-text-white))] hover:bg-[rgb(var(--color-error-dark))]"
             :disabled="deleteSubmitting"
           >
-            <svg v-if="deleteSubmitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+            <svg v-if="deleteSubmitting" class="w-5 h-5 mr-2 animate-spin" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>

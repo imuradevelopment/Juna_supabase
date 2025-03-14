@@ -17,7 +17,7 @@
         <!-- アバター -->
         <div>
           <label class="block text-sm font-medium mb-2 text-[rgb(var(--color-text))]">プロフィール画像</label>
-          <div class="flex flex-col sm:flex-row items-start space-y-3 sm:space-y-0 sm:space-x-4">
+          <div class="flex flex-col items-start space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
             <!-- アバター表示部分 -->
             <div class="flex flex-col items-center">
               <div class="relative w-24 h-24 rounded-full bg-[rgb(var(--color-primary-light))] flex items-center justify-center text-[rgb(var(--color-text-white))] text-3xl overflow-hidden">

@@ -2,12 +2,12 @@
   <div>
     <!-- コメント投稿フォーム -->
     <div class="mb-6">
-      <div class="p-5 rounded-lg border shadow-[0_2px_4px_rgba(var(--color-background),0.2)]" style="background-color: rgb(var(--color-surface-variant)); border-color: rgb(var(--color-border));">
-        <div v-if="!authStore.isAuthenticated" class="text-center py-4">
+      <div class="rounded-lg border p-5 shadow-[0_2px_4px_rgba(var(--color-background),0.2)]" style="background-color: rgb(var(--color-surface-variant)); border-color: rgb(var(--color-border));">
+        <div v-if="!authStore.isAuthenticated" class="py-4 text-center">
           <p class="mb-3" style="color: rgb(var(--color-text-muted));">
             コメントするにはログインが必要です
           </p>
-          <router-link to="/login" class="px-4 py-2 rounded font-medium transition-all hover:shadow-md" style="background-color: rgb(var(--color-primary-dark)); color: rgb(var(--color-text-white));">
+          <router-link to="/login" class="rounded px-4 py-2 font-medium transition-all hover:shadow-md" style="background-color: rgb(var(--color-primary-dark)); color: rgb(var(--color-text-white));">
             ログインする
           </router-link>
         </div>
@@ -16,7 +16,7 @@
           <div class="mb-3">
             <textarea 
               v-model="commentText" 
-              class="w-full p-4 rounded-lg transition-all placeholder-[rgb(var(--color-text-muted))] focus:outline-none focus:shadow-[0_0_0_2px_rgb(var(--color-primary)_/_0.2)] focus:border-[rgb(var(--color-primary))]" 
+              class="w-full rounded-lg border p-4 transition-all placeholder-[rgb(var(--color-text-muted))] focus:outline-none focus:shadow-[0_0_0_2px_rgb(var(--color-primary)_/_0.2)] focus:border-[rgb(var(--color-primary))]" 
               style="background-color: rgb(var(--color-surface)); color: rgb(var(--color-text)); border: 1px solid rgb(var(--color-border));"
               rows="3"
               :placeholder="parentCommentId ? '返信を入力...' : 'コメントを入力...'"
@@ -28,11 +28,11 @@
           <div class="flex justify-end">
             <button 
               type="submit" 
-              class="px-4 py-2 rounded font-medium flex items-center justify-center transition-all hover:shadow-[0_4px_8px_rgba(var(--color-primary-dark),0.3)]"
+              class="flex items-center justify-center rounded px-4 py-2 font-medium transition-all hover:shadow-[0_4px_8px_rgba(var(--color-primary-dark),0.3)]"
               style="background-color: rgb(var(--color-primary-dark)); color: rgb(var(--color-text-white));"
               :disabled="submitting || !commentText.trim()"
             >
-              <svg v-if="submitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+              <svg v-if="submitting" class="h-5 w-5 mr-2 animate-spin" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -43,17 +43,12 @@
       </div>
     </div>
 
-    <!-- コメント数 -->
-    <div class="mb-4">
-      <h3 class="text-xl font-bold" style="color: rgb(var(--color-heading));">コメント {{ comments.length }}件</h3>
-    </div>
-
     <!-- コメント一覧 -->
     <div v-if="loading" class="flex justify-center p-4">
-      <div class="w-6 h-6 rounded-full border-2 border-t-transparent animate-spin" style="border-color: rgb(var(--color-primary-light)) transparent rgb(var(--color-primary-light)) transparent;"></div>
+      <div class="h-6 w-6 rounded-full border-2 border-t-transparent animate-spin" style="border-color: rgb(var(--color-primary-light)) transparent rgb(var(--color-primary-light)) transparent;"></div>
     </div>
 
-    <div v-else-if="comments.length === 0" class="text-center py-8">
+    <div v-else-if="comments.length === 0" class="py-8 text-center">
       <p style="color: rgb(var(--color-text-muted));">
         まだコメントはありません。最初のコメントを投稿してみましょう。
       </p>
@@ -65,15 +60,15 @@
         <!-- 個別コメント表示 -->
         <div class="mb-4">
           <!-- コメント本体 -->
-          <div class="flex mb-4">
+          <div class="mb-4 flex">
             <!-- アバター -->
-            <div class="flex-shrink-0 mr-3">
-              <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden" style="background-color: rgb(var(--color-primary-light)); color: rgb(var(--color-text-white));">
+            <div class="mr-3 flex-shrink-0">
+              <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full" style="background-color: rgb(var(--color-primary-light)); color: rgb(var(--color-text-white));">
                 <img 
                   v-if="comment.profiles?.avatar_data" 
                   :src="getAvatarUrl(comment.profiles.avatar_data)" 
                   :alt="comment.profiles.nickname"
-                  class="w-full h-full object-cover"
+                  class="h-full w-full object-cover"
                 />
                 <span v-else>{{ getInitials(comment.profiles?.nickname || '?') }}</span>
               </div>
@@ -81,9 +76,9 @@
             
             <!-- コメント内容 -->
             <div class="flex-1">
-              <div class="rounded-lg p-3 border backdrop-blur-sm" style="background-color: rgb(var(--color-surface) / 0.8); border-color: rgb(var(--color-border-light) / 0.6); box-shadow: 0 2px 6px rgba(var(--color-background), 0.3);">
+              <div class="rounded-lg border p-3 backdrop-blur-sm" style="background-color: rgb(var(--color-surface) / 0.8); border-color: rgb(var(--color-border-light) / 0.6); box-shadow: 0 2px 6px rgba(var(--color-background), 0.3);">
                 <!-- ユーザー情報と日時 -->
-                <div class="flex justify-between items-center mb-2">
+                <div class="mb-2 flex items-center justify-between">
                   <span class="font-medium" style="color: rgb(var(--color-text));">{{ comment.profiles?.nickname }}</span>
                   <span class="text-xs" style="color: rgb(var(--color-text-muted));">{{ formatDate(comment.created_at) }}</span>
                 </div>
@@ -92,11 +87,11 @@
                 <div v-if="editingCommentId === comment.id" class="mb-2">
                   <textarea 
                     v-model="editedContent" 
-                    class="w-full px-3 py-2 rounded border focus:outline-none" 
+                    class="w-full rounded border px-3 py-2 focus:outline-none" 
                     style="background-color: rgb(var(--color-surface)); color: rgb(var(--color-text)); border-color: rgb(var(--color-border)); box-shadow: 0 0 0 2px rgb(var(--color-primary) / 0.2);"
                     rows="2"
                   ></textarea>
-                  <div class="flex justify-end space-x-2 mt-2">
+                  <div class="mt-2 flex justify-end space-x-2">
                     <button 
                       @click="cancelEdit" 
                       class="text-xs hover:text-[rgb(var(--color-text-white))]"
@@ -116,14 +111,14 @@
                 </div>
                 
                 <!-- コメント表示 -->
-                <p v-else class="text-sm whitespace-pre-wrap" style="color: rgb(var(--color-text));">{{ comment.content }}</p>
+                <p v-else class="whitespace-pre-wrap text-sm" style="color: rgb(var(--color-text));">{{ comment.content }}</p>
               </div>
               
               <!-- アクションボタン -->
-              <div class="flex text-xs mt-1 space-x-4">
+              <div class="mt-1 flex space-x-4 text-xs">
                 <button 
                   @click="setReplyTo(comment)" 
-                  class="px-4 py-2 rounded font-medium flex items-center justify-center transition-all hover:shadow-md"
+                  class="flex items-center justify-center rounded px-4 py-2 font-medium transition-all hover:shadow-md"
                   style="background-color: rgb(var(--color-primary-dark)); color: rgb(var(--color-text-white));"
                   :disabled="submitting || !commentText.trim()"
                 >
@@ -153,7 +148,7 @@
                   :style="{ color: isCommentLiked(comment.id) ? `rgb(var(--color-primary-light))` : `rgb(var(--color-text-muted))` }"
                 >
                   <span class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{ 'fill-current': isCommentLiked(comment.id) }">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{ 'fill-current': isCommentLiked(comment.id) }">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
                     {{ getCommentLikeCount(comment) }}
@@ -164,13 +159,13 @@
           </div>
           
           <!-- 返信フォーム -->
-          <div v-if="parentCommentId === comment.id" class="ml-12 mb-4">
-            <div class="p-5 rounded-lg border shadow-[0_2px_4px_rgba(var(--color-background),0.2)]" style="background-color: rgb(var(--color-surface-variant)); border-color: rgb(var(--color-border));">
+          <div v-if="parentCommentId === comment.id" class="mb-4 ml-12">
+            <div class="rounded-lg border p-5 shadow-[0_2px_4px_rgba(var(--color-background),0.2)]" style="background-color: rgb(var(--color-surface-variant)); border-color: rgb(var(--color-border));">
               <form @submit.prevent="submitComment" class="space-y-3">
                 <div class="mb-3">
                   <textarea 
                     v-model="commentText" 
-                    class="w-full p-4 rounded-lg transition-all placeholder-[rgb(var(--color-text-muted))] focus:outline-none focus:shadow-[0_0_0_2px_rgb(var(--color-primary)_/_0.2)] focus:border-[rgb(var(--color-primary))]" 
+                    class="w-full rounded-lg border p-4 transition-all placeholder-[rgb(var(--color-text-muted))] focus:outline-none focus:shadow-[0_0_0_2px_rgb(var(--color-primary)_/_0.2)] focus:border-[rgb(var(--color-primary))]" 
                     style="background-color: rgb(var(--color-surface)); color: rgb(var(--color-text)); border: 1px solid rgb(var(--color-border));"
                     rows="3"
                     placeholder="返信を入力..."
@@ -190,11 +185,11 @@
                 
                   <button 
                     type="submit" 
-                    class="px-4 py-2 rounded font-medium flex items-center justify-center transition-all hover:shadow-[0_4px_8px_rgba(var(--color-primary-dark),0.3)]"
+                    class="flex items-center justify-center rounded px-4 py-2 font-medium transition-all hover:shadow-[0_4px_8px_rgba(var(--color-primary-dark),0.3)]"
                     style="background-color: rgb(var(--color-primary-dark)); color: rgb(var(--color-text-white));"
                     :disabled="submitting || !commentText.trim()"
                   >
-                    <svg v-if="submitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+                    <svg v-if="submitting" class="mr-2 h-5 w-5 animate-spin" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -209,15 +204,15 @@
           <div v-if="getCommentReplies(comment.id).length > 0" class="ml-12">
             <div v-for="reply in getCommentReplies(comment.id)" :key="reply.id" class="mb-4">
               <!-- 返信コメント本体 -->
-              <div class="flex mb-4">
+              <div class="mb-4 flex">
                 <!-- アバター -->
-                <div class="flex-shrink-0 mr-3">
-                  <div class="w-10 h-10 rounded-full flex items-center justify-center overflow-hidden" style="background-color: rgb(var(--color-primary-light)); color: rgb(var(--color-text-white));">
+                <div class="mr-3 flex-shrink-0">
+                  <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full" style="background-color: rgb(var(--color-primary-light)); color: rgb(var(--color-text-white));">
                     <img 
                       v-if="reply.profiles?.avatar_data" 
                       :src="getAvatarUrl(reply.profiles.avatar_data)" 
                       :alt="reply.profiles.nickname"
-                      class="w-full h-full object-cover"
+                      class="h-full w-full object-cover"
                     />
                     <span v-else>{{ getInitials(reply.profiles?.nickname || '?') }}</span>
                   </div>
@@ -225,9 +220,9 @@
                 
                 <!-- 返信コメント内容 -->
                 <div class="flex-1">
-                  <div class="rounded-lg p-3 border backdrop-blur-sm" style="background-color: rgb(var(--color-surface) / 0.8); border-color: rgb(var(--color-border-light) / 0.6); box-shadow: 0 2px 6px rgba(var(--color-background), 0.3);">
+                  <div class="rounded-lg border p-3 backdrop-blur-sm" style="background-color: rgb(var(--color-surface) / 0.8); border-color: rgb(var(--color-border-light) / 0.6); box-shadow: 0 2px 6px rgba(var(--color-background), 0.3);">
                     <!-- ユーザー情報と日時 -->
-                    <div class="flex justify-between items-center mb-2">
+                    <div class="mb-2 flex items-center justify-between">
                       <span class="font-medium" style="color: rgb(var(--color-text));">{{ reply.profiles?.nickname }}</span>
                       <span class="text-xs" style="color: rgb(var(--color-text-muted));">{{ formatDate(reply.created_at) }}</span>
                     </div>
@@ -236,11 +231,11 @@
                     <div v-if="editingCommentId === reply.id" class="mb-2">
                       <textarea 
                         v-model="editedContent" 
-                        class="w-full px-3 py-2 rounded border focus:outline-none" 
+                        class="w-full rounded border px-3 py-2 focus:outline-none" 
                         style="background-color: rgb(var(--color-surface)); color: rgb(var(--color-text)); border-color: rgb(var(--color-border)); box-shadow: 0 0 0 2px rgb(var(--color-primary) / 0.2);"
                         rows="2"
                       ></textarea>
-                      <div class="flex justify-end space-x-2 mt-2">
+                      <div class="mt-2 flex justify-end space-x-2">
                         <button 
                           @click="cancelEdit" 
                           class="text-xs hover:text-[rgb(var(--color-text-white))]"
@@ -260,14 +255,14 @@
                     </div>
                     
                     <!-- コメント表示 -->
-                    <p v-else class="text-sm whitespace-pre-wrap" style="color: rgb(var(--color-text));">{{ reply.content }}</p>
+                    <p v-else class="whitespace-pre-wrap text-sm" style="color: rgb(var(--color-text));">{{ reply.content }}</p>
                   </div>
                   
                   <!-- アクションボタン -->
-                  <div class="flex text-xs mt-1 space-x-4">
+                  <div class="mt-1 flex space-x-4 text-xs">
                     <button 
                       @click="setReplyTo(comment)" 
-                      class="px-4 py-2 rounded font-medium flex items-center justify-center transition-all hover:shadow-md"
+                      class="flex items-center justify-center rounded px-4 py-2 font-medium transition-all hover:shadow-md"
                       style="background-color: rgb(var(--color-primary-dark)); color: rgb(var(--color-text-white));"
                       :disabled="submitting || !commentText.trim()"
                     >
@@ -297,7 +292,7 @@
                       :style="{ color: isCommentLiked(reply.id) ? `rgb(var(--color-primary-light))` : `rgb(var(--color-text-muted))` }"
                     >
                       <span class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{ 'fill-current': isCommentLiked(reply.id) }">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{ 'fill-current': isCommentLiked(reply.id) }">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                         {{ getCommentLikeCount(reply) }}
@@ -313,23 +308,23 @@
     </div>
 
     <!-- 削除確認モーダル -->
-    <div v-if="showDeleteModal" class="fixed inset-0 flex items-center justify-center z-50 p-4" style="background-color: rgba(var(--color-background), 0.5);">
-      <div class="rounded-lg p-6 max-w-sm w-full backdrop-blur-sm" style="background-color: rgb(var(--color-surface) / 0.8); border: 1px solid rgb(var(--color-border-light) / 0.6); box-shadow: 0 4px 10px rgba(var(--color-background), 0.4);">
-        <h3 class="text-lg font-bold mb-4" style="color: rgb(var(--color-heading));">コメントを削除しますか？</h3>
+    <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(var(--color-background), 0.5);">
+      <div class="w-full max-w-sm rounded-lg p-6 backdrop-blur-sm" style="background-color: rgb(var(--color-surface) / 0.8); border: 1px solid rgb(var(--color-border-light) / 0.6); box-shadow: 0 4px 10px rgba(var(--color-background), 0.4);">
+        <h3 class="mb-4 text-lg font-bold" style="color: rgb(var(--color-heading));">コメントを削除しますか？</h3>
         <p class="mb-6" style="color: rgb(var(--color-text-muted));">
           この操作は取り消せません。
         </p>
         <div class="flex justify-end space-x-4">
           <button 
             @click="showDeleteModal = false" 
-            class="px-4 py-2 rounded font-medium transition-all"
+            class="rounded px-4 py-2 font-medium transition-all"
             style="background-color: transparent; color: rgb(var(--color-primary)); border: 1px solid rgb(var(--color-border));"
           >
             キャンセル
           </button>
           <button 
             @click="deleteComment" 
-            class="px-4 py-2 rounded font-medium transition-all"
+            class="rounded px-4 py-2 font-medium transition-all"
             style="background-color: rgb(var(--color-error)); color: rgb(var(--color-text-white));"
             :disabled="deleteSubmitting"
           >

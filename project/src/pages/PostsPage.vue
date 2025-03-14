@@ -3,12 +3,12 @@
     <h1 class="text-3xl font-bold mb-6 text-[rgb(var(--color-heading))]">投稿一覧</h1>
     
     <!-- 検索フォーム -->
-    <div class="mb-8 max-w-3xl mx-auto">
+    <div class="max-w-3xl mx-auto mb-8">
       <div class="relative">
         <input
           v-model="searchQuery"
           type="text"
-          class="w-full px-4 pr-10 py-3 rounded-full bg-[rgb(var(--color-surface))] border border-[rgb(var(--color-border))] focus:border-[rgb(var(--color-primary))] focus:ring-2 focus:ring-[rgb(var(--color-primary)/0.3)] text-[rgb(var(--color-text))]"
+          class="w-full px-4 py-3 pr-10 rounded-full bg-[rgb(var(--color-surface))] border border-[rgb(var(--color-border))] text-[rgb(var(--color-text))] focus:border-[rgb(var(--color-primary))] focus:ring-2 focus:ring-[rgb(var(--color-primary)/0.3)]"
           placeholder="検索キーワードを入力してください"
           @input="debouncedSearch"
         />
@@ -25,14 +25,14 @@
     
     <!-- フィルターとソート -->
     <div class="glass-card p-4 mb-6">
-      <div class="flex flex-wrap gap-4 items-center">
+      <div class="flex flex-wrap items-center gap-4">
         <!-- カテゴリーフィルター -->
         <div class="w-full sm:w-auto">
           <label for="category-filter" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">カテゴリー</label>
           <select
             id="category-filter"
             v-model="selectedCategoryId"
-            class="w-full sm:w-auto px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))] appearance-none bg-right-0.5 bg-no-repeat pr-10"
+            class="appearance-none w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] bg-no-repeat bg-[length:16px] bg-[right_10px_center] text-[rgb(var(--color-text))] sm:w-auto focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))]"
           >
             <option :value="null">すべて</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
@@ -47,7 +47,7 @@
           <select
             id="disability-filter"
             v-model="selectedDisabilityType"
-            class="w-full sm:w-auto px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))] appearance-none bg-right-0.5 bg-no-repeat pr-10"
+            class="appearance-none w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] bg-no-repeat bg-[length:16px] bg-[right_10px_center] text-[rgb(var(--color-text))] sm:w-auto focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))]"
           >
             <option :value="null">すべて</option>
             <option v-for="type in disabilityTypes" :key="type.id" :value="type.id">
@@ -62,7 +62,7 @@
           <select
             id="sort-order"
             v-model="sortOrder"
-            class="w-full sm:w-auto px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))] appearance-none bg-right-0.5 bg-no-repeat pr-10"
+            class="appearance-none w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] bg-no-repeat bg-[length:16px] bg-[right_10px_center] text-[rgb(var(--color-text))] sm:w-auto focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))]"
           >
             <option value="created_at.desc">新しい順</option>
             <option value="created_at.asc">古い順</option>
@@ -72,8 +72,8 @@
         </div>
         
         <!-- フィルターリセットボタン -->
-        <div class="w-full sm:w-auto mt-auto ml-auto">
-          <button @click="resetFilters" class="px-4 py-2 rounded text-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-primary)/0.1)] transition-all font-medium">
+        <div class="w-full mt-auto ml-auto sm:w-auto">
+          <button @click="resetFilters" class="px-4 py-2 rounded font-medium text-[rgb(var(--color-primary))] transition-all hover:bg-[rgb(var(--color-primary)/0.1)]">
             フィルターをリセット
           </button>
         </div>
@@ -81,7 +81,7 @@
     </div>
     
     <!-- メインコンテンツ -->
-    <div class="flex flex-col md:flex-row gap-8">
+    <div class="flex flex-col gap-8 md:flex-row">
       <!-- カテゴリーサイドバー -->
       <div class="w-full md:w-1/4 lg:w-1/5">
         <div class="glass-card p-4 mb-6">
@@ -89,24 +89,24 @@
           
           <!-- カテゴリーローディング -->
           <div v-if="categoriesLoading" class="flex justify-center py-4">
-            <div class="border-4 border-[rgb(var(--color-surface-accent))] border-t-[rgb(var(--color-primary))] rounded-full w-8 h-8 animate-spin"></div>
+            <div class="w-8 h-8 border-4 rounded-full border-[rgb(var(--color-surface-accent))] border-t-[rgb(var(--color-primary))] animate-spin"></div>
           </div>
           
           <!-- カテゴリーエラー -->
-          <div v-else-if="categoriesError" class="text-[rgb(var(--color-error))] text-sm mb-2">
+          <div v-else-if="categoriesError" class="text-sm mb-2 text-[rgb(var(--color-error))]">
             {{ categoriesError }}
-            <button @click="fetchCategories" class="text-[rgb(var(--color-primary))] hover:underline ml-2">再試行</button>
+            <button @click="fetchCategories" class="ml-2 text-[rgb(var(--color-primary))] hover:underline">再試行</button>
           </div>
           
           <!-- カテゴリーリスト -->
-          <div v-else-if="categories.length === 0" class="text-center text-[rgb(var(--color-text-muted))] py-2">
+          <div v-else-if="categories.length === 0" class="py-2 text-center text-[rgb(var(--color-text-muted))]">
             カテゴリーはまだありません
           </div>
           
           <div v-else class="space-y-2">
             <button 
               @click="selectCategory(null)" 
-              class="w-full text-left px-3 py-2 rounded-lg transition-colors"
+              class="w-full px-3 py-2 text-left rounded-lg transition-colors"
               :class="selectedCategoryId === null ? 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-text-white))]' : 'hover:bg-[rgb(var(--color-surface-accent)/0.5)]'"
             >
               すべてのカテゴリー
@@ -115,7 +115,7 @@
               v-for="category in categories" 
               :key="category.id"
               @click="selectCategory(category.id)"
-              class="w-full text-left px-3 py-2 rounded-lg transition-colors flex justify-between items-center"
+              class="w-full flex items-center justify-between px-3 py-2 text-left rounded-lg transition-colors"
               :class="selectedCategoryId === category.id ? 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-text-white))]' : 'hover:bg-[rgb(var(--color-surface-accent)/0.5)]'"
             >
               <span>{{ category.name }}</span>
@@ -130,18 +130,18 @@
           
           <!-- 障害タイプローディング -->
           <div v-if="disabilityTypesLoading" class="flex justify-center py-4">
-            <div class="border-4 border-[rgb(var(--color-surface-accent))] border-t-[rgb(var(--color-primary))] rounded-full w-8 h-8 animate-spin"></div>
+            <div class="w-8 h-8 border-4 rounded-full border-[rgb(var(--color-surface-accent))] border-t-[rgb(var(--color-primary))] animate-spin"></div>
           </div>
           
           <!-- 障害タイプリスト -->
-          <div v-else-if="disabilityTypes.length === 0" class="text-center text-[rgb(var(--color-text-muted))] py-2">
+          <div v-else-if="disabilityTypes.length === 0" class="py-2 text-center text-[rgb(var(--color-text-muted))]">
             障害タイプはまだありません
           </div>
           
           <div v-else class="space-y-2">
             <button 
               @click="selectDisabilityType(null)" 
-              class="w-full text-left px-3 py-2 rounded-lg transition-colors"
+              class="w-full px-3 py-2 text-left rounded-lg transition-colors"
               :class="selectedDisabilityType === null ? 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-text-white))]' : 'hover:bg-[rgb(var(--color-surface-accent)/0.5)]'"
             >
               すべてのタイプ
@@ -150,7 +150,7 @@
               v-for="type in disabilityTypes" 
               :key="type.id"
               @click="selectDisabilityType(type.id)"
-              class="w-full text-left px-3 py-2 rounded-lg transition-colors"
+              class="w-full px-3 py-2 text-left rounded-lg transition-colors"
               :class="selectedDisabilityType === type.id ? 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-text-white))]' : 'hover:bg-[rgb(var(--color-surface-accent)/0.5)]'"
             >
               {{ type.name }}
@@ -162,22 +162,22 @@
       <!-- 検索結果/投稿一覧 -->
       <div class="w-full md:w-3/4 lg:w-4/5">
         <!-- 検索中ローディング -->
-        <div v-if="loading" class="flex justify-center items-center h-32">
-          <div class="border-4 border-[rgb(var(--color-surface-accent))] border-t-[rgb(var(--color-primary))] rounded-full w-8 h-8 animate-spin"></div>
+        <div v-if="loading" class="flex items-center justify-center h-32">
+          <div class="w-8 h-8 border-4 rounded-full border-[rgb(var(--color-surface-accent))] border-t-[rgb(var(--color-primary))] animate-spin"></div>
         </div>
         
         <!-- エラー表示 -->
         <div v-else-if="error" class="glass-card p-4 text-[rgb(var(--color-error))]">
           <p>{{ error }}</p>
-          <button @click="refreshData" class="mt-2 px-4 py-2 text-sm rounded font-medium bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] transition-all shadow-[0_2px_4px_rgba(var(--color-primary-dark)/0.5)]">再試行</button>
+          <button @click="refreshData" class="mt-2 px-4 py-2 text-sm rounded font-medium shadow-[0_2px_4px_rgba(var(--color-primary-dark)/0.5)] bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] transition-all">再試行</button>
         </div>
         
         <!-- 選択されたカテゴリータイトル -->
         <div v-else-if="selectedCategoryId && selectedCategory" class="mb-6">
-          <div class="flex justify-between items-center">
+          <div class="flex items-center justify-between">
             <h2 class="text-2xl font-bold text-[rgb(var(--color-heading))]">{{ selectedCategory.name }}</h2>
           </div>
-          <p v-if="selectedCategory.description" class="text-[rgb(var(--color-text-muted))] mt-2">
+          <p v-if="selectedCategory.description" class="mt-2 text-[rgb(var(--color-text-muted))]">
             {{ selectedCategory.description }}
           </p>
         </div>
@@ -197,7 +197,7 @@
           </p>
           <button v-if="searchQuery.trim() || selectedCategoryId || selectedDisabilityType" 
                   @click="resetFilters" 
-                  class="mt-4 px-4 py-2 rounded font-medium bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] transition-all hover:bg-[rgb(var(--color-primary-dark))] shadow-[0_2px_4px_rgba(var(--color-primary-dark)/0.5)]">
+                  class="mt-4 px-4 py-2 rounded font-medium shadow-[0_2px_4px_rgba(var(--color-primary-dark)/0.5)] bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] transition-all hover:bg-[rgb(var(--color-primary-dark))]">
             フィルターをリセット
           </button>
         </div>
@@ -208,7 +208,7 @@
             {{ totalResults }}件中 {{ startIndex + 1 }}～{{ endIndex }}件を表示
           </div>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <PostCard 
               v-for="post in posts" 
               :key="post.id"
@@ -225,7 +225,7 @@
             <div class="flex space-x-2">
               <button 
                 @click="changePage(currentPage - 1)" 
-                class="px-4 py-2 text-sm rounded font-medium bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_1px_3px_rgba(var(--color-background)/0.3)]"
+                class="px-4 py-2 text-sm rounded font-medium shadow-[0_1px_3px_rgba(var(--color-background)/0.3)] bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 :disabled="currentPage === 1"
               >
                 前へ
@@ -236,14 +236,14 @@
                 :key="page"
                 @click="changePage(Number(page))"
                 class="px-4 py-2 text-sm rounded font-medium transition-all"
-                :class="currentPage === page ? 'bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] shadow-[0_2px_4px_rgba(var(--color-primary-dark)/0.5)]' : 'bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] hover:bg-[rgb(var(--color-surface-variant))] shadow-[0_1px_3px_rgba(var(--color-background)/0.3)]'"
+                :class="currentPage === page ? 'shadow-[0_2px_4px_rgba(var(--color-primary-dark)/0.5)] bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))]' : 'shadow-[0_1px_3px_rgba(var(--color-background)/0.3)] bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] hover:bg-[rgb(var(--color-surface-variant))]'"
               >
                 {{ page }}
               </button>
               
               <button 
                 @click="changePage(currentPage + 1)" 
-                class="px-4 py-2 text-sm rounded font-medium bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[0_1px_3px_rgba(var(--color-background)/0.3)]"
+                class="px-4 py-2 text-sm rounded font-medium shadow-[0_1px_3px_rgba(var(--color-background)/0.3)] bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 :disabled="currentPage === totalPages"
               >
                 次へ
@@ -592,11 +592,20 @@ async function performSearch() {
         
         if (likeError) console.error(`投稿 ${post.id} のいいね数取得エラー:`, likeError);
         
+        // コメント数を取得
+        const { count: commentCount, error: commentError } = await supabase
+          .from('comments')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', post.id);
+          
+        if (commentError) console.error(`投稿 ${post.id} のコメント数取得エラー:`, commentError);
+        
         return {
           ...post,
           avatar_url: profileData?.avatar_data || null,
           author_name: profileData?.nickname || '不明なユーザー',
-          like_count: likeCount || 0
+          like_count: likeCount || 0,
+          comment_count: commentCount || 0
         };
       }));
       
@@ -697,18 +706,27 @@ async function fetchFilteredPosts() {
           .single();
         
         // いいね数を取得
-        const { count, error: likeError } = await supabase
+        const { count: likeCount, error: likeError } = await supabase
           .from('post_likes')
           .select('*', { count: 'exact', head: true })
           .eq('post_id', post.id);
         
         if (likeError) console.error(`投稿 ${post.id} のいいね数取得エラー:`, likeError);
         
+        // コメント数を取得
+        const { count: commentCount, error: commentError } = await supabase
+          .from('comments')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', post.id);
+          
+        if (commentError) console.error(`投稿 ${post.id} のコメント数取得エラー:`, commentError);
+        
         return {
           ...post,
           avatar_url: profileData?.avatar_data || null,
           author_name: profileData?.nickname || '不明なユーザー',
-          like_count: count || 0
+          like_count: likeCount || 0,
+          comment_count: commentCount || 0
         };
       }));
       

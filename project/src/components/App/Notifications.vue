@@ -9,7 +9,7 @@
       <div 
         v-for="notification in notifications" 
         :key="notification.id" 
-        class="backdrop-blur-md rounded-lg p-4 flex"
+        class="flex rounded-lg p-4 backdrop-blur-md"
         :class="{
           'bg-[rgb(var(--color-success)/0.1)] border border-[rgb(var(--color-success)/0.6)] shadow-[0_4px_6px_rgb(var(--color-success)/0.2)]': notification.type === 'success',
           'bg-[rgb(var(--color-error)/0.1)] border border-[rgb(var(--color-error)/0.6)] shadow-[0_4px_6px_rgb(var(--color-error)/0.2)]': notification.type === 'error',
@@ -42,14 +42,14 @@
         
         <!-- テキスト部分 -->
         <div class="flex-1">
-          <h4 class="font-medium text-sm text-[rgb(var(--color-text))]">{{ notification.title }}</h4>
+          <h4 class="text-sm font-medium text-[rgb(var(--color-text))]">{{ notification.title }}</h4>
           <p class="text-sm text-[rgb(var(--color-text)/0.9)]">{{ notification.message }}</p>
         </div>
         
         <!-- 閉じるボタン -->
         <button 
           @click="removeNotification(notification.id)" 
-          class="ml-4 text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text))] focus:outline-none transition-colors"
+          class="ml-4 text-[rgb(var(--color-text-muted))] transition-colors hover:text-[rgb(var(--color-text))] focus:outline-none"
         >
           <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

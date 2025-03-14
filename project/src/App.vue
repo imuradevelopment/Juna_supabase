@@ -1,14 +1,14 @@
 <template>
-  <div class="flex flex-col min-h-screen bg-[rgb(var(--color-background))] relative">
+  <div class="flex flex-col min-h-screen relative bg-[rgb(var(--color-background))]">
     <!-- 背景装飾 -->
     <div class="fixed inset-0 z-0 pointer-events-none">
-      <div class="absolute top-0 right-0 w-1/3 h-1/3 bg-[rgb(var(--color-primary)/0.05)] rounded-full blur-3xl shadow-[0_0_50px_rgb(var(--color-primary)/0.2)]"></div>
-      <div class="absolute bottom-0 left-0 w-1/2 h-1/2 bg-[rgb(var(--color-primary)/0.05)] rounded-full blur-3xl shadow-[0_0_50px_rgb(var(--color-primary)/0.2)]"></div>
+      <div class="absolute top-0 right-0 w-1/3 h-1/3 rounded-full blur-3xl bg-[rgb(var(--color-primary)/0.05)] shadow-[0_0_50px_rgb(var(--color-primary)/0.2)]"></div>
+      <div class="absolute bottom-0 left-0 w-1/2 h-1/2 rounded-full blur-3xl bg-[rgb(var(--color-primary)/0.05)] shadow-[0_0_50px_rgb(var(--color-primary)/0.2)]"></div>
     </div>
     
     <Navbar />
     
-    <main class="flex-1 container mx-auto px-5 py-8 relative z-10">
+    <main class="flex-1 relative z-10 mx-auto px-5 py-8 container">
       <router-view v-slot="{ Component }">
         <transition name="page" mode="out-in">
           <component :is="Component" />

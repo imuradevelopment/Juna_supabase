@@ -1,7 +1,7 @@
 <template>
-  <div class="max-w-5xl mx-auto my-8 md:my-12 animate-[fadeIn_0.5s_ease_forwards]">
+  <div class="max-w-5xl mx-auto my-8 animate-[fadeIn_0.5s_ease_forwards] md:my-12">
     <!-- ローディング状態 -->
-    <div v-if="loading" class="glass-card p-8 flex justify-center items-center min-h-[300px]">
+    <div v-if="loading" class="glass-card flex items-center justify-center min-h-[300px] p-8">
       <div class="flex flex-col items-center">
         <div class="w-10 h-10 rounded-full border-3 border-[rgb(var(--color-text-white))/0.1] border-t-[rgb(var(--color-primary))] animate-spin mb-4"></div>
         <p class="text-[rgb(var(--color-text-muted))] animate-pulse">投稿を読み込んでいます...</p>
@@ -9,8 +9,8 @@
     </div>
     
     <!-- エラー状態 -->
-    <div v-else-if="error" class="glass-card p-8 text-center min-h-[300px] flex flex-col justify-center items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-[rgb(var(--color-error))] mx-auto mb-4 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div v-else-if="error" class="glass-card flex flex-col items-center justify-center min-h-[300px] p-8 text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-[rgb(var(--color-error))] animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
       <h2 class="text-xl font-bold mb-2">投稿の読み込みに失敗しました</h2>
@@ -19,8 +19,8 @@
     </div>
     
     <!-- 投稿が見つからない -->
-    <div v-else-if="!post" class="glass-card p-8 text-center min-h-[300px] flex flex-col justify-center items-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-[rgb(var(--color-text-muted))] mx-auto mb-4 transform rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div v-else-if="!post" class="glass-card flex flex-col items-center justify-center min-h-[300px] p-8 text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-[rgb(var(--color-text-muted))] transform rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
       <h2 class="text-xl font-bold mb-2">投稿が見つかりませんでした</h2>
@@ -31,11 +31,11 @@
     <!-- 投稿表示 -->
     <template v-else>
       <!-- 投稿全体を一つのカードに結合 -->
-      <div class="glass-card overflow-hidden shadow-[0_4px_6px_rgb(var(--color-background)_/_0.3)] rounded-lg transition-all duration-300">
+      <div class="glass-card overflow-hidden rounded-lg shadow-[0_4px_6px_rgb(var(--color-background)_/_0.3)] transition-all duration-300">
         <!-- ヘッダー部分 - アイキャッチと投稿情報を横並びに -->
         <div class="flex flex-col md:flex-row">
           <!-- 左側 - アイキャッチ画像 -->
-          <div v-if="post.cover_image_path" class="relative md:w-1/3 h-40 md:h-[200px] bg-[rgb(var(--color-surface-variant))] overflow-hidden">
+          <div v-if="post.cover_image_path" class="relative h-40 overflow-hidden bg-[rgb(var(--color-surface-variant))] md:w-1/3 md:h-[200px]">
             <img 
               :src="getImageUrl(post.cover_image_path)" 
               :alt="post.title"
@@ -48,7 +48,7 @@
                   v-for="category in postCategories" 
                   :key="category.id" 
                   :to="`/categories/${category.id}`"
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--color-primary))/80] hover:bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] transition-all"
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[rgb(var(--color-primary))/80] text-[rgb(var(--color-text-white))] transition-all hover:bg-[rgb(var(--color-primary))]"
                 >
                   {{ category.name }}
                 </router-link>
@@ -57,12 +57,12 @@
           </div>
           
           <!-- 右側 - 投稿情報 -->
-          <div class="p-5 md:p-6 flex-1 flex flex-col justify-between">
+          <div class="flex flex-col justify-between flex-1 p-5 md:p-6">
             <!-- タイトル -->
-            <h1 class="text-xl md:text-2xl font-bold mb-3 leading-tight text-[rgb(var(--color-heading))]">{{ post.title }}</h1>
+            <h1 class="text-xl font-bold mb-3 leading-tight text-[rgb(var(--color-heading))] md:text-2xl">{{ post.title }}</h1>
             
             <!-- 閲覧数・更新情報 -->
-            <div class="flex items-center text-sm text-[rgb(var(--color-text-muted))] mb-3">
+            <div class="flex items-center mb-3 text-sm text-[rgb(var(--color-text-muted))]">
               <span class="flex items-center mr-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -74,30 +74,30 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p class="text-xs text-[rgb(var(--color-text-muted))] flex items-center">
+                <p class="flex items-center text-xs text-[rgb(var(--color-text-muted))]">
                   {{ formatDate(post.updated_at || post.created_at) }}
                 </p>
               </span>
             </div>
             
             <!-- 著者情報と操作ボタン -->
-            <div class="flex flex-row justify-between items-center mb-2">
+            <div class="flex flex-row items-center justify-between mb-2">
               <!-- 著者情報 -->
               <router-link :to="`/profile/${post.author_id}`" class="flex items-center group">
-                <div class="w-10 h-10 rounded-full bg-[rgb(var(--color-primary-light))] flex items-center justify-center text-[rgb(var(--color-text-white))] mr-3 overflow-hidden border-2 border-transparent group-hover:border-[rgb(var(--color-primary))] transition-all">
+                <div class="flex items-center justify-center w-10 h-10 mr-3 overflow-hidden text-[rgb(var(--color-text-white))] bg-[rgb(var(--color-primary-light))] rounded-full border-2 border-transparent transition-all group-hover:border-[rgb(var(--color-primary))]">
                   <img 
                     v-if="post.profiles?.avatar_data" 
                     :src="getAvatarUrl(post.profiles.avatar_data)" 
                     :alt="post.profiles?.nickname || '不明なユーザー'"
-                    class="w-full h-full rounded-full object-cover"
+                    class="w-full h-full object-cover rounded-full"
                   />
                   <span v-else>{{ getInitials(post.profiles?.nickname || '不明なユーザー') }}</span>
                 </div>
                 <div>
-                  <p class="text-base font-medium group-hover:text-[rgb(var(--color-primary))] transition-colors">
+                  <p class="text-base font-medium transition-colors group-hover:text-[rgb(var(--color-primary))]">
                     {{ post.profiles?.nickname || '不明なユーザー' }}
                   </p>
-                  <p class="text-xs text-[rgb(var(--color-text-muted))] flex items-center">
+                  <p class="flex items-center text-xs text-[rgb(var(--color-text-muted))]">
                     {{ formatDate(post.created_at) }}
                   </p>
                 </div>
@@ -108,7 +108,7 @@
                 <!-- いいねボタン -->
                 <button 
                   @click="toggleLike" 
-                  class="flex items-center justify-center px-3 py-1.5 rounded-lg bg-[rgb(var(--color-surface-variant))/30] hover:bg-[rgb(var(--color-surface-variant))/50] border border-[rgb(var(--color-border-light))/30] hover:border-[rgb(var(--color-border-light))/50] transition-all text-sm"
+                  class="flex items-center justify-center px-3 py-1.5 text-sm rounded-lg bg-[rgb(var(--color-surface-variant))/30] border border-[rgb(var(--color-border-light))/30] transition-all hover:bg-[rgb(var(--color-surface-variant))/50] hover:border-[rgb(var(--color-border-light))/50]"
                   :class="{ 'text-[rgb(var(--color-primary-light))]': isLiked }"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{ 'fill-current': isLiked }">
@@ -120,7 +120,7 @@
                 <!-- シェアボタン -->
                 <button 
                   @click="sharePost" 
-                  class="flex items-center justify-center px-3 py-1.5 rounded-lg bg-[rgb(var(--color-surface-variant))/30] hover:bg-[rgb(var(--color-surface-variant))/50] border border-[rgb(var(--color-border-light))/30] hover:border-[rgb(var(--color-border-light))/50] transition-all text-sm"
+                  class="flex items-center justify-center px-3 py-1.5 text-sm rounded-lg bg-[rgb(var(--color-surface-variant))/30] border border-[rgb(var(--color-border-light))/30] transition-all hover:bg-[rgb(var(--color-surface-variant))/50] hover:border-[rgb(var(--color-border-light))/50]"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -132,7 +132,7 @@
                 <div v-if="isAuthor" class="flex space-x-2">
                   <router-link 
                     :to="`/editor/${post.id}`" 
-                    class="flex items-center justify-center px-3 py-1.5 rounded-lg bg-[rgb(var(--color-surface-variant))/30] hover:bg-[rgb(var(--color-primary))/10] hover:text-[rgb(var(--color-primary))] hover:border-[rgb(var(--color-primary))/30] border border-[rgb(var(--color-border-light))/30] transition-all text-sm"
+                    class="flex items-center justify-center px-3 py-1.5 text-sm rounded-lg bg-[rgb(var(--color-surface-variant))/30] border border-[rgb(var(--color-border-light))/30] transition-all hover:bg-[rgb(var(--color-primary))/10] hover:text-[rgb(var(--color-primary))] hover:border-[rgb(var(--color-primary))/30]"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -142,7 +142,7 @@
                   
                   <button 
                     @click="showDeleteModal = true" 
-                    class="flex items-center justify-center px-3 py-1.5 rounded-lg bg-[rgb(var(--color-surface-variant))/30] hover:bg-[rgb(var(--color-error))/10] hover:text-[rgb(var(--color-error))] hover:border-[rgb(var(--color-error))/30] border border-[rgb(var(--color-border-light))/30] transition-all text-sm"
+                    class="flex items-center justify-center px-3 py-1.5 text-sm rounded-lg bg-[rgb(var(--color-surface-variant))/30] border border-[rgb(var(--color-border-light))/30] transition-all hover:bg-[rgb(var(--color-error))/10] hover:text-[rgb(var(--color-error))] hover:border-[rgb(var(--color-error))/30]"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -158,8 +158,7 @@
         <!-- 記事本文 -->
         <div class="p-6">
           <RichTextContent 
-            :content="post.content" 
-            class="[&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-4 [&_h2]:pb-2 [&_h2]:border-b [&_h2]:border-[rgb(var(--color-border-light))] [&_a]:text-[rgb(var(--color-primary))] [&_a]:hover:underline [&_blockquote]:pl-4 [&_blockquote]:italic [&_blockquote]:my-4 [&_blockquote]:border-l-4 [&_blockquote]:border-[rgb(var(--color-primary))] [&_blockquote]:text-[rgb(var(--color-text-muted))] [&_pre]:p-4 [&_pre]:rounded-lg [&_pre]:overflow-x-auto [&_pre]:my-4 [&_pre]:bg-[rgb(var(--color-surface-variant))] [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-sm [&_code]:font-mono [&_code]:bg-[rgb(var(--color-surface-variant))]"
+            :content="post.content"
           />
         </div>
       </div>
@@ -177,16 +176,16 @@
       </div>
       
       <!-- シェアモーダル -->
-      <div v-if="showShareModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="glass-card p-6 max-w-sm w-full rounded-lg">
+      <div v-if="showShareModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="glass-card w-full max-w-sm p-6 rounded-lg">
           <h3 class="text-lg font-bold mb-4 text-[rgb(var(--color-heading))]">この投稿をシェア</h3>
           
           <div class="space-y-4">
             <div>
-              <div class="flex space-x-4 mb-4">
+              <div class="flex mb-4 space-x-4">
                 <button 
                   @click="shareVia('twitter')" 
-                  class="flex-1 p-3 rounded-lg bg-[rgb(var(--color-info))]/10 text-[rgb(var(--color-info))] hover:bg-[rgb(var(--color-info))]/20 transition-colors flex items-center justify-center"
+                  class="flex-1 flex items-center justify-center p-3 rounded-lg bg-[rgb(var(--color-info))]/10 text-[rgb(var(--color-info))] transition-colors hover:bg-[rgb(var(--color-info))]/20"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
@@ -196,7 +195,7 @@
                 
                 <button 
                   @click="shareVia('facebook')" 
-                  class="flex-1 p-3 rounded-lg bg-[rgb(var(--color-primary-dark))]/10 text-[rgb(var(--color-primary-dark))] hover:bg-[rgb(var(--color-primary-dark))]/20 transition-colors flex items-center justify-center"
+                  class="flex-1 flex items-center justify-center p-3 rounded-lg bg-[rgb(var(--color-primary-dark))]/10 text-[rgb(var(--color-primary-dark))] transition-colors hover:bg-[rgb(var(--color-primary-dark))]/20"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
@@ -206,7 +205,7 @@
               </div>
               
               <div>
-                <p class="text-sm mb-2 text-[rgb(var(--color-text))]">または、リンクをコピー:</p>
+                <p class="mb-2 text-sm text-[rgb(var(--color-text))]">または、リンクをコピー:</p>
                 <div class="flex">
                   <input 
                     type="text" 
@@ -239,10 +238,10 @@
       </div>
       
       <!-- 削除確認モーダル -->
-      <div v-if="showDeleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="glass-card p-6 max-w-sm w-full rounded-lg">
+      <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="glass-card w-full max-w-sm p-6 rounded-lg">
           <h3 class="text-lg font-bold mb-4 text-[rgb(var(--color-heading))]">投稿を削除しますか？</h3>
-          <p class="text-[rgb(var(--color-text-muted))] mb-6">
+          <p class="mb-6 text-[rgb(var(--color-text-muted))]">
             この操作は取り消せません。本当にこの投稿を削除しますか？
           </p>
           <div class="flex justify-end space-x-4">

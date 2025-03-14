@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold" style="color: rgb(var(--color-heading))">下書き</h2>
       <div class="text-sm" style="color: rgb(var(--color-text-muted))">
         全 {{ totalDrafts }} 件
@@ -9,7 +9,7 @@
     
     <!-- ローディング状態 -->
     <div v-if="loading" class="flex justify-center p-6">
-      <svg class="animate-spin h-8 w-8" style="color: rgb(var(--color-primary))" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <svg class="h-8 w-8 animate-spin" style="color: rgb(var(--color-primary))" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
@@ -30,7 +30,7 @@
       <div v-for="draft in drafts" :key="draft.id" class="glass-card p-4">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div class="flex-1">
-            <h3 class="font-bold text-lg mb-1" style="color: rgb(var(--color-heading))">
+            <h3 class="text-lg font-bold mb-1" style="color: rgb(var(--color-heading))">
               {{ draft.title || '(無題)' }}
             </h3>
             <p class="text-sm mb-2" style="color: rgb(var(--color-text-muted))">
@@ -39,8 +39,8 @@
           </div>
           
           <!-- アクションボタン -->
-          <div class="flex space-x-2 mt-3 md:mt-0">
-            <router-link :to="`/posts/${draft.id}/edit`" class="btn" 
+          <div class="flex mt-3 space-x-2 md:mt-0">
+            <router-link :to="`/editor/${draft.id}`" class="btn" 
                          style="background-color: transparent; color: rgb(var(--color-text)); border: 1px solid rgb(var(--color-border));">
               編集
             </router-link>
@@ -110,7 +110,7 @@
     </div>
     
     <!-- 削除確認モーダル -->
-    <div v-if="showDeleteModal" class="fixed inset-0 flex items-center justify-center z-50" style="background-color: rgb(var(--color-background) / 0.5);">
+    <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center" style="background-color: rgb(var(--color-background) / 0.5);">
       <div class="glass-card max-w-md mx-auto">
         <h3 class="text-xl font-bold mb-4" style="color: rgb(var(--color-heading))">下書きを削除しますか？</h3>
         <p class="mb-6" style="color: rgb(var(--color-text-muted))">この操作は取り消せません。本当にこの下書きを削除しますか？</p>
@@ -131,7 +131,7 @@
             }"
             :disabled="actionSubmitting"
           >
-            <svg v-if="actionSubmitting" class="animate-spin h-5 w-5 mr-2 inline-block" viewBox="0 0 24 24">
+            <svg v-if="actionSubmitting" class="inline-block h-5 w-5 mr-2 animate-spin" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
@@ -142,7 +142,7 @@
     </div>
     
     <!-- 公開確認モーダル -->
-    <div v-if="showPublishModal" class="fixed inset-0 flex items-center justify-center z-50" style="background-color: rgb(var(--color-background) / 0.5);">
+    <div v-if="showPublishModal" class="fixed inset-0 z-50 flex items-center justify-center" style="background-color: rgb(var(--color-background) / 0.5);">
       <div class="glass-card max-w-md mx-auto">
         <h3 class="text-xl font-bold mb-4" style="color: rgb(var(--color-heading))">下書きを公開しますか？</h3>
         <p class="mb-6" style="color: rgb(var(--color-text-muted))">この下書きを公開すると、すべてのユーザーが閲覧できるようになります。</p>
@@ -160,7 +160,7 @@
             }"
             :disabled="actionSubmitting"
           >
-            <svg v-if="actionSubmitting" class="animate-spin h-5 w-5 mr-2 inline-block" viewBox="0 0 24 24">
+            <svg v-if="actionSubmitting" class="inline-block h-5 w-5 mr-2 animate-spin" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>

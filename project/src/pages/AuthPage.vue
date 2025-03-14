@@ -1,12 +1,12 @@
 <template>
-  <div class="max-w-md mx-auto py-8">
-    <div class="glass-card p-6">
+  <div class="mx-auto py-4 sm:py-6 md:py-8 max-w-md">
+    <div class="glass-card p-4 sm:p-6">
       <!-- タブ切り替えボタン -->
-      <div class="flex border-b border-[rgb(var(--color-border))] mb-6">
+      <div class="flex mb-4 sm:mb-6 border-b border-[rgb(var(--color-border))]">
         <button 
           @click="activeTab = 'login'"
           :class="[
-            'py-2 px-4 font-medium text-sm focus:outline-none',
+            'py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium focus:outline-none',
             activeTab === 'login' 
               ? 'border-b-2 border-[rgb(var(--color-primary))] text-[rgb(var(--color-primary))]' 
               : 'text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text))]'
@@ -17,7 +17,7 @@
         <button 
           @click="activeTab = 'register'"
           :class="[
-            'py-2 px-4 font-medium text-sm focus:outline-none',
+            'py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium focus:outline-none',
             activeTab === 'register' 
               ? 'border-b-2 border-[rgb(var(--color-primary))] text-[rgb(var(--color-primary))]' 
               : 'text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text))]'
@@ -29,34 +29,34 @@
       
       <!-- ログインフォーム -->
       <div v-if="activeTab === 'login'">
-        <h2 class="text-2xl font-bold mb-6 text-center text-[rgb(var(--color-heading))]">ログイン</h2>
+        <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center text-[rgb(var(--color-heading))]">ログイン</h2>
         
-        <form @submit.prevent="handleLoginSubmit" class="space-y-6">
+        <form @submit.prevent="handleLoginSubmit" class="space-y-4 sm:space-y-6">
           <!-- アラートメッセージ -->
-          <div v-if="loginFormError" class="bg-[rgb(var(--color-error-dark))/30] border border-[rgb(var(--color-error))] text-[rgb(var(--color-error))] px-4 py-3 rounded">
+          <div v-if="loginFormError" class="px-3 py-2 sm:px-4 sm:py-3 rounded bg-[rgb(var(--color-error-dark))/30] border border-[rgb(var(--color-error))] text-[rgb(var(--color-error))]">
             {{ loginFormError }}
           </div>
           
           <!-- メールアドレス/アカウントID -->
           <div>
-            <label for="identifier" class="text-[rgb(var(--color-text))] block text-sm font-medium mb-1">メールアドレスまたはアカウントID</label>
+            <label for="identifier" class="block mb-1 text-xs sm:text-sm font-medium text-[rgb(var(--color-text))]">メールアドレスまたはアカウントID</label>
             <input 
               type="text" 
               id="identifier" 
               v-model="loginData.identifier" 
-              class="w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))] focus:border-[rgb(var(--color-primary))]"
+              class="w-full px-3 py-2 sm:px-4 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))] focus:border-[rgb(var(--color-primary))]"
               required
             />
           </div>
           
           <!-- パスワード -->
           <div>
-            <label for="password" class="text-[rgb(var(--color-text))] block text-sm font-medium mb-1">パスワード</label>
+            <label for="password" class="block mb-1 text-xs sm:text-sm font-medium text-[rgb(var(--color-text))]">パスワード</label>
             <input 
               type="password" 
               id="password" 
               v-model="loginData.password" 
-              class="w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))] focus:border-[rgb(var(--color-primary))]"
+              class="w-full px-3 py-2 sm:px-4 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))] focus:border-[rgb(var(--color-primary))]"
               required
             />
           </div>
@@ -65,10 +65,10 @@
           <div>
             <button 
               type="submit" 
-              class="w-full bg-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-primary-dark))] text-[rgb(var(--color-text-white))] font-medium rounded py-2 flex justify-center items-center transition-colors"
+              class="flex w-full py-2 justify-center items-center rounded font-medium transition-colors bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] hover:bg-[rgb(var(--color-primary-dark))]"
               :disabled="loginLoading"
             >
-              <svg v-if="loginLoading" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+              <svg v-if="loginLoading" class="h-4 w-4 mr-2 sm:h-5 sm:w-5 animate-spin" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -78,32 +78,32 @@
           
           <!-- パスワード忘れた場合 -->
           <div class="text-center">
-            <router-link to="/forgot-password" class="text-sm text-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary-light))]">
+            <router-link to="/forgot-password" class="text-xs sm:text-sm text-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary-light))]">
               パスワードをお忘れですか？
             </router-link>
           </div>
         </form>
         
         <!-- 登録リンク -->
-        <div class="mt-6 text-center text-sm">
-          <span class="text-[rgb(var(--color-text-muted))]">アカウントをお持ちでないですか？</span>
-          <button @click="activeTab = 'register'" class="text-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary-light))] ml-1">会員登録</button>
+        <div class="mt-4 sm:mt-6 text-center">
+          <span class="text-xs sm:text-sm text-[rgb(var(--color-text-muted))]">アカウントをお持ちでないですか？</span>
+          <button @click="activeTab = 'register'" class="text-xs sm:text-sm ml-1 text-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary-light))]">会員登録</button>
         </div>
       </div>
       
       <!-- 会員登録フォーム -->
       <div v-else>
-        <h2 class="text-2xl font-bold mb-6 text-center text-[rgb(var(--color-heading))]">会員登録</h2>
+        <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center text-[rgb(var(--color-heading))]">会員登録</h2>
         
-        <form @submit.prevent="handleRegisterSubmit" class="space-y-6">
+        <form @submit.prevent="handleRegisterSubmit" class="space-y-4 sm:space-y-6">
           <!-- アラートメッセージ -->
-          <div v-if="registerFormError" class="bg-[rgb(var(--color-error-dark))/30] border border-[rgb(var(--color-error))] text-[rgb(var(--color-error))] p-3 rounded">
+          <div v-if="registerFormError" class="p-2 sm:p-3 rounded bg-[rgb(var(--color-error-dark))/30] border border-[rgb(var(--color-error))] text-[rgb(var(--color-error))]">
             {{ registerFormError }}
           </div>
           
           <!-- 表示名 -->
-          <div class="mb-4">
-            <label for="displayName" class="text-[rgb(var(--color-text))] block mb-1">表示名 <span class="text-[rgb(var(--color-error))]">*</span></label>
+          <div class="mb-2 sm:mb-4">
+            <label for="displayName" class="block mb-1 text-xs sm:text-sm text-[rgb(var(--color-text))]">表示名 <span class="text-[rgb(var(--color-error))]">*</span></label>
             <input 
               type="text" 
               id="displayName" 
@@ -114,10 +114,10 @@
           </div>
           
           <!-- アカウントID -->
-          <div class="mb-4">
-            <label for="accountId" class="text-[rgb(var(--color-text))] block mb-1">アカウントID</label>
+          <div class="mb-2 sm:mb-4">
+            <label for="accountId" class="block mb-1 text-xs sm:text-sm text-[rgb(var(--color-text))]">アカウントID</label>
             <div class="flex">
-              <span class="bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] px-3 py-2 rounded-l border border-[rgb(var(--color-border))] flex items-center justify-center">@</span>
+              <span class="flex px-2 py-2 sm:px-3 items-center justify-center rounded-l border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))]">@</span>
               <input 
                 type="text" 
                 id="accountId" 
@@ -127,14 +127,14 @@
                 placeholder="英数字とアンダースコアのみ"
               />
             </div>
-            <p class="text-xs mt-1 text-[rgb(var(--color-text-muted))]">
+            <p class="mt-1 text-xs text-[rgb(var(--color-text-muted))]">
               空欄の場合は自動的に生成されます
             </p>
           </div>
           
           <!-- メールアドレス -->
-          <div class="mb-4">
-            <label for="email" class="text-[rgb(var(--color-text))] block mb-1">メールアドレス <span class="text-[rgb(var(--color-error))]">*</span></label>
+          <div class="mb-2 sm:mb-4">
+            <label for="email" class="block mb-1 text-xs sm:text-sm text-[rgb(var(--color-text))]">メールアドレス <span class="text-[rgb(var(--color-error))]">*</span></label>
             <input 
               type="email" 
               id="email" 
@@ -145,8 +145,8 @@
           </div>
           
           <!-- パスワード -->
-          <div class="mb-4">
-            <label for="registerPassword" class="text-[rgb(var(--color-text))] block mb-1">パスワード <span class="text-[rgb(var(--color-error))]">*</span></label>
+          <div class="mb-2 sm:mb-4">
+            <label for="registerPassword" class="block mb-1 text-xs sm:text-sm text-[rgb(var(--color-text))]">パスワード <span class="text-[rgb(var(--color-error))]">*</span></label>
             <input 
               type="password" 
               id="registerPassword" 
@@ -158,8 +158,8 @@
           </div>
           
           <!-- パスワード確認 -->
-          <div class="mb-4">
-            <label for="passwordConfirm" class="text-[rgb(var(--color-text))] block mb-1">パスワード（確認）</label>
+          <div class="mb-2 sm:mb-4">
+            <label for="passwordConfirm" class="block mb-1 text-xs sm:text-sm text-[rgb(var(--color-text))]">パスワード（確認）</label>
             <input 
               id="passwordConfirm" 
               v-model="registerData.passwordConfirm" 
@@ -171,16 +171,16 @@
           
           <!-- 規約同意 -->
           <div class="flex items-start">
-            <div class="flex items-center h-5">
+            <div class="flex h-5 items-center">
               <input 
                 id="terms" 
                 v-model="registerData.agreeToTerms" 
                 type="checkbox" 
                 required
-                class="bg-[rgb(var(--color-surface))] border-[rgb(var(--color-border))] rounded focus:ring-[rgb(var(--color-primary))] h-4 w-4"
+                class="h-4 w-4 rounded border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] focus:ring-[rgb(var(--color-primary))]"
               />
             </div>
-            <label for="terms" class="text-[rgb(var(--color-text))] ml-2 text-sm">
+            <label for="terms" class="ml-2 text-xs sm:text-sm text-[rgb(var(--color-text))]">
               <span>
                 <router-link to="/terms" class="text-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary-light))]">利用規約</router-link>と
                 <router-link to="/privacy" class="text-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary-light))]">プライバシーポリシー</router-link>に同意します
@@ -192,10 +192,10 @@
           <div>
             <button 
               type="submit" 
-              class="bg-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-primary-dark))] text-[rgb(var(--color-text-white))] w-full py-2 rounded font-medium flex justify-center items-center transition-colors"
+              class="flex w-full py-2 justify-center items-center rounded font-medium transition-colors bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] hover:bg-[rgb(var(--color-primary-dark))]"
               :disabled="registerLoading || !isRegisterFormValid"
             >
-              <svg v-if="registerLoading" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+              <svg v-if="registerLoading" class="h-4 w-4 mr-2 sm:h-5 sm:w-5 animate-spin" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -205,9 +205,9 @@
         </form>
         
         <!-- ログインリンク -->
-        <div class="mt-6 text-center text-sm">
+        <div class="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
           <span class="text-[rgb(var(--color-text-muted))]">すでにアカウントをお持ちですか？</span>
-          <button @click="activeTab = 'login'" class="text-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary-light))] ml-1">ログイン</button>
+          <button @click="activeTab = 'login'" class="ml-1 text-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-primary-light))]">ログイン</button>
         </div>
       </div>
     </div>

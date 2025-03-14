@@ -88,7 +88,7 @@
         <!-- カテゴリー -->
         <div>
           <label class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">カテゴリー <span class="text-[rgb(var(--color-error))]">*</span></label>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+          <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
             <div 
               v-for="category in availableCategories" 
               :key="category.id"
@@ -99,14 +99,14 @@
                 :id="`category-${category.id}`" 
                 :value="category.id" 
                 v-model="formData.categories"
-                class="h-4 w-4 focus:ring-[rgb(var(--color-primary))] rounded"
+                class="w-4 h-4 rounded focus:ring-[rgb(var(--color-primary))]"
               />
-              <label :for="`category-${category.id}`" class="ml-2 block text-sm text-[rgb(var(--color-text))]">
+              <label :for="`category-${category.id}`" class="block ml-2 text-sm text-[rgb(var(--color-text))]">
                 {{ category.name }}
               </label>
             </div>
           </div>
-          <p v-if="formData.categories.length === 0" class="text-[rgb(var(--color-error))] text-xs mt-1">
+          <p v-if="formData.categories.length === 0" class="text-xs mt-1 text-[rgb(var(--color-error))]">
             少なくとも1つのカテゴリーを選択してください
           </p>
         </div>
@@ -120,7 +120,7 @@
                 type="radio" 
                 v-model="formData.published" 
                 :value="true"
-                class="h-4 w-4 text-[rgb(var(--color-primary))] focus:ring-[rgb(var(--color-primary))]"
+                class="w-4 h-4 text-[rgb(var(--color-primary))] focus:ring-[rgb(var(--color-primary))]"
               />
               <span class="ml-2 text-[rgb(var(--color-text))]">公開</span>
             </label>
@@ -129,7 +129,7 @@
                 type="radio" 
                 v-model="formData.published" 
                 :value="false"
-                class="h-4 w-4 text-[rgb(var(--color-primary))] focus:ring-[rgb(var(--color-primary))]"
+                class="w-4 h-4 text-[rgb(var(--color-primary))] focus:ring-[rgb(var(--color-primary))]"
               />
               <span class="ml-2 text-[rgb(var(--color-text))]">下書き</span>
             </label>
@@ -141,10 +141,10 @@
           <router-link to="/" class="px-4 py-2 rounded font-medium transition-all bg-transparent text-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-primary)/0.1)]">キャンセル</router-link>
           <button 
             type="submit" 
-            class="py-2 rounded font-medium transition-all bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] hover:bg-[rgb(var(--color-primary-dark))] disabled:opacity-70 disabled:cursor-not-allowed px-6"
+            class="px-6 py-2 rounded font-medium transition-all bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] hover:bg-[rgb(var(--color-primary-dark))] disabled:opacity-70 disabled:cursor-not-allowed"
             :disabled="submitting || !isFormValid"
           >
-            <svg v-if="submitting" class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24">
+            <svg v-if="submitting" class="w-5 h-5 mr-2 animate-spin" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>

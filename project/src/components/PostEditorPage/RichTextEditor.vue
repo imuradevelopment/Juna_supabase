@@ -1,12 +1,12 @@
 <template>
   <div class="rich-text-editor">
     <!-- エディターメニュー -->
-    <div class="glass-card p-2 mb-2 flex flex-wrap gap-1">
+    <div class="glass-card flex flex-wrap gap-1 p-2 mb-2">
       <!-- 見出し -->
       <button
-        @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()"
+        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
         :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('heading', { level: 2 }) }"
-        class="p-1.5 rounded hover:bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]"
+        @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()"
         title="見出し2"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -14,9 +14,9 @@
         </svg>
       </button>
       <button
-        @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()"
+        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
         :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('heading', { level: 3 }) }"
-        class="p-1.5 rounded hover:bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]"
+        @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()"
         title="見出し3"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -26,9 +26,9 @@
 
       <!-- 太字、斜体、取り消し線 -->
       <button
-        @click="editor?.chain().focus().toggleBold().run()"
+        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
         :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('bold') }"
-        class="p-1.5 rounded hover:bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]"
+        @click="editor?.chain().focus().toggleBold().run()"
         title="太字"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -36,9 +36,9 @@
         </svg>
       </button>
       <button
-        @click="editor?.chain().focus().toggleItalic().run()"
+        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
         :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('italic') }"
-        class="p-1.5 rounded hover:bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]"
+        @click="editor?.chain().focus().toggleItalic().run()"
         title="斜体"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -46,9 +46,9 @@
         </svg>
       </button>
       <button
-        @click="editor?.chain().focus().toggleStrike().run()"
+        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
         :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('strike') }"
-        class="p-1.5 rounded hover:bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]"
+        @click="editor?.chain().focus().toggleStrike().run()"
         title="取り消し線"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -58,9 +58,9 @@
 
       <!-- リスト -->
       <button
-        @click="editor?.chain().focus().toggleBulletList().run()"
+        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
         :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('bulletList') }"
-        class="p-1.5 rounded hover:bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]"
+        @click="editor?.chain().focus().toggleBulletList().run()"
         title="箇条書き"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -68,9 +68,9 @@
         </svg>
       </button>
       <button
-        @click="editor?.chain().focus().toggleOrderedList().run()"
+        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
         :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('orderedList') }"
-        class="p-1.5 rounded hover:bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]"
+        @click="editor?.chain().focus().toggleOrderedList().run()"
         title="番号付きリスト"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -80,9 +80,9 @@
 
       <!-- ブロック操作 -->
       <button
-        @click="editor?.chain().focus().toggleBlockquote().run()"
+        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
         :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('blockquote') }"
-        class="p-1.5 rounded hover:bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]"
+        @click="editor?.chain().focus().toggleBlockquote().run()"
         title="引用"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -90,8 +90,8 @@
         </svg>
       </button>
       <button
+        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
         @click="editor?.chain().focus().setHorizontalRule().run()"
-        class="p-1.5 rounded hover:bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]"
         title="水平線"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -101,9 +101,9 @@
 
       <!-- リンク -->
       <button
-        @click="showLinkModalDialog"
+        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
         :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('link') }"
-        class="p-1.5 rounded hover:bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]"
+        @click="showLinkModalDialog"
         title="リンク"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -113,15 +113,15 @@
 
       <!-- 画像アップロード -->
       <button
+        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
         @click="openFileDialog"
-        class="p-1.5 rounded hover:bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]"
         title="画像"
         :disabled="uploading"
       >
         <svg v-if="!uploading" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-        <svg v-else class="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+        <svg v-else class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
@@ -136,8 +136,8 @@
       
       <!-- 元に戻す、やり直し -->
       <button
+        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
         @click="editor?.chain().focus().undo().run()"
-        class="p-1.5 rounded hover:bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]"
         title="元に戻す"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -145,8 +145,8 @@
         </svg>
       </button>
       <button
+        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
         @click="editor?.chain().focus().redo().run()"
-        class="p-1.5 rounded hover:bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]"
         title="やり直し"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -171,7 +171,7 @@
     <!-- リンクメニュー -->
     <div 
       v-if="showLinkMenu" 
-      class="glass-card p-3 absolute z-20 shadow-[0_4px_10px_rgb(var(--color-background)/0.7)] rounded"
+      class="glass-card absolute z-20 rounded p-3 shadow-[0_4px_10px_rgb(var(--color-background)/0.7)]"
       :style="{ left: `${linkMenuPosition.x}px`, top: `${linkMenuPosition.y}px` }"
     >
       <div class="flex items-center mb-2">
@@ -179,26 +179,26 @@
           v-model="linkUrl"
           type="text"
           placeholder="URLを入力"
-          class="px-2 py-1 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] text-sm flex-1"
+          class="flex-1 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-2 py-1 text-sm text-[rgb(var(--color-text))]"
         />
       </div>
       <div class="flex justify-end space-x-2">
         <button 
           @click="showLinkMenu = false"
-          class="px-2 py-1 text-xs rounded bg-[rgb(var(--color-surface-accent))] hover:bg-[rgb(var(--color-surface-variant))] text-[rgb(var(--color-text))]"
+          class="rounded bg-[rgb(var(--color-surface-accent))] px-2 py-1 text-xs text-[rgb(var(--color-text))] hover:bg-[rgb(var(--color-surface-variant))]"
         >
           キャンセル
         </button>
         <button 
           @click="removeLink"
-          class="px-2 py-1 text-xs rounded bg-[rgb(var(--color-error)/0.3)] text-[rgb(var(--color-error))] hover:bg-[rgb(var(--color-error)/0.5)]"
+          class="rounded bg-[rgb(var(--color-error)/0.3)] px-2 py-1 text-xs text-[rgb(var(--color-error))] hover:bg-[rgb(var(--color-error)/0.5)]"
           :disabled="!editor?.isActive('link')"
         >
           リンク解除
         </button>
         <button 
           @click="applyLink"
-          class="px-2 py-1 text-xs rounded bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] hover:bg-[rgb(var(--color-primary-dark))]"
+          class="rounded bg-[rgb(var(--color-primary))] px-2 py-1 text-xs text-[rgb(var(--color-text-white))] hover:bg-[rgb(var(--color-primary-dark))]"
           :disabled="!linkUrl"
         >
           適用

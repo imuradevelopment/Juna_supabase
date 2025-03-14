@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-likes-list">
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex items-center justify-between mb-4">
       <h2 class="text-xl font-bold">いいね管理</h2>
       <div class="text-sm text-[rgb(var(--color-text-muted))]">
         全 {{ activeLikeType === 'post' ? totalPostLikes : totalCommentLikes }} 件
@@ -8,10 +8,10 @@
     </div>
     
     <!-- タブ切り替え -->
-    <div class="flex border-b border-[rgb(var(--color-border))] mb-4">
+    <div class="flex mb-4 border-b border-[rgb(var(--color-border))]">
       <button 
         @click="activeLikeType = 'post'" 
-        class="py-2 px-4 font-medium text-sm focus:outline-none"
+        class="py-2 px-4 text-sm font-medium focus:outline-none"
         :class="activeLikeType === 'post' 
           ? 'border-b-2 border-[rgb(var(--color-primary))] text-[rgb(var(--color-primary))]' 
           : 'text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text))]'"
@@ -20,7 +20,7 @@
       </button>
       <button 
         @click="activeLikeType = 'comment'" 
-        class="py-2 px-4 font-medium text-sm focus:outline-none"
+        class="py-2 px-4 text-sm font-medium focus:outline-none"
         :class="activeLikeType === 'comment' 
           ? 'border-b-2 border-[rgb(var(--color-primary))] text-[rgb(var(--color-primary))]' 
           : 'text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text))]'"
@@ -31,7 +31,7 @@
     
     <!-- ローディング状態 -->
     <div v-if="loading" class="flex justify-center p-6">
-      <svg class="animate-spin h-8 w-8 text-[rgb(var(--color-primary))]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <svg class="w-8 h-8 animate-spin text-[rgb(var(--color-primary))]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
@@ -52,7 +52,7 @@
           <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div class="flex-1">
               <!-- 投稿情報 -->
-              <h3 class="font-bold text-lg mb-1">
+              <h3 class="mb-1 text-lg font-bold">
                 <router-link :to="`/posts/${like.post_id}`" class="hover:text-[rgb(var(--color-primary))]">
                   {{ like.post?.title || '不明な投稿' }}
                 </router-link>
@@ -60,12 +60,12 @@
               
               <!-- 投稿メタデータ -->
               <div class="flex items-center mb-2">
-                <div class="w-6 h-6 rounded-full bg-[rgb(var(--color-primary-light))] flex items-center justify-center text-[rgb(var(--color-text-white))] overflow-hidden mr-2">
+                <div class="flex items-center justify-center w-6 h-6 mr-2 overflow-hidden rounded-full bg-[rgb(var(--color-primary-light))] text-[rgb(var(--color-text-white))]">
                   <img 
                     v-if="like.post?.author?.avatar_data" 
                     :src="getAvatarUrl(like.post.author.avatar_data)" 
                     :alt="like.post?.author?.nickname || ''"
-                    class="w-full h-full object-cover"
+                    class="object-cover w-full h-full"
                   />
                   <span v-else>{{ getInitials(like.post?.author?.nickname || '') }}</span>
                 </div>
@@ -73,7 +73,7 @@
               </div>
               
               <!-- 投稿の抜粋 -->
-              <p v-if="like.post?.excerpt" class="text-sm text-[rgb(var(--color-text-muted))] line-clamp-2 mb-2">
+              <p v-if="like.post?.excerpt" class="mb-2 text-sm line-clamp-2 text-[rgb(var(--color-text-muted))]">
                 {{ like.post.excerpt }}
               </p>
             </div>
@@ -82,9 +82,9 @@
             <div class="flex justify-end mt-3 md:mt-0 md:ml-4">
               <button 
                 @click="confirmUnlikePost(like)" 
-                class="px-3 py-1 rounded text-sm font-medium transition-all flex items-center text-[rgb(var(--color-error))] border border-[rgb(var(--color-error))] hover:bg-[rgb(var(--color-error))] hover:text-[rgb(var(--color-text-white))]"
+                class="flex items-center px-3 py-1 text-sm font-medium border rounded transition-all text-[rgb(var(--color-error))] border-[rgb(var(--color-error))] hover:bg-[rgb(var(--color-error))] hover:text-[rgb(var(--color-text-white))]"
               >
-                <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
                 </svg>
                 いいね解除
@@ -98,7 +98,7 @@
           <div class="flex space-x-2">
             <button 
               @click="changePostPage(currentPostPage - 1)" 
-              class="px-3 py-1 rounded text-sm font-medium border border-[rgb(var(--color-border))] transition-all"
+              class="px-3 py-1 text-sm font-medium border rounded transition-all border-[rgb(var(--color-border))]"
               :class="currentPostPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-text-white))]'"
               :disabled="currentPostPage === 1"
             >
@@ -108,14 +108,14 @@
               v-for="page in getPostPageNumbers()" 
               :key="page"
               @click="changePostPage(page)" 
-              class="px-3 py-1 rounded text-sm font-medium transition-all" 
+              class="px-3 py-1 text-sm font-medium rounded transition-all" 
               :class="page === currentPostPage ? 'bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))]' : 'border border-[rgb(var(--color-border))] hover:bg-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-text-white))]'"
             >
               {{ page }}
             </button>
             <button 
               @click="changePostPage(currentPostPage + 1)" 
-              class="px-3 py-1 rounded text-sm font-medium border border-[rgb(var(--color-border))] transition-all"
+              class="px-3 py-1 text-sm font-medium border rounded transition-all border-[rgb(var(--color-border))]"
               :class="currentPostPage === totalPostPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-text-white))]'"
               :disabled="currentPostPage === totalPostPages"
             >
@@ -141,7 +141,7 @@
           <div class="flex flex-col md:flex-row md:items-center md:justify-between">
             <div class="flex-1">
               <!-- コメント情報 -->
-              <div class="mb-2 p-3 bg-[rgb(var(--color-surface-variant))] rounded">
+              <div class="p-3 mb-2 rounded bg-[rgb(var(--color-surface-variant))]">
                 <p class="text-sm whitespace-pre-wrap">{{ like.comment?.content || '不明なコメント' }}</p>
               </div>
               
@@ -150,7 +150,7 @@
                 <router-link 
                   v-if="like.comment?.post_id" 
                   :to="`/posts/${like.comment.post_id}`" 
-                  class="text-sm text-[rgb(var(--color-primary))] hover:underline"
+                  class="text-sm hover:underline text-[rgb(var(--color-primary))]"
                 >
                   {{ like.comment?.post?.title || '不明な投稿' }}
                 </router-link>
@@ -161,12 +161,12 @@
               
               <!-- コメント投稿者 -->
               <div class="flex items-center mt-2">
-                <div class="w-5 h-5 rounded-full bg-[rgb(var(--color-primary-light))] flex items-center justify-center text-[rgb(var(--color-text-white))] overflow-hidden mr-2">
+                <div class="flex items-center justify-center w-5 h-5 mr-2 overflow-hidden rounded-full bg-[rgb(var(--color-primary-light))] text-[rgb(var(--color-text-white))]">
                   <img 
                     v-if="like.comment?.author?.avatar_data" 
                     :src="getAvatarUrl(like.comment.author.avatar_data)" 
                     :alt="like.comment?.author?.nickname || ''"
-                    class="w-full h-full object-cover"
+                    class="object-cover w-full h-full"
                   />
                   <span v-else>{{ getInitials(like.comment?.author?.nickname || '') }}</span>
                 </div>
@@ -178,9 +178,9 @@
             <div class="flex justify-end mt-3 md:mt-0 md:ml-4">
               <button 
                 @click="confirmUnlikeComment(like)" 
-                class="px-3 py-1 rounded text-sm font-medium transition-all flex items-center text-[rgb(var(--color-error))] border border-[rgb(var(--color-error))] hover:bg-[rgb(var(--color-error))] hover:text-[rgb(var(--color-text-white))]"
+                class="flex items-center px-3 py-1 text-sm font-medium border rounded transition-all text-[rgb(var(--color-error))] border-[rgb(var(--color-error))] hover:bg-[rgb(var(--color-error))] hover:text-[rgb(var(--color-text-white))]"
               >
-                <svg class="h-4 w-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                   <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
                 </svg>
                 いいね解除
@@ -194,7 +194,7 @@
           <div class="flex space-x-2">
             <button 
               @click="changeCommentPage(currentCommentPage - 1)" 
-              class="px-3 py-1 rounded text-sm font-medium border border-[rgb(var(--color-border))] transition-all"
+              class="px-3 py-1 text-sm font-medium border rounded transition-all border-[rgb(var(--color-border))]"
               :class="currentCommentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-text-white))]'"
               :disabled="currentCommentPage === 1"
             >
@@ -204,14 +204,14 @@
               v-for="page in getCommentPageNumbers()" 
               :key="page"
               @click="changeCommentPage(page)" 
-              class="px-3 py-1 rounded text-sm font-medium transition-all" 
+              class="px-3 py-1 text-sm font-medium rounded transition-all" 
               :class="page === currentCommentPage ? 'bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))]' : 'border border-[rgb(var(--color-border))] hover:bg-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-text-white))]'"
             >
               {{ page }}
             </button>
             <button 
               @click="changeCommentPage(currentCommentPage + 1)" 
-              class="px-3 py-1 rounded text-sm font-medium border border-[rgb(var(--color-border))] transition-all"
+              class="px-3 py-1 text-sm font-medium border rounded transition-all border-[rgb(var(--color-border))]"
               :class="currentCommentPage === totalCommentPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[rgb(var(--color-primary))] hover:text-[rgb(var(--color-text-white))]'"
               :disabled="currentCommentPage === totalCommentPages"
             >
@@ -223,20 +223,20 @@
     </div>
     
     <!-- いいね解除確認モーダル -->
-    <div v-if="showUnlikeModal" class="fixed inset-0 bg-[rgb(var(--color-background))/0.7] flex items-center justify-center z-50">
-      <div class="glass-card p-6 max-w-md mx-auto">
-        <h3 class="text-xl font-bold mb-4">いいねを解除しますか？</h3>
+    <div v-if="showUnlikeModal" class="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--color-background))/0.7]">
+      <div class="glass-card p-6 mx-auto max-w-md">
+        <h3 class="mb-4 text-xl font-bold">いいねを解除しますか？</h3>
         <p class="mb-6 text-[rgb(var(--color-text-muted))]">
           {{ activeLikeType === 'post' ? 'この投稿' : 'このコメント' }}のいいねを解除しますか？
         </p>
         <div class="flex justify-end space-x-3">
-          <button @click="showUnlikeModal = false" class="px-4 py-2 rounded font-medium transition-all bg-transparent text-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-primary))/0.1]">キャンセル</button>
+          <button @click="showUnlikeModal = false" class="px-4 py-2 font-medium rounded transition-all bg-transparent text-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-primary))/0.1]">キャンセル</button>
           <button 
             @click="unlikeItem" 
-            class="px-4 py-2 rounded font-medium transition-all bg-[rgb(var(--color-error))] hover:bg-[rgb(var(--color-error-dark))] text-[rgb(var(--color-text-white))]"
+            class="px-4 py-2 font-medium rounded transition-all bg-[rgb(var(--color-error))] hover:bg-[rgb(var(--color-error-dark))] text-[rgb(var(--color-text-white))]"
             :disabled="unlikeSubmitting"
           >
-            <svg v-if="unlikeSubmitting" class="animate-spin h-5 w-5 mr-2 inline" viewBox="0 0 24 24">
+            <svg v-if="unlikeSubmitting" class="inline w-5 h-5 mr-2 animate-spin" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>

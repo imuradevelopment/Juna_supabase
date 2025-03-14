@@ -54,7 +54,8 @@
 
 /* グラスモーフィズム効果 - モダンUIのための半透明効果 */
 .glass-card {
-  @apply rounded-lg p-6;
+  @apply rounded-lg;
+  padding: 0.75rem;
   background: rgb(var(--color-surface) / 0.8);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
@@ -68,7 +69,10 @@
 
 /* 基本ボタンスタイル */
 .btn {
-  @apply px-4 py-2 rounded font-medium transition-all;
+  @apply rounded font-medium transition-all;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.875rem;
+  min-height: 44px; /* タッチターゲットサイズ確保 */
 }
 
 /* プライマリーボタン - 主要アクション用 */
@@ -152,11 +156,11 @@ input.flex-1,
 }
 
 /* ====================================
- * レスポンシブデザイン
+ * レスポンシブデザイン（モバイルファースト）
  * ==================================== */
 
-/* タブレット向け調整 (768px以下) */
-@media (max-width: 768px) {
+/* タブレット向け調整 (481px以上) */
+@media (min-width: 481px) {
   .glass-card {
     padding: 1rem;
   }
@@ -166,20 +170,14 @@ input.flex-1,
   }
 }
 
-/* モバイル向け調整 (480px以下) */
-@media (max-width: 480px) {
+/* デスクトップ向け調整 (769px以上) */
+@media (min-width: 769px) {
   .glass-card {
-    padding: 0.75rem;
+    padding: 1.5rem;
   }
   
   .btn {
-    padding: 0.4rem 0.75rem;
-    font-size: 0.875rem;
-  }
-  
-  /* タッチターゲットサイズ確保 */
-  button, 
-  .btn {
-    min-height: 44px;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
   }
 }

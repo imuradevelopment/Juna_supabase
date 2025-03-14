@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="rich-text-content max-w-none text-[rgb(var(--color-text))] leading-[1.75] text-base prose dark:prose-invert prose-img:rounded-lg prose-img:shadow-[0_4px_8px_rgb(var(--color-background)/0.5)] prose-headings:text-[rgb(var(--color-heading))] prose-a:text-[rgb(var(--color-primary))] prose-a:no-underline hover:prose-a:underline prose-blockquote:border-l-4 prose-blockquote:border-[rgb(var(--color-primary))] prose-code:bg-[rgb(var(--color-surface-variant))] prose-pre:bg-[rgb(var(--color-surface-variant))] prose-ul:my-4 prose-ul:pl-6 prose-ul:list-disc prose-ol:my-4 prose-ol:pl-6 prose-ol:list-decimal prose-li:my-1"
+    class="rich-text-content prose max-w-none text-base leading-[1.75] text-[rgb(var(--color-text))] dark:prose-invert prose-headings:text-[rgb(var(--color-heading))] prose-a:text-[rgb(var(--color-primary))] prose-a:no-underline hover:prose-a:underline prose-blockquote:my-4 prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:border-[rgb(var(--color-primary))] prose-blockquote:text-[rgb(var(--color-text-muted))] prose-pre:my-4 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-pre:bg-[rgb(var(--color-surface-variant))] prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:rounded prose-code:font-mono prose-code:bg-[rgb(var(--color-surface-variant))] prose-ul:my-4 prose-ul:pl-6 prose-ul:list-disc prose-ol:my-4 prose-ol:pl-6 prose-ol:list-decimal prose-li:my-1 prose-img:rounded-lg prose-img:shadow-[0_4px_8px_rgb(var(--color-background)/0.5)] [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-4 [&_h2]:pb-2 [&_h2]:border-b [&_h2]:border-[rgb(var(--color-border-light))]"
     v-html="content"
   ></div>
 </template>
@@ -57,8 +57,6 @@ const sanitizedContent = computed(() => {
 
 // TiptapコンテンツをHTML文字列に変換する補助関数
 function renderTiptapContent(doc: any): string {
-  // シンプルなテキストを抽出する基本実装
-  // 実際のプロジェクトでは、より高度なTiptap/ProseMirror処理が必要になる場合あり
   try {
     let html = '';
     
@@ -74,6 +72,10 @@ function renderTiptapContent(doc: any): string {
                   textNode.marks.forEach((mark: any) => {
                     if (mark.type === 'bold') text = `<strong>${text}</strong>`;
                     if (mark.type === 'italic') text = `<em>${text}</em>`;
+                    if (mark.type === 'code') text = `<code>${text}</code>`;
+                    if (mark.type === 'link' && mark.attrs?.href) {
+                      text = `<a href="${mark.attrs.href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+                    }
                   });
                 }
                 html += text;
@@ -84,7 +86,7 @@ function renderTiptapContent(doc: any): string {
         } else if (node.type === 'heading') {
           const level = node.attrs?.level || 1;
           const headingClasses = level === 1 ? 'text-2xl font-bold mt-6 mb-4 text-[rgb(var(--color-heading))]' : 
-                                level === 2 ? 'text-xl font-semibold mt-6 mb-3 text-[rgb(var(--color-heading))]' : 
+                                level === 2 ? 'text-xl font-semibold mt-6 mb-3 pb-2 border-b border-[rgb(var(--color-border-light))] text-[rgb(var(--color-heading))]' : 
                                 'text-lg font-semibold mt-5 mb-2 text-[rgb(var(--color-heading))]';
           
           html += `<h${level} class="${headingClasses}">`;
@@ -94,6 +96,67 @@ function renderTiptapContent(doc: any): string {
             });
           }
           html += `</h${level}>`;
+        } else if (node.type === 'blockquote') {
+          html += '<blockquote class="my-4 border-l-4 pl-4 italic border-[rgb(var(--color-primary))] text-[rgb(var(--color-text-muted))]">';
+          if (Array.isArray(node.content)) {
+            node.content.forEach((contentNode: any) => {
+              if (contentNode.type === 'paragraph' && contentNode.content) {
+                html += '<p>';
+                contentNode.content.forEach((textNode: any) => {
+                  if (textNode.type === 'text') html += textNode.text || '';
+                });
+                html += '</p>';
+              }
+            });
+          }
+          html += '</blockquote>';
+        } else if (node.type === 'codeBlock') {
+          const language = node.attrs?.language || '';
+          html += `<pre class="my-4 p-4 rounded-lg overflow-x-auto bg-[rgb(var(--color-surface-variant))]">`;
+          html += `<code class="language-${language}">${node.content?.[0]?.text || ''}</code>`;
+          html += `</pre>`;
+        } else if (node.type === 'bulletList') {
+          html += '<ul class="my-4 pl-6 list-disc">';
+          if (Array.isArray(node.content)) {
+            node.content.forEach((listItem: any) => {
+              if (listItem.type === 'listItem' && listItem.content) {
+                html += '<li class="my-1">';
+                listItem.content.forEach((contentNode: any) => {
+                  if (contentNode.type === 'paragraph' && contentNode.content) {
+                    contentNode.content.forEach((textNode: any) => {
+                      if (textNode.type === 'text') html += textNode.text || '';
+                    });
+                  }
+                });
+                html += '</li>';
+              }
+            });
+          }
+          html += '</ul>';
+        } else if (node.type === 'orderedList') {
+          html += '<ol class="my-4 pl-6 list-decimal">';
+          if (Array.isArray(node.content)) {
+            node.content.forEach((listItem: any) => {
+              if (listItem.type === 'listItem' && listItem.content) {
+                html += '<li class="my-1">';
+                listItem.content.forEach((contentNode: any) => {
+                  if (contentNode.type === 'paragraph' && contentNode.content) {
+                    contentNode.content.forEach((textNode: any) => {
+                      if (textNode.type === 'text') html += textNode.text || '';
+                    });
+                  }
+                });
+                html += '</li>';
+              }
+            });
+          }
+          html += '</ol>';
+        } else if (node.type === 'image' && node.attrs?.src) {
+          const src = node.attrs.src;
+          const alt = node.attrs.alt || '';
+          html += `<img src="${src}" alt="${alt}" class="my-4 rounded-lg shadow-[0_4px_8px_rgb(var(--color-background)/0.5)]" />`;
+        } else if (node.type === 'horizontalRule') {
+          html += '<hr class="my-6 border-[rgb(var(--color-border-light))]" />';
         }
       });
     }
