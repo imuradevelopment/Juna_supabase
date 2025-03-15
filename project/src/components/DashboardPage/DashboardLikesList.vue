@@ -494,6 +494,11 @@ async function fetchCommentLikes() {
 function changePostPage(page: number) {
   if (page < 1 || page > totalPostPages.value) return;
   currentPostPage.value = page;
+  // ページトップへスクロール
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
   fetchPostLikes();
 }
 
@@ -501,6 +506,11 @@ function changePostPage(page: number) {
 function changeCommentPage(page: number) {
   if (page < 1 || page > totalCommentPages.value) return;
   currentCommentPage.value = page;
+  // ページトップへスクロール
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
   fetchCommentLikes();
 }
 

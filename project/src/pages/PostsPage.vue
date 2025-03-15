@@ -768,6 +768,11 @@ function selectDisabilityType(typeId: number | null) {
 function changePage(page: number) {
   if (page < 1 || page > totalPages.value) return;
   currentPage.value = page;
+  // ページトップへスクロール
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
   refreshData();
 }
 
