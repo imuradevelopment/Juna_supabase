@@ -50,6 +50,36 @@
             subtree: true
           });
         });
+        
+        // スクロール状態をリセットする関数 - 強化版
+        function resetScrollState() {
+          // モーダルやメニューが表示されていないときは強制的にスクロールを有効化
+          if (document.body.style.overflow === 'hidden') {
+            const hasOpenModal = document.querySelector('.fixed.inset-0.z-50');
+            const hasOpenMenu = document.querySelector('#app .fixed.inset-0.z-40');
+            
+            if (!hasOpenModal && !hasOpenMenu) {
+              console.log('Fixed scroll: No visible modal/menu detected, enabling scroll');
+              document.body.style.overflow = '';
+            }
+          }
+        }
+        
+        // ページ読み込み完了時にスクロール状態をリセット
+        window.addEventListener('load', resetScrollState);
+        
+        // より頻繁にスクロール状態をチェック
+        setInterval(resetScrollState, 1000);
+        
+        // URL変更時にもスクロール状態をリセット
+        window.addEventListener('popstate', resetScrollState);
+        
+        // スクロールロックのハック対策 - SPAでの遷移後にも呼び出される
+        window.addEventListener('DOMContentLoaded', function() {
+          setTimeout(resetScrollState, 500);
+          setTimeout(resetScrollState, 1500);
+          setTimeout(resetScrollState, 3000);
+        });
       })();
     </script>
   </body>

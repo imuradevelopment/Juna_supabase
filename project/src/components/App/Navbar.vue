@@ -323,5 +323,6 @@ onUnmounted(() => {
   window.removeEventListener('click', handleClickOutside);
   window.removeEventListener('resize', handleResize);
   document.body.style.overflow = '';
+  isMenuOpen.value = false;
 });
 </script>
