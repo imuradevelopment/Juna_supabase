@@ -55,7 +55,7 @@
               <!-- 認証済みの場合 - プロフィールメニュー -->
               <div v-else class="relative" ref="dropdownRef">
                 <div 
-                  @click="toggleDropdown" 
+                  @click="handleAvatarClick" 
                   class="flex cursor-pointer items-center rounded-full bg-[rgb(var(--color-primary)/0.2)] px-2 py-1.5 transition-colors hover:bg-[rgb(var(--color-primary)/0.3)]"
                 >
                   <div 
@@ -79,7 +79,7 @@
                 <!-- ドロップダウンメニュー -->
                 <div 
                   v-show="dropdownOpen" 
-                  class="absolute right-0 mt-2 z-50 w-48 rounded-lg border border-[rgb(var(--color-border-light)/0.2)] bg-[rgb(var(--color-background)/0.8)] py-2 shadow-lg backdrop-blur-md transition-all duration-200 ease-out animate-[dropdown_0.2s_ease-out_forwards] overflow-hidden"
+                  class="absolute right-0 mt-2 z-50 w-48 rounded-lg border border-[rgb(var(--color-border-light)/0.2)] bg-[rgb(var(--color-background)/0.8)] py-2 shadow-lg backdrop-blur-md transition-all duration-200 ease-out animate-[dropdown_0.2s_ease-out_forwards] overflow-hidden sm:block hidden"
                 >
                   <router-link 
                     to="/dashboard" 
@@ -234,11 +234,12 @@
             
             <div class="my-3 border-t border-[rgb(var(--color-border))]"></div>
             
-            <button @click="handleLogout" class="w-full rounded px-2 py-2.5 text-left text-[rgb(var(--color-error))] transition-colors hover:bg-[rgb(var(--color-primary)/0.1)]">ログアウト</button>
-          </template>
-          <template v-else>
-            <router-link to="/auth?mode=login" class="block rounded px-2 py-2.5 text-[rgb(var(--color-text))] transition-colors hover:bg-[rgb(var(--color-primary)/0.1)]" @click="isMenuOpen = false">ログイン</router-link>
-            <router-link to="/auth?mode=register" class="block rounded px-2 py-2.5 text-[rgb(var(--color-text))] transition-colors hover:bg-[rgb(var(--color-primary)/0.1)]" @click="isMenuOpen = false">会員登録</router-link>
+            <button 
+              @click="handleLogout(); isMenuOpen = false;" 
+              class="block w-full text-left rounded px-2 py-2.5 text-[rgb(var(--color-error))] transition-colors hover:bg-[rgb(var(--color-primary)/0.1)]"
+            >
+              ログアウト
+            </button>
           </template>
         </nav>
       </div>
@@ -247,7 +248,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAuthStore } from '../../stores/auth';
 
@@ -256,9 +257,26 @@ const authStore = useAuthStore();
 const dropdownOpen = ref(false);
 const isMenuOpen = ref(false);
 const dropdownRef = ref<HTMLElement | null>(null);
+const isMobile = ref(window.innerWidth < 640);
 
-// ドロップダウンの表示・非表示を切り替え
-function toggleDropdown() {
+// ウィンドウサイズの変更を監視
+function handleResize() {
+  isMobile.value = window.innerWidth < 640;
+  
+  // モバイルからデスクトップへの切り替え時にメニューを閉じる
+  if (!isMobile.value && isMenuOpen.value) {
+    isMenuOpen.value = false;
+    document.body.style.overflow = '';
+  }
+}
+
+// アバターアイコンクリック時の処理
+function handleAvatarClick() {
+  // モバイル表示時は何もしない
+  if (isMobile.value) {
+    return;
+  }
+  // デスクトップ表示時はドロップダウンを切り替え
   dropdownOpen.value = !dropdownOpen.value;
 }
 
@@ -274,60 +292,36 @@ function toggleMobileMenu() {
   }
 }
 
-// ドロップダウン以外の場所をクリックしたときに閉じる
+// ドロップダウン外側クリック時に閉じる
 function handleClickOutside(event: MouseEvent) {
   if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
     dropdownOpen.value = false;
   }
 }
 
+// ログアウト処理
+function handleLogout() {
+  dropdownOpen.value = false;
+  authStore.logout();
+  router.push('/');
+}
+
+// 名前のイニシャルを取得
+function getInitials(name: string): string {
+  if (!name) return '';
+  return name.split(' ').map(part => part[0]).join('').toUpperCase();
+}
+
 onMounted(() => {
   window.addEventListener('click', handleClickOutside);
+  window.addEventListener('resize', handleResize);
+  // 初期状態を設定
+  handleResize();
 });
 
 onUnmounted(() => {
   window.removeEventListener('click', handleClickOutside);
-  // 念のためスクロールを有効に戻す
+  window.removeEventListener('resize', handleResize);
   document.body.style.overflow = '';
 });
-
-// ページ遷移時にメニューを閉じる
-watch(() => router.currentRoute.value, () => {
-  isMenuOpen.value = false;
-  dropdownOpen.value = false;
-  document.body.style.overflow = '';
-});
-
-// ログアウト処理
-async function handleLogout() {
-  try {
-    await authStore.logout();
-    router.push('/');
-    isMenuOpen.value = false;
-    dropdownOpen.value = false;
-  } catch (error) {
-    console.error('ログアウトエラー:', error);
-  }
-}
-
-// ヘルパー関数
-function getInitials(name: string | undefined): string {
-  if (!name) return 'U';
-  return name.charAt(0).toUpperCase();
-}
 </script>
-
-<style scoped lang="postcss">
-@keyframes dropdown {
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.active-nav-link {
-  @apply relative;
-}
-
-.active-nav-link::after {
-  content: '';
-  @apply absolute -bottom-1 left-0 w-full h-0.5 bg-[rgb(var(--color-primary-light)/0.7)] rounded-full transition-all duration-300 ease-in-out;
-}
-</style> 
