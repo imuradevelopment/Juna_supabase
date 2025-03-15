@@ -1,12 +1,21 @@
 <template>
-  <div 
-    class="rich-text-content prose max-w-none text-base leading-[1.75] text-[rgb(var(--color-text))] dark:prose-invert prose-headings:text-[rgb(var(--color-heading))] prose-a:text-[rgb(var(--color-primary))] prose-a:no-underline hover:prose-a:underline prose-blockquote:my-4 prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:border-[rgb(var(--color-primary))] prose-blockquote:text-[rgb(var(--color-text-muted))] prose-pre:my-4 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-pre:bg-[rgb(var(--color-surface-variant))] prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:rounded prose-code:font-mono prose-code:bg-[rgb(var(--color-surface-variant))] prose-ul:my-4 prose-ul:pl-6 prose-ul:list-disc prose-ol:my-4 prose-ol:pl-6 prose-ol:list-decimal prose-li:my-1 prose-img:rounded-lg prose-img:shadow-[0_4px_8px_rgb(var(--color-background)/0.5)] [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-4 [&_h2]:pb-2 [&_h2]:border-b [&_h2]:border-[rgb(var(--color-border-light))]"
-    v-html="content"
-  ></div>
+  <div class="rich-text-container">
+    <!-- 操作ボタングループを削除 -->
+    
+    <div 
+      ref="contentRef"
+      :class="['rich-text-content prose max-w-none leading-[1.75] text-text dark:prose-invert prose-headings:text-heading prose-a:text-primary hover:prose-a:text-primary-dark prose-a:no-underline hover:prose-a:underline prose-blockquote:my-4 prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:border-primary prose-blockquote:text-text-muted prose-pre:my-4 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-pre:bg-surface-variant prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:rounded prose-code:font-mono prose-code:bg-surface-variant prose-ul:my-4 prose-ul:pl-6 prose-ul:list-disc prose-ol:my-4 prose-ol:pl-6 prose-ol:list-decimal prose-li:my-1 prose-img:rounded-lg prose-img:shadow-background/50 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-4 [&_h2]:pb-2 [&_h2]:border-b [&_h2]:border-border-light', fontSizeClass]"
+      v-html="content"
+    ></div>
+    
+    <!-- 共有リンクのモーダルを削除 -->
+    
+    <!-- コピー完了通知を削除 -->
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import DOMPurify from 'dompurify';
 
 const props = defineProps({
@@ -15,6 +24,12 @@ const props = defineProps({
     default: ''
   }
 });
+
+// フォントサイズはデフォルト値を設定
+const fontSizeClass = computed(() => 'text-base');
+
+// コンテンツ参照（他の機能で使用されている可能性があるため残す）
+const contentRef = ref<HTMLElement | null>(null);
 
 // コンテンツ処理を改善：JSONBオブジェクトの構造をより適切に処理する
 const sanitizedContent = computed(() => {
@@ -74,7 +89,7 @@ function renderTiptapContent(doc: any): string {
                     if (mark.type === 'italic') text = `<em>${text}</em>`;
                     if (mark.type === 'code') text = `<code>${text}</code>`;
                     if (mark.type === 'link' && mark.attrs?.href) {
-                      text = `<a href="${mark.attrs.href}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+                      text = `<a href="${mark.attrs.href}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark transition-all">${text}</a>`;
                     }
                   });
                 }
@@ -85,9 +100,9 @@ function renderTiptapContent(doc: any): string {
           html += '</p>';
         } else if (node.type === 'heading') {
           const level = node.attrs?.level || 1;
-          const headingClasses = level === 1 ? 'text-2xl font-bold mt-6 mb-4 text-[rgb(var(--color-heading))]' : 
-                                level === 2 ? 'text-xl font-semibold mt-6 mb-3 pb-2 border-b border-[rgb(var(--color-border-light))] text-[rgb(var(--color-heading))]' : 
-                                'text-lg font-semibold mt-5 mb-2 text-[rgb(var(--color-heading))]';
+          const headingClasses = level === 1 ? 'text-2xl font-bold mt-6 mb-4 text-heading' : 
+                                level === 2 ? 'text-xl font-semibold mt-6 mb-3 pb-2 border-b border-border-light text-heading' : 
+                                'text-lg font-semibold mt-5 mb-2 text-heading';
           
           html += `<h${level} class="${headingClasses}">`;
           if (node.content) {
@@ -97,7 +112,7 @@ function renderTiptapContent(doc: any): string {
           }
           html += `</h${level}>`;
         } else if (node.type === 'blockquote') {
-          html += '<blockquote class="my-4 border-l-4 pl-4 italic border-[rgb(var(--color-primary))] text-[rgb(var(--color-text-muted))]">';
+          html += '<blockquote class="my-4 border-l-4 pl-4 italic border-primary text-text-muted">';
           if (Array.isArray(node.content)) {
             node.content.forEach((contentNode: any) => {
               if (contentNode.type === 'paragraph' && contentNode.content) {
@@ -112,7 +127,7 @@ function renderTiptapContent(doc: any): string {
           html += '</blockquote>';
         } else if (node.type === 'codeBlock') {
           const language = node.attrs?.language || '';
-          html += `<pre class="my-4 p-4 rounded-lg overflow-x-auto bg-[rgb(var(--color-surface-variant))]">`;
+          html += `<pre class="my-4 p-4 rounded-lg overflow-x-auto bg-surface-variant">`;
           html += `<code class="language-${language}">${node.content?.[0]?.text || ''}</code>`;
           html += `</pre>`;
         } else if (node.type === 'bulletList') {
@@ -154,9 +169,9 @@ function renderTiptapContent(doc: any): string {
         } else if (node.type === 'image' && node.attrs?.src) {
           const src = node.attrs.src;
           const alt = node.attrs.alt || '';
-          html += `<img src="${src}" alt="${alt}" class="my-4 rounded-lg shadow-[0_4px_8px_rgb(var(--color-background)/0.5)]" />`;
+          html += `<img src="${src}" alt="${alt}" class="my-4 rounded-lg shadow-background/50" />`;
         } else if (node.type === 'horizontalRule') {
-          html += '<hr class="my-6 border-[rgb(var(--color-border-light))]" />';
+          html += '<hr class="my-6 border-border-light" />';
         }
       });
     }
@@ -170,4 +185,13 @@ function renderTiptapContent(doc: any): string {
 
 // コンテンツを表示
 const content = computed(() => sanitizedContent.value);
-</script> 
+</script>
+
+<style>
+@media print {
+  .rich-text-container > div:first-child,
+  .fixed {
+    display: none !important;
+  }
+}
+</style> 

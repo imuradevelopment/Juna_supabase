@@ -1,15 +1,15 @@
 <template>
   <header class="sticky top-0 z-50 transition-all duration-300">
-    <nav class="border-b border-[rgb(var(--color-border)/0.5)] px-4 py-3 backdrop-blur-md bg-[rgb(var(--color-background)/0.8)]">
+    <nav class="border-b border-border/50 px-4 py-3 backdrop-blur-md bg-background/80">
       <div class="container mx-auto">
         <!-- モバイルナビゲーション -->
         <div class="flex items-center justify-between">
           <!-- ロゴ -->
           <router-link to="/" class="group flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8 text-[rgb(var(--color-primary-light))] transition-transform group-hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8 text-primary-light transition-transform group-hover:scale-110">
               <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-12h2v6h-2zm0 8h2v2h-2z" />
             </svg>
-            <span class="ml-2 text-xl font-bold tracking-wide text-[rgb(var(--color-heading))]">Juna</span>
+            <span class="ml-2 text-xl font-bold tracking-wide text-heading">Juna</span>
           </router-link>
 
           <div class="flex items-center space-x-3">
@@ -17,7 +17,7 @@
             <div class="hidden items-center space-x-5 sm:flex">
               <router-link 
                 to="/posts" 
-                class="active-nav-link relative py-1 text-[rgb(var(--color-secondary))] tracking-[0.02em] transition-colors hover:text-[rgb(var(--color-primary-light))]"
+                class="active-nav-link relative py-1 text-secondary tracking-[0.02em] transition-colors hover:text-primary-light"
                 active-class="active-nav-link"
               >投稿一覧</router-link>
               
@@ -25,7 +25,7 @@
               <router-link 
                 v-if="authStore.isAuthenticated" 
                 to="/editor" 
-                class="hidden items-center text-[rgb(var(--color-primary-light))] transition-colors hover:text-[rgb(var(--color-primary))] md:flex"
+                class="hidden items-center text-primary-light transition-colors hover:text-primary md:flex"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -40,13 +40,13 @@
               <template v-if="!authStore.isAuthenticated">
                 <router-link
                   to="/auth?mode=login"
-                  class="rounded-full border-2 border-[rgb(var(--color-primary))] px-3 py-1.5 text-sm text-[rgb(var(--color-primary-light))] transition-all hover:bg-[rgb(var(--color-primary)/0.1)]"
+                  class="btn btn-outline-primary rounded-full"
                 >
                   ログイン
                 </router-link>
                 <router-link
                   to="/auth?mode=register"
-                  class="hidden rounded-full bg-[rgb(var(--color-primary))] px-3 py-1.5 text-sm text-[rgb(var(--color-text-white))] shadow-[0_1px_2px_rgb(var(--color-primary)/0.3)] transition-all hover:bg-[rgb(var(--color-primary-dark))] hover:shadow-[0_4px_6px_rgb(var(--color-primary)/0.4)] sm:block"
+                  class="btn btn-primary rounded-full hidden sm:flex"
                 >
                   会員登録
                 </router-link>
@@ -56,7 +56,7 @@
               <div v-else class="relative" ref="dropdownRef">
                 <div 
                   @click="handleAvatarClick" 
-                  class="flex cursor-pointer items-center rounded-full bg-[rgb(var(--color-primary)/0.2)] px-2 py-1.5 transition-colors hover:bg-[rgb(var(--color-primary)/0.3)]"
+                  class="flex cursor-pointer items-center rounded-full bg-primary/20 px-2 py-1.5 transition-colors hover:bg-primary/30"
                 >
                   <div 
                     class="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full"
@@ -67,11 +67,11 @@
                       :alt="authStore.displayName"
                       class="h-full w-full object-cover"
                     />
-                    <div v-else class="flex h-full w-full items-center justify-center bg-[rgb(var(--color-primary-dark)/0.3)] text-sm text-[rgb(var(--color-text))]">
+                    <div v-else class="flex h-full w-full items-center justify-center bg-primary-dark/30 text-sm text-text">
                       {{ getInitials(authStore.displayName) }}
                     </div>
                   </div>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 h-4 w-4 text-[rgb(var(--color-text))] hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 h-4 w-4 text-text hidden sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                   </svg>
                 </div>
@@ -79,11 +79,11 @@
                 <!-- ドロップダウンメニュー -->
                 <div 
                   v-show="dropdownOpen" 
-                  class="absolute right-0 mt-2 z-50 w-48 rounded-lg border border-[rgb(var(--color-border-light)/0.2)] bg-[rgb(var(--color-background)/0.8)] py-2 shadow-lg backdrop-blur-md transition-all duration-200 ease-out animate-[dropdown_0.2s_ease-out_forwards] overflow-hidden sm:block hidden"
+                  class="absolute right-0 mt-2 z-50 w-48 rounded-lg border border-border-light/20 bg-background/80 py-2 shadow-lg backdrop-blur-md transition-all duration-200 ease-out animate-[dropdown_0.2s_ease-out_forwards] overflow-hidden sm:block hidden"
                 >
                   <router-link 
                     to="/dashboard" 
-                    class="flex items-center px-4 py-2.5 text-sm text-[rgb(var(--color-text))] transition-colors hover:bg-[rgb(var(--color-primary)/0.15)]"
+                    class="flex items-center px-4 py-2.5 text-sm text-text transition-colors hover:bg-primary/15"
                     @click="dropdownOpen = false"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -94,7 +94,7 @@
                   
                   <router-link 
                     :to="`/profile/${authStore.user?.id}`" 
-                    class="flex items-center px-4 py-2.5 text-sm text-[rgb(var(--color-text))] transition-colors hover:bg-[rgb(var(--color-primary)/0.15)]"
+                    class="flex items-center px-4 py-2.5 text-sm text-text transition-colors hover:bg-primary/15"
                     @click="dropdownOpen = false"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -105,7 +105,7 @@
                   
                   <router-link 
                     to="/editor" 
-                    class="flex items-center px-4 py-2.5 text-sm text-[rgb(var(--color-text))] transition-colors hover:bg-[rgb(var(--color-primary)/0.15)]"
+                    class="flex items-center px-4 py-2.5 text-sm text-text transition-colors hover:bg-primary/15"
                     @click="dropdownOpen = false"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -116,7 +116,7 @@
                   
                   <router-link 
                     to="/profile/edit" 
-                    class="flex items-center px-4 py-2.5 text-sm text-[rgb(var(--color-text))] transition-colors hover:bg-[rgb(var(--color-primary)/0.15)]"
+                    class="flex items-center px-4 py-2.5 text-sm text-text transition-colors hover:bg-primary/15"
                     @click="dropdownOpen = false"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -126,11 +126,11 @@
                     設定
                   </router-link>
                   
-                  <div class="my-1 border-t border-[rgb(var(--color-border))/0.3]"></div>
+                  <div class="my-1 border-t border-border/30"></div>
                   
                   <button 
                     @click="handleLogout" 
-                    class="flex w-full items-center px-4 py-2.5 text-left text-sm text-[rgb(var(--color-error))] transition-colors hover:bg-[rgb(var(--color-primary)/0.15)] hover:text-[rgb(var(--color-error-dark))]"
+                    class="flex w-full items-center px-4 py-2.5 text-left text-sm text-error transition-colors hover:bg-primary/15 hover:text-error-dark"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -144,7 +144,7 @@
             <!-- モバイルメニューボタン -->
             <button 
               @click="toggleMobileMenu" 
-              class="rounded-lg p-1.5 text-[rgb(var(--color-text))] focus:outline-none sm:hidden"
+              class="btn-icon-text sm:hidden"
               aria-label="モバイルメニュー"
             >
               <svg 
@@ -178,18 +178,18 @@
     <!-- モバイルメニュー -->
     <div 
       v-if="isMenuOpen" 
-      class="fixed inset-0 z-40 bg-[rgb(var(--color-background))/0.95] sm:hidden"
+      class="fixed inset-0 z-40 bg-background/95 sm:hidden"
       @click="isMenuOpen = false"
     >
       <div 
-        class="ml-auto h-full w-full max-w-xs overflow-y-auto bg-[rgb(var(--color-surface-variant))] px-4 py-6 shadow-[0_10px_15px_rgb(var(--color-background)/0.5)]"
+        class="ml-auto h-full w-full max-w-xs overflow-y-auto bg-surface-variant px-4 py-6 shadow-background/50 shadow-xl"
         @click.stop
       >
         <div class="mb-6 flex items-center justify-between">
-          <h2 class="text-lg font-medium text-[rgb(var(--color-heading))]">メニュー</h2>
+          <h2 class="text-lg font-medium text-heading">メニュー</h2>
           <button 
             @click="isMenuOpen = false" 
-            class="rounded-lg p-1 text-[rgb(var(--color-text))]"
+            class="btn-icon-text"
           >
             <svg 
               xmlns="http://www.w3.org/2000/svg" 
@@ -209,34 +209,34 @@
         </div>
           
         <nav class="space-y-1">
-          <router-link to="/" class="block rounded px-2 py-2.5 text-[rgb(var(--color-text))] transition-colors hover:bg-[rgb(var(--color-primary)/0.1)]" @click="isMenuOpen = false">ホーム</router-link>
-          <router-link to="/posts" class="block rounded px-2 py-2.5 text-[rgb(var(--color-text))] transition-colors hover:bg-[rgb(var(--color-primary)/0.1)]" @click="isMenuOpen = false">投稿一覧</router-link>
+          <router-link to="/" class="block rounded px-2 py-2.5 text-text transition-colors hover:bg-primary/10" @click="isMenuOpen = false">ホーム</router-link>
+          <router-link to="/posts" class="block rounded px-2 py-2.5 text-text transition-colors hover:bg-primary/10" @click="isMenuOpen = false">投稿一覧</router-link>
           
-          <div class="my-3 border-t border-[rgb(var(--color-border))]"></div>
+          <div class="my-3 border-t border-border"></div>
           
           <template v-if="authStore.isAuthenticated">
             <div class="mb-2 flex items-center p-2">
-              <div class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-[rgb(var(--color-primary)/0.3)]">
+              <div class="mr-3 flex h-8 w-8 items-center justify-center rounded-full bg-primary/30">
                 <img 
                   v-if="authStore.avatarUrl" 
                   :src="authStore.avatarUrl" 
                   :alt="authStore.displayName"
                   class="h-full w-full rounded-full object-cover"
                 />
-                <span v-else class="text-[rgb(var(--color-text))]">{{ getInitials(authStore.displayName) }}</span>
+                <span v-else class="text-text">{{ getInitials(authStore.displayName) }}</span>
               </div>
-              <span class="font-medium text-[rgb(var(--color-heading))]">{{ authStore.displayName }}</span>
+              <span class="font-medium text-heading">{{ authStore.displayName }}</span>
             </div>
-            <router-link to="/editor" class="block rounded px-2 py-2.5 text-[rgb(var(--color-text))] transition-colors hover:bg-[rgb(var(--color-primary)/0.1)]" @click="isMenuOpen = false">投稿作成</router-link>
-            <router-link to="/dashboard" class="block rounded px-2 py-2.5 text-[rgb(var(--color-text))] transition-colors hover:bg-[rgb(var(--color-primary)/0.1)]" @click="isMenuOpen = false">ダッシュボード</router-link>
-            <router-link :to="`/profile/${authStore.user?.id}`" class="block rounded px-2 py-2.5 text-[rgb(var(--color-text))] transition-colors hover:bg-[rgb(var(--color-primary)/0.1)]" @click="isMenuOpen = false">プロフィール</router-link>
-            <router-link to="/profile/edit" class="block rounded px-2 py-2.5 text-[rgb(var(--color-text))] transition-colors hover:bg-[rgb(var(--color-primary)/0.1)]" @click="isMenuOpen = false">設定</router-link>
+            <router-link to="/editor" class="block rounded px-2 py-2.5 text-text transition-colors hover:bg-primary/10" @click="isMenuOpen = false">投稿作成</router-link>
+            <router-link to="/dashboard" class="block rounded px-2 py-2.5 text-text transition-colors hover:bg-primary/10" @click="isMenuOpen = false">ダッシュボード</router-link>
+            <router-link :to="`/profile/${authStore.user?.id}`" class="block rounded px-2 py-2.5 text-text transition-colors hover:bg-primary/10" @click="isMenuOpen = false">プロフィール</router-link>
+            <router-link to="/profile/edit" class="block rounded px-2 py-2.5 text-text transition-colors hover:bg-primary/10" @click="isMenuOpen = false">設定</router-link>
             
-            <div class="my-3 border-t border-[rgb(var(--color-border))]"></div>
+            <div class="my-3 border-t border-border"></div>
             
             <button 
               @click="handleLogout(); isMenuOpen = false;" 
-              class="block w-full text-left rounded px-2 py-2.5 text-[rgb(var(--color-error))] transition-colors hover:bg-[rgb(var(--color-primary)/0.1)]"
+              class="btn btn-outline-error w-full justify-start text-left"
             >
               ログアウト
             </button>

@@ -1,9 +1,9 @@
 <template>
-  <div class="flex flex-col min-h-screen relative bg-[rgb(var(--color-background))]">
+  <div class="flex flex-col min-h-screen relative bg-background">
     <!-- 背景装飾 -->
     <div class="fixed inset-0 z-0 pointer-events-none">
-      <div class="absolute top-0 right-0 w-1/3 h-1/3 rounded-full blur-3xl bg-[rgb(var(--color-primary)/0.05)] shadow-[0_0_50px_rgb(var(--color-primary)/0.2)]"></div>
-      <div class="absolute bottom-0 left-0 w-1/2 h-1/2 rounded-full blur-3xl bg-[rgb(var(--color-primary)/0.05)] shadow-[0_0_50px_rgb(var(--color-primary)/0.2)]"></div>
+      <div class="absolute top-0 right-0 w-1/3 h-1/3 rounded-full blur-3xl bg-primary/5 shadow-primary/20"></div>
+      <div class="absolute bottom-0 left-0 w-1/2 h-1/2 rounded-full blur-3xl bg-primary/5 shadow-primary/20"></div>
     </div>
     
     <Navbar />
@@ -19,8 +19,8 @@
       <div v-else class="flex justify-center items-center h-full">
         <!-- 認証初期化中のローディング表示 -->
         <div class="animate-pulse flex flex-col items-center">
-          <div class="w-12 h-12 rounded-full bg-[rgb(var(--color-primary)/0.3)] mb-4"></div>
-          <div class="h-2 w-24 bg-[rgb(var(--color-text-muted)/0.3)] rounded"></div>
+          <div class="w-12 h-12 rounded-full bg-primary/30 mb-4"></div>
+          <div class="h-2 w-24 bg-text-muted/30 rounded"></div>
         </div>
       </div>
     </main>
@@ -104,15 +104,15 @@ onMounted(async () => {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgb(var(--color-background));
+  @apply bg-background;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(var(--color-secondary));
+  @apply bg-secondary;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgb(var(--color-primary));
+  @apply bg-primary;
 }
 </style> 

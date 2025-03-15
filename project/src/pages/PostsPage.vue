@@ -1,6 +1,6 @@
 <template>
   <div class="max-w-6xl mx-auto py-8 px-4">
-    <h1 class="text-3xl font-bold mb-6 text-[rgb(var(--color-heading))]">投稿一覧</h1>
+    <h1 class="text-3xl font-bold mb-6 text-heading">投稿一覧</h1>
     
     <!-- 検索フォーム -->
     <div class="max-w-3xl mx-auto mb-8">
@@ -8,13 +8,13 @@
         <input
           v-model="searchQuery"
           type="text"
-          class="w-full px-4 py-3 pr-10 rounded-full bg-[rgb(var(--color-surface))] border border-[rgb(var(--color-border))] text-[rgb(var(--color-text))] focus:border-[rgb(var(--color-primary))] focus:ring-2 focus:ring-[rgb(var(--color-primary)/0.3)]"
+          class="w-full px-4 py-3 pr-10 rounded-full bg-surface border border-border text-text focus:border-primary focus:ring-2 focus:ring-primary/30"
           placeholder="検索キーワードを入力してください"
           @input="debouncedSearch"
         />
         <button 
           @click="refreshData"
-          class="absolute right-2 top-1/2 transform -translate-y-1/2 text-[rgb(var(--color-text-muted))] hover:text-[rgb(var(--color-text))]"
+          class="btn-icon-primary absolute right-2 top-1/2 transform -translate-y-1/2"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -28,11 +28,11 @@
       <div class="flex flex-wrap items-center gap-4">
         <!-- カテゴリフィルター -->
         <div class="w-full sm:w-auto">
-          <label for="category-filter" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">カテゴリ</label>
+          <label for="category-filter" class="block text-sm font-medium mb-1 text-text">カテゴリ</label>
           <select
             id="category-filter"
             v-model="selectedCategoryId"
-            class="appearance-none w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] bg-no-repeat bg-[length:16px] bg-[right_10px_center] text-[rgb(var(--color-text))] sm:w-auto focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))]"
+            class="appearance-none w-full px-4 py-2 rounded border border-border bg-surface bg-no-repeat bg-[length:16px] bg-[right_10px_center] text-text sm:w-auto focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option :value="null">すべて</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
@@ -43,11 +43,11 @@
         
         <!-- 障害タイプフィルター -->
         <div class="w-full sm:w-auto">
-          <label for="disability-filter" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">障害タイプ</label>
+          <label for="disability-filter" class="block text-sm font-medium mb-1 text-text">障害タイプ</label>
           <select
             id="disability-filter"
             v-model="selectedDisabilityType"
-            class="appearance-none w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] bg-no-repeat bg-[length:16px] bg-[right_10px_center] text-[rgb(var(--color-text))] sm:w-auto focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))]"
+            class="appearance-none w-full px-4 py-2 rounded border border-border bg-surface bg-no-repeat bg-[length:16px] bg-[right_10px_center] text-text sm:w-auto focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option :value="null">すべて</option>
             <option v-for="type in disabilityTypes" :key="type.id" :value="type.id">
@@ -58,11 +58,11 @@
         
         <!-- ソート -->
         <div class="w-full sm:w-auto">
-          <label for="sort-order" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">並び順</label>
+          <label for="sort-order" class="block text-sm font-medium mb-1 text-text">並び順</label>
           <select
             id="sort-order"
             v-model="sortOrder"
-            class="appearance-none w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] bg-no-repeat bg-[length:16px] bg-[right_10px_center] text-[rgb(var(--color-text))] sm:w-auto focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))]"
+            class="appearance-none w-full px-4 py-2 rounded border border-border bg-surface bg-no-repeat bg-[length:16px] bg-[right_10px_center] text-text sm:w-auto focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="created_at.desc">新しい順</option>
             <option value="created_at.asc">古い順</option>
@@ -73,7 +73,7 @@
         
         <!-- フィルターリセットボタン -->
         <div class="w-full mt-auto ml-auto sm:w-auto">
-          <button @click="resetFilters" class="px-4 py-2 rounded font-medium text-[rgb(var(--color-primary))] transition-all hover:bg-[rgb(var(--color-primary)/0.1)]">
+          <button @click="resetFilters" class="btn btn-outline-primary">
             フィルターをリセット
           </button>
         </div>
@@ -85,29 +85,29 @@
       <!-- カテゴリサイドバー -->
       <div class="w-full md:w-1/4 lg:w-1/5">
         <div class="glass-card p-4 mb-6">
-          <h2 class="text-xl font-bold mb-4 text-[rgb(var(--color-heading))]">カテゴリ</h2>
+          <h2 class="text-xl font-bold mb-4 text-heading">カテゴリ</h2>
           
           <!-- カテゴリローディング -->
           <div v-if="categoriesLoading" class="flex justify-center py-4">
-            <div class="w-8 h-8 border-4 rounded-full border-[rgb(var(--color-surface-accent))] border-t-[rgb(var(--color-primary))] animate-spin"></div>
+            <div class="w-8 h-8 border-4 rounded-full border-surface-accent border-t-primary animate-spin"></div>
           </div>
           
           <!-- カテゴリエラー -->
-          <div v-else-if="categoriesError" class="text-sm mb-2 text-[rgb(var(--color-error))]">
+          <div v-else-if="categoriesError" class="text-sm mb-2 text-error">
             {{ categoriesError }}
-            <button @click="fetchCategories" class="ml-2 text-[rgb(var(--color-primary))] hover:underline">再試行</button>
+            <button @click="fetchCategories" class="ml-2 text-primary hover:underline">再試行</button>
           </div>
           
           <!-- カテゴリリスト -->
-          <div v-else-if="categories.length === 0" class="py-2 text-center text-[rgb(var(--color-text-muted))]">
+          <div v-else-if="categories.length === 0" class="py-2 text-center text-text-muted">
             カテゴリはまだありません
           </div>
           
           <div v-else class="space-y-2">
             <button 
               @click="selectCategory(null)" 
-              class="w-full px-3 py-2 text-left rounded-lg transition-colors text-[rgb(var(--color-text))]"
-              :class="selectedCategoryId === null ? 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-text-white))]' : 'hover:bg-[rgb(var(--color-surface-accent)/0.5)]'"
+              class="w-full px-3 py-2 text-left rounded-lg transition-colors btn-ghost"
+              :class="selectedCategoryId === null ? 'bg-primary/20 text-text-white' : ''"
             >
               すべてのカテゴリ
             </button>
@@ -115,34 +115,34 @@
               v-for="category in categories" 
               :key="category.id"
               @click="selectCategory(category.id)"
-              class="w-full flex items-center justify-between px-3 py-2 text-left rounded-lg transition-colors text-[rgb(var(--color-text))]"
-              :class="selectedCategoryId === category.id ? 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-text-white))]' : 'hover:bg-[rgb(var(--color-surface-accent)/0.5)]'"
+              class="w-full flex items-center justify-between px-3 py-2 text-left rounded-lg transition-colors btn-ghost"
+              :class="selectedCategoryId === category.id ? 'bg-primary/20 text-text-white' : ''"
             >
               <span>{{ category.name }}</span>
-              <span class="text-xs text-[rgb(var(--color-primary))]">{{ category.post_count || 0 }}</span>
+              <span class="text-xs text-primary">{{ category.post_count || 0 }}</span>
             </button>
           </div>
         </div>
         
         <!-- 障害タイプサイドバー -->
         <div class="glass-card p-4">
-          <h2 class="text-xl font-bold mb-4 text-[rgb(var(--color-heading))]">障害タイプ</h2>
+          <h2 class="text-xl font-bold mb-4 text-heading">障害タイプ</h2>
           
           <!-- 障害タイプローディング -->
           <div v-if="disabilityTypesLoading" class="flex justify-center py-4">
-            <div class="w-8 h-8 border-4 rounded-full border-[rgb(var(--color-surface-accent))] border-t-[rgb(var(--color-primary))] animate-spin"></div>
+            <div class="w-8 h-8 border-4 rounded-full border-surface-accent border-t-primary animate-spin"></div>
           </div>
           
           <!-- 障害タイプリスト -->
-          <div v-else-if="disabilityTypes.length === 0" class="py-2 text-center text-[rgb(var(--color-text-muted))]">
+          <div v-else-if="disabilityTypes.length === 0" class="py-2 text-center text-text-muted">
             障害タイプはまだありません
           </div>
           
           <div v-else class="space-y-2">
             <button 
               @click="selectDisabilityType(null)" 
-              class="w-full px-3 py-2 text-left rounded-lg transition-colors text-[rgb(var(--color-text))]"
-              :class="selectedDisabilityType === null ? 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-text-white))]' : 'hover:bg-[rgb(var(--color-surface-accent)/0.5)]'"
+              class="w-full px-3 py-2 text-left rounded-lg transition-colors btn-ghost"
+              :class="selectedDisabilityType === null ? 'bg-primary/20 text-text-white' : ''"
             >
               すべてのタイプ
             </button>
@@ -150,8 +150,8 @@
               v-for="type in disabilityTypes" 
               :key="type.id"
               @click="selectDisabilityType(type.id)"
-              class="w-full px-3 py-2 text-left rounded-lg transition-colors text-[rgb(var(--color-text))]"
-              :class="selectedDisabilityType === type.id ? 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-text-white))]' : 'hover:bg-[rgb(var(--color-surface-accent)/0.5)]'"
+              class="w-full px-3 py-2 text-left rounded-lg transition-colors btn-ghost"
+              :class="selectedDisabilityType === type.id ? 'bg-primary/20 text-text-white' : ''"
             >
               {{ type.name }}
             </button>
@@ -163,48 +163,48 @@
       <div class="w-full md:w-3/4 lg:w-4/5">
         <!-- 検索中ローディング -->
         <div v-if="loading" class="flex items-center justify-center h-32">
-          <div class="w-8 h-8 border-4 rounded-full border-[rgb(var(--color-surface-accent))] border-t-[rgb(var(--color-primary))] animate-spin"></div>
+          <div class="w-8 h-8 border-4 rounded-full border-surface-accent border-t-primary animate-spin"></div>
         </div>
         
         <!-- エラー表示 -->
-        <div v-else-if="error" class="glass-card p-4 text-[rgb(var(--color-error))]">
+        <div v-else-if="error" class="glass-card p-4 text-error">
           <p>{{ error }}</p>
-          <button @click="refreshData" class="mt-2 px-4 py-2 text-sm rounded font-medium shadow-[0_2px_4px_rgba(var(--color-primary-dark)/0.5)] bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] transition-all">再試行</button>
+          <button @click="refreshData" class="btn btn-error mt-2">再試行</button>
         </div>
         
         <!-- 選択されたカテゴリタイトル -->
         <div v-else-if="selectedCategoryId && selectedCategory" class="mb-6">
           <div class="flex items-center justify-between">
-            <h2 class="text-2xl font-bold text-[rgb(var(--color-heading))]">{{ selectedCategory.name }}</h2>
+            <h2 class="text-2xl font-bold text-heading">{{ selectedCategory.name }}</h2>
           </div>
-          <p v-if="selectedCategory.description" class="mt-2 text-[rgb(var(--color-text-muted))]">
+          <p v-if="selectedCategory.description" class="mt-2 text-text-muted">
             {{ selectedCategory.description }}
           </p>
         </div>
         
         <!-- 検索キーワードがあれば表示 -->
         <div v-else-if="searchQuery.trim()" class="mb-6">
-          <h2 class="text-2xl font-bold text-[rgb(var(--color-heading))]">「{{ searchQuery }}」の検索結果</h2>
+          <h2 class="text-2xl font-bold text-heading">「{{ searchQuery }}」の検索結果</h2>
         </div>
         
         <!-- 投稿が存在しない場合 -->
         <div v-if="!loading && posts.length === 0" class="glass-card p-8 text-center">
-          <p v-if="searchQuery.trim() || selectedCategoryId || selectedDisabilityType" class="text-[rgb(var(--color-text-muted))]">
+          <p v-if="searchQuery.trim() || selectedCategoryId || selectedDisabilityType" class="text-text-muted">
             条件に一致する投稿は見つかりませんでした
           </p>
-          <p v-else class="text-[rgb(var(--color-text-muted))]">
+          <p v-else class="text-text-muted">
             投稿がありません
           </p>
           <button v-if="searchQuery.trim() || selectedCategoryId || selectedDisabilityType" 
                   @click="resetFilters" 
-                  class="mt-4 px-4 py-2 rounded font-medium shadow-[0_2px_4px_rgba(var(--color-primary-dark)/0.5)] bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] transition-all hover:bg-[rgb(var(--color-primary-dark))]">
+                  class="btn btn-outline-primary mt-4">
             フィルターをリセット
           </button>
         </div>
         
         <!-- 投稿一覧 -->
         <div v-else-if="posts.length > 0">
-          <div v-if="totalResults > 0" class="mb-2 text-sm text-[rgb(var(--color-text-muted))]">
+          <div v-if="totalResults > 0" class="mb-2 text-sm text-text-muted">
             {{ totalResults }}件中 {{ startIndex + 1 }}～{{ endIndex }}件を表示
           </div>
           
@@ -225,7 +225,7 @@
             <div class="flex space-x-2">
               <button 
                 @click="changePage(currentPage - 1)" 
-                class="px-4 py-2 text-sm rounded font-medium shadow-[0_1px_3px_rgba(var(--color-background)/0.3)] bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                class="btn btn-outline-primary btn-sm"
                 :disabled="currentPage === 1"
               >
                 前へ
@@ -235,15 +235,15 @@
                 v-for="page in getPageNumbers()"
                 :key="page"
                 @click="changePage(Number(page))"
-                class="px-4 py-2 text-sm rounded font-medium transition-all"
-                :class="currentPage === page ? 'shadow-[0_2px_4px_rgba(var(--color-primary-dark)/0.5)] bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))]' : 'shadow-[0_1px_3px_rgba(var(--color-background)/0.3)] bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] hover:bg-[rgb(var(--color-surface-variant))]'"
+                class="btn btn-sm"
+                :class="currentPage === page ? 'btn-primary' : 'btn-outline-primary'"
               >
                 {{ page }}
               </button>
               
               <button 
                 @click="changePage(currentPage + 1)" 
-                class="px-4 py-2 text-sm rounded font-medium shadow-[0_1px_3px_rgba(var(--color-background)/0.3)] bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                class="btn btn-outline-primary btn-sm"
                 :disabled="currentPage === totalPages"
               >
                 次へ

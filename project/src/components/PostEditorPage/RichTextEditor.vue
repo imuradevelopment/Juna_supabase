@@ -4,8 +4,8 @@
     <div class="glass-card flex flex-wrap gap-1 p-2 mb-2">
       <!-- 見出し -->
       <button
-        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
-        :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('heading', { level: 2 }) }"
+        class="btn-icon-primary"
+        :class="{ 'bg-primary/20 text-primary': editor?.isActive('heading', { level: 2 }) }"
         @click="editor?.chain().focus().toggleHeading({ level: 2 }).run()"
         title="見出し2"
       >
@@ -14,8 +14,8 @@
         </svg>
       </button>
       <button
-        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
-        :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('heading', { level: 3 }) }"
+        class="btn-icon-primary"
+        :class="{ 'bg-primary/20 text-primary': editor?.isActive('heading', { level: 3 }) }"
         @click="editor?.chain().focus().toggleHeading({ level: 3 }).run()"
         title="見出し3"
       >
@@ -26,8 +26,8 @@
 
       <!-- 太字、斜体、取り消し線 -->
       <button
-        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
-        :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('bold') }"
+        class="btn-icon-primary"
+        :class="{ 'bg-primary/20 text-primary': editor?.isActive('bold') }"
         @click="editor?.chain().focus().toggleBold().run()"
         title="太字"
       >
@@ -36,8 +36,8 @@
         </svg>
       </button>
       <button
-        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
-        :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('italic') }"
+        class="btn-icon-primary"
+        :class="{ 'bg-primary/20 text-primary': editor?.isActive('italic') }"
         @click="editor?.chain().focus().toggleItalic().run()"
         title="斜体"
       >
@@ -46,8 +46,8 @@
         </svg>
       </button>
       <button
-        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
-        :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('strike') }"
+        class="btn-icon-warning"
+        :class="{ 'bg-primary/20 text-primary': editor?.isActive('strike') }"
         @click="editor?.chain().focus().toggleStrike().run()"
         title="取り消し線"
       >
@@ -58,8 +58,8 @@
 
       <!-- リスト -->
       <button
-        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
-        :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('bulletList') }"
+        class="btn-icon-secondary"
+        :class="{ 'bg-primary/20 text-primary': editor?.isActive('bulletList') }"
         @click="editor?.chain().focus().toggleBulletList().run()"
         title="箇条書き"
       >
@@ -68,8 +68,8 @@
         </svg>
       </button>
       <button
-        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
-        :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('orderedList') }"
+        class="btn-icon-secondary"
+        :class="{ 'bg-primary/20 text-primary': editor?.isActive('orderedList') }"
         @click="editor?.chain().focus().toggleOrderedList().run()"
         title="番号付きリスト"
       >
@@ -80,8 +80,8 @@
 
       <!-- ブロック操作 -->
       <button
-        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
-        :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('blockquote') }"
+        class="btn-icon-info"
+        :class="{ 'bg-primary/20 text-primary': editor?.isActive('blockquote') }"
         @click="editor?.chain().focus().toggleBlockquote().run()"
         title="引用"
       >
@@ -90,7 +90,7 @@
         </svg>
       </button>
       <button
-        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
+        class="btn-icon-secondary"
         @click="editor?.chain().focus().setHorizontalRule().run()"
         title="水平線"
       >
@@ -101,8 +101,8 @@
 
       <!-- リンク -->
       <button
-        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
-        :class="{ 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-primary))]': editor?.isActive('link') }"
+        class="btn-icon-info"
+        :class="{ 'bg-primary/20 text-primary': editor?.isActive('link') }"
         @click="showLinkModalDialog"
         title="リンク"
       >
@@ -113,7 +113,7 @@
 
       <!-- 画像アップロード -->
       <button
-        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
+        class="btn-icon-success"
         @click="openFileDialog"
         title="画像"
         :disabled="uploading"
@@ -136,7 +136,7 @@
       
       <!-- 元に戻す、やり直し -->
       <button
-        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
+        class="btn-icon-text"
         @click="editor?.chain().focus().undo().run()"
         title="元に戻す"
       >
@@ -145,7 +145,7 @@
         </svg>
       </button>
       <button
-        class="rounded p-1.5 text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-surface-accent))]"
+        class="btn-icon-text"
         @click="editor?.chain().focus().redo().run()"
         title="やり直し"
       >
@@ -158,20 +158,20 @@
     <!-- エディター本体 -->
     <div 
       class="glass-card p-4"
-      :class="{ 'ring-2 ring-[rgb(var(--color-primary))] ring-opacity-50': isFocused }"
+      :class="{ 'ring-2 ring-primary ring-opacity-50': isFocused }"
     >
       <EditorContent 
         :editor="editor as Editor" 
         @focus="isFocused = true"
         @blur="isFocused = false"
-        class="[&_.ProseMirror]:min-h-[250px] [&_.ProseMirror]:outline-none [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mt-6 [&_.ProseMirror_h2]:mb-2 [&_.ProseMirror_h2]:text-[rgb(var(--color-heading))] [&_.ProseMirror_h3]:text-xl [&_.ProseMirror_h3]:font-bold [&_.ProseMirror_h3]:mt-5 [&_.ProseMirror_h3]:mb-2 [&_.ProseMirror_h3]:text-[rgb(var(--color-heading))] [&_.ProseMirror_p]:mb-3 [&_.ProseMirror_p]:text-[rgb(var(--color-text))] [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ul]:mb-3 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_ol]:mb-3 [&_.ProseMirror_blockquote]:border-l-[3px] [&_.ProseMirror_blockquote]:border-[rgb(var(--color-border-light))] [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:text-[rgb(var(--color-text-muted))] [&_.ProseMirror_blockquote]:my-4 [&_.ProseMirror_hr]:border-0 [&_.ProseMirror_hr]:border-t-2 [&_.ProseMirror_hr]:border-[rgb(var(--color-border-light))] [&_.ProseMirror_hr]:my-6 [&_.ProseMirror_img]:max-w-full [&_.ProseMirror_img]:h-auto [&_.ProseMirror_img]:rounded [&_.ProseMirror_img]:my-2 [&_.ProseMirror_a]:text-[rgb(var(--color-primary))] [&_.ProseMirror_a]:underline"
+        class="[&_.ProseMirror]:min-h-[250px] [&_.ProseMirror]:outline-none [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mt-6 [&_.ProseMirror_h2]:mb-2 [&_.ProseMirror_h2]:text-heading [&_.ProseMirror_h3]:text-xl [&_.ProseMirror_h3]:font-bold [&_.ProseMirror_h3]:mt-5 [&_.ProseMirror_h3]:mb-2 [&_.ProseMirror_h3]:text-heading [&_.ProseMirror_p]:mb-3 [&_.ProseMirror_p]:text-text [&_.ProseMirror_ul]:list-disc [&_.ProseMirror_ul]:pl-6 [&_.ProseMirror_ul]:mb-3 [&_.ProseMirror_ol]:list-decimal [&_.ProseMirror_ol]:pl-6 [&_.ProseMirror_ol]:mb-3 [&_.ProseMirror_blockquote]:border-l-[3px] [&_.ProseMirror_blockquote]:border-border-light [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:text-text-muted [&_.ProseMirror_blockquote]:my-4 [&_.ProseMirror_hr]:border-0 [&_.ProseMirror_hr]:border-t-2 [&_.ProseMirror_hr]:border-border-light [&_.ProseMirror_hr]:my-6 [&_.ProseMirror_img]:max-w-full [&_.ProseMirror_img]:h-auto [&_.ProseMirror_img]:rounded [&_.ProseMirror_img]:my-2 [&_.ProseMirror_a]:text-primary [&_.ProseMirror_a]:underline"
       />
     </div>
     
     <!-- リンクメニュー -->
     <div 
       v-if="showLinkMenu" 
-      class="glass-card absolute z-20 rounded p-3 shadow-[0_4px_10px_rgb(var(--color-background)/0.7)]"
+      class="glass-card absolute z-20 rounded p-3 shadow-background/70"
       :style="{ left: `${linkMenuPosition.x}px`, top: `${linkMenuPosition.y}px` }"
     >
       <div class="flex items-center mb-2">
@@ -179,26 +179,26 @@
           v-model="linkUrl"
           type="text"
           placeholder="URLを入力"
-          class="flex-1 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] px-2 py-1 text-sm text-[rgb(var(--color-text))]"
+          class="flex-1 rounded border border-border bg-surface px-2 py-1 text-sm text-text"
         />
       </div>
       <div class="flex justify-end space-x-2">
         <button 
           @click="showLinkMenu = false"
-          class="rounded bg-[rgb(var(--color-surface-accent))] px-2 py-1 text-xs text-[rgb(var(--color-text))] hover:bg-[rgb(var(--color-surface-variant))]"
+          class="btn btn-secondary btn-sm"
         >
           キャンセル
         </button>
         <button 
           @click="removeLink"
-          class="rounded bg-[rgb(var(--color-error)/0.3)] px-2 py-1 text-xs text-[rgb(var(--color-error))] hover:bg-[rgb(var(--color-error)/0.5)]"
+          class="btn btn-error btn-sm"
           :disabled="!editor?.isActive('link')"
         >
           リンク解除
         </button>
         <button 
           @click="applyLink"
-          class="rounded bg-[rgb(var(--color-primary))] px-2 py-1 text-xs text-[rgb(var(--color-text-white))] hover:bg-[rgb(var(--color-primary-dark))]"
+          class="btn btn-primary btn-sm"
           :disabled="!linkUrl"
         >
           適用
@@ -446,7 +446,7 @@ function uploadImage(event: Event) {
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
-  color: rgb(var(--color-text-muted));
+  color: theme('colors.text-muted');
   pointer-events: none;
   height: 0;
 }

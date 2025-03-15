@@ -1,26 +1,26 @@
 <template>
   <div class="max-w-3xl mx-auto py-8">
     <div class="glass-card p-6">
-      <h1 class="text-2xl font-bold mb-6 text-[rgb(var(--color-heading))]">プロフィール設定</h1>
+      <h1 class="text-2xl font-bold mb-6 text-heading">プロフィール設定</h1>
       
       <!-- エラーメッセージ -->
-      <div v-if="error" class="bg-[rgb(var(--color-error)/0.2)] border border-[rgb(var(--color-error-dark))] text-[rgb(var(--color-error))] px-4 py-3 rounded mb-6">
+      <div v-if="error" class="bg-error/20 border border-error-dark text-error px-4 py-3 rounded mb-6">
         {{ error }}
       </div>
       
       <!-- 成功メッセージ -->
-      <div v-if="successMessage" class="bg-[rgb(var(--color-success)/0.2)] border border-[rgb(var(--color-success-dark))] text-[rgb(var(--color-success))] px-4 py-3 rounded mb-6">
+      <div v-if="successMessage" class="bg-success/20 border border-success-dark text-success px-4 py-3 rounded mb-6">
         {{ successMessage }}
       </div>
       
       <form @submit.prevent="saveProfile" class="space-y-6">
         <!-- アバター -->
         <div>
-          <label class="block text-sm font-medium mb-2 text-[rgb(var(--color-text))]">プロフィール画像</label>
+          <label class="block text-sm font-medium mb-2 text-text">プロフィール画像</label>
           <div class="flex flex-col items-start space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
             <!-- アバター表示部分 -->
             <div class="flex flex-col items-center">
-              <div class="relative w-24 h-24 rounded-full bg-[rgb(var(--color-primary-light))] flex items-center justify-center text-[rgb(var(--color-text-white))] text-3xl overflow-hidden">
+              <div class="relative w-24 h-24 rounded-full bg-primary-light flex items-center justify-center text-text-white text-3xl overflow-hidden">
                 <img 
                   v-if="avatarPreview" 
                   :src="avatarPreview" 
@@ -42,7 +42,7 @@
                 v-if="avatarPreview || profileData.avatar_data" 
                 type="button" 
                 @click="removeAvatar"
-                class="mt-2 text-[rgb(var(--color-error))] hover:text-[rgb(var(--color-error-dark))] text-sm flex items-center"
+                class="mt-2 btn btn-outline-error btn-sm"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                   <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
@@ -53,7 +53,7 @@
             
             <!-- アップロードボタン -->
             <div class="flex flex-col">
-              <label class="bg-[rgb(var(--color-surface-accent))] hover:bg-[rgb(var(--color-surface-variant))] text-[rgb(var(--color-text))] px-4 py-2 rounded transition-colors cursor-pointer flex items-center">
+              <label class="btn btn-outline-secondary cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
@@ -66,48 +66,48 @@
                   ref="avatarInput"
                 />
               </label>
-              <p class="text-sm text-[rgb(var(--color-text-muted))] mt-2">推奨サイズ: 200x200px (2MB以下)</p>
+              <p class="text-sm text-text-muted mt-2">推奨サイズ: 200x200px (2MB以下)</p>
             </div>
           </div>
         </div>
         
         <!-- 表示名 -->
         <div>
-          <label for="nickname" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">表示名 <span class="text-[rgb(var(--color-error))]">*</span></label>
+          <label for="nickname" class="block text-sm font-medium mb-1 text-text">表示名 <span class="text-error">*</span></label>
           <input 
             id="nickname" 
             v-model="profileData.nickname" 
             type="text" 
             required
-            class="w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))]"
+            class="w-full px-4 py-2 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         
         <!-- アカウントID -->
         <div>
-          <label for="account_id" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">アカウントID</label>
+          <label for="account_id" class="block text-sm font-medium mb-1 text-text">アカウントID</label>
           <div class="flex">
-            <span class="inline-flex items-center px-3 py-2 rounded-l border border-r-0 border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text))]">@</span>
+            <span class="inline-flex items-center px-3 py-2 rounded-l border border-r-0 border-border bg-surface-accent text-text">@</span>
             <input 
               id="account_id" 
               v-model="profileData.account_id" 
               type="text" 
-              class="flex-1 px-4 py-2 rounded-r border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))]"
+              class="flex-1 px-4 py-2 rounded-r border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="account_id"
             />
           </div>
-          <p class="text-xs text-[rgb(var(--color-text-muted))] mt-1">
+          <p class="text-xs text-text-muted mt-1">
             半角英数字とアンダースコアのみ使用可能です
           </p>
         </div>
         
         <!-- 自己紹介 -->
         <div>
-          <label for="bio" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">自己紹介</label>
+          <label for="bio" class="block text-sm font-medium mb-1 text-text">自己紹介</label>
           <textarea 
             id="bio" 
             v-model="profileData.bio" 
-            class="w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))]"
+            class="w-full px-4 py-2 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
             rows="3"
             placeholder="自己紹介を入力してください"
           ></textarea>
@@ -115,11 +115,11 @@
         
         <!-- 障害種別 -->
         <div>
-          <label for="disability_type" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">障害種別</label>
+          <label for="disability_type" class="block text-sm font-medium mb-1 text-text">障害種別</label>
           <select 
             id="disability_type" 
             v-model="profileData.disability_type_id"
-            class="w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))]"
+            class="w-full px-4 py-2 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="">選択しない</option>
             <option v-for="type in disabilityTypes" :key="type.id" :value="type.id">
@@ -130,11 +130,11 @@
         
         <!-- 障害についての説明 -->
         <div>
-          <label for="disability_description" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">障害についての説明</label>
+          <label for="disability_description" class="block text-sm font-medium mb-1 text-text">障害についての説明</label>
           <textarea 
             id="disability_description" 
             v-model="profileData.disability_description" 
-            class="w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))]"
+            class="w-full px-4 py-2 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
             rows="3"
             placeholder="お持ちの障害について、共有したい情報があればご記入ください"
           ></textarea>
@@ -144,7 +144,7 @@
         <div>
           <button 
             type="submit" 
-            class="bg-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-primary-dark))] text-[rgb(var(--color-text-white))] flex items-center justify-center w-full py-2 rounded font-medium transition-colors shadow-[0_0_15px_rgba(var(--color-primary-dark),0.3)]"
+            class="btn btn-primary w-full"
             :disabled="submitting"
           >
             <div class="flex items-center">

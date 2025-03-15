@@ -1,10 +1,10 @@
 <template>
   <div>
-    <h2 class="text-xl font-bold mb-4 text-[rgb(var(--color-heading))]">統計情報</h2>
+    <h2 class="text-xl font-bold mb-4 text-heading">統計情報</h2>
     
     <!-- ローディング状態 -->
     <div v-if="loading" class="flex justify-center p-6">
-      <svg class="h-8 w-8 animate-spin text-[rgb(var(--color-primary))]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <svg class="h-8 w-8 animate-spin text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
@@ -15,74 +15,74 @@
       <!-- 概要カード -->
       <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div class="glass-card flex flex-col items-center p-4">
-          <h3 class="mb-1 text-lg font-semibold text-[rgb(var(--color-text-muted))]">投稿数</h3>
-          <p class="text-3xl font-bold text-[rgb(var(--color-primary))]">{{ stats.postsCount }}</p>
+          <h3 class="mb-1 text-lg font-semibold text-text-muted">投稿数</h3>
+          <p class="text-3xl font-bold text-primary-dark">{{ stats.postsCount }}</p>
         </div>
         
         <div class="glass-card flex flex-col items-center p-4">
-          <h3 class="mb-1 text-lg font-semibold text-[rgb(var(--color-text-muted))]">コメント数</h3>
-          <p class="text-3xl font-bold text-[rgb(var(--color-primary))]">{{ stats.commentsCount }}</p>
+          <h3 class="mb-1 text-lg font-semibold text-text-muted">コメント数</h3>
+          <p class="text-3xl font-bold text-primary-dark">{{ stats.commentsCount }}</p>
         </div>
         
         <div class="glass-card flex flex-col items-center p-4">
-          <h3 class="mb-1 text-lg font-semibold text-[rgb(var(--color-text-muted))]">いいね数</h3>
-          <p class="text-3xl font-bold text-[rgb(var(--color-primary))]">{{ stats.totalLikesGivenCount }}</p>
+          <h3 class="mb-1 text-lg font-semibold text-text-muted">いいね数</h3>
+          <p class="text-3xl font-bold text-primary-dark">{{ stats.totalLikesGivenCount }}</p>
         </div>
       </div>
       
       <!-- 詳細統計 -->
       <div class="glass-card p-4">
-        <h3 class="mb-3 text-lg font-bold text-[rgb(var(--color-heading))]">詳細統計</h3>
+        <h3 class="mb-3 text-lg font-bold text-heading">詳細統計</h3>
         
-        <div class="divide-y divide-[rgb(var(--color-border))]">
+        <div class="divide-y divide-border">
           <div class="flex justify-between py-3">
-            <span class="text-[rgb(var(--color-text-muted))]">公開中の投稿</span>
-            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.publishedPostsCount }}</span>
+            <span class="text-text-muted">公開中の投稿</span>
+            <span class="font-semibold text-primary">{{ stats.publishedPostsCount }}</span>
           </div>
           
           <div class="flex justify-between py-3">
-            <span class="text-[rgb(var(--color-text-muted))]">下書き</span>
-            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.draftsCount }}</span>
+            <span class="text-text-muted">下書き</span>
+            <span class="font-semibold text-primary">{{ stats.draftsCount }}</span>
           </div>
           
           <div class="flex justify-between py-3">
-            <span class="text-[rgb(var(--color-text-muted))]">総閲覧数</span>
-            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.totalViews }}</span>
+            <span class="text-text-muted">総閲覧数</span>
+            <span class="font-semibold text-primary">{{ stats.totalViews }}</span>
           </div>
           
           <div class="flex justify-between py-3">
-            <span class="text-[rgb(var(--color-text-muted))]">投稿への返信コメント</span>
-            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.commentsOnPostsCount }}</span>
+            <span class="text-text-muted">投稿への返信コメント</span>
+            <span class="font-semibold text-primary">{{ stats.commentsOnPostsCount }}</span>
           </div>
           
           <div class="flex justify-between py-3">
-            <span class="text-[rgb(var(--color-text-muted))]">自分がいいねした投稿</span>
-            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.postLikesGivenCount }}</span>
+            <span class="text-text-muted">自分がいいねした投稿</span>
+            <span class="font-semibold text-primary">{{ stats.postLikesGivenCount }}</span>
           </div>
           
           <div class="flex justify-between py-3">
-            <span class="text-[rgb(var(--color-text-muted))]">自分がいいねしたコメント</span>
-            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.commentLikesGivenCount }}</span>
+            <span class="text-text-muted">自分がいいねしたコメント</span>
+            <span class="font-semibold text-primary">{{ stats.commentLikesGivenCount }}</span>
           </div>
           
           <div class="flex justify-between py-3">
-            <span class="text-[rgb(var(--color-text-muted))]">自分の投稿が受けたいいね</span>
-            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.likesReceivedCount }}</span>
+            <span class="text-text-muted">自分の投稿が受けたいいね</span>
+            <span class="font-semibold text-primary">{{ stats.likesReceivedCount }}</span>
           </div>
         </div>
       </div>
       
       <!-- 人気の投稿 -->
       <div v-if="stats.popularPosts.length > 0" class="glass-card p-4">
-        <h3 class="mb-3 text-lg font-bold text-[rgb(var(--color-heading))]">人気の投稿</h3>
+        <h3 class="mb-3 text-lg font-bold text-heading">人気の投稿</h3>
         
         <div class="space-y-3">
           <div v-for="post in stats.popularPosts" :key="post.id" class="flex items-center justify-between">
             <div class="flex-1">
-              <router-link :to="`/posts/${post.id}`" class="font-medium text-[rgb(var(--color-text))] hover:text-[rgb(var(--color-primary))]">
+              <router-link :to="`/posts/${post.id}`" class="btn-link">
                 {{ post.title }}
               </router-link>
-              <div class="flex items-center text-sm text-[rgb(var(--color-text-muted))]">
+              <div class="flex items-center text-sm text-text-muted">
                 <svg class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -96,12 +96,12 @@
       
       <!-- 最近の活動 -->
       <div v-if="stats.recentActivities.length > 0" class="glass-card p-4">
-        <h3 class="mb-3 text-lg font-bold text-[rgb(var(--color-heading))]">最近の活動</h3>
+        <h3 class="mb-3 text-lg font-bold text-heading">最近の活動</h3>
         
         <div class="space-y-3">
           <div v-for="activity in stats.recentActivities" :key="activity.id" class="flex items-start">
             <div class="mr-3 flex-shrink-0">
-              <div :class="getActivityIconClass(activity.type)" class="flex h-8 w-8 items-center justify-center rounded-full">
+              <div :class="getActivityIconClass(activity.type)" class="rounded-full p-1.5 flex items-center justify-center">
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path v-if="activity.type === 'post'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   <path v-else-if="activity.type === 'comment'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
@@ -112,10 +112,10 @@
             </div>
             
             <div class="flex-1">
-              <p class="text-sm text-[rgb(var(--color-text))]">
+              <p class="text-sm text-text">
                 {{ getActivityText(activity) }}
               </p>
-              <p class="text-xs text-[rgb(var(--color-text-muted))]">
+              <p class="text-xs text-text-muted">
                 {{ formatDate(activity.created_at) }}
               </p>
             </div>
@@ -126,7 +126,7 @@
       <!-- ユーザー情報表示 -->
       <div class="glass-card p-4 text-center md:text-left">
         <div class="flex flex-col items-center md:flex-row">
-          <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-[rgb(var(--color-primary-light))] text-2xl text-[rgb(var(--color-text-white))] md:mb-0 md:mr-4">
+          <div class="mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-primary-light text-2xl text-text-white md:mb-0 md:mr-4">
             <img 
               v-if="profile?.avatar_data" 
               :src="getAvatarUrl(profile.avatar_data)" 
@@ -136,8 +136,8 @@
             <span v-else>{{ getInitials(profile?.nickname || 'U') }}</span>
           </div>
           <div>
-            <h3 class="text-xl font-bold text-[rgb(var(--color-heading))]">{{ profile?.nickname }}</h3>
-            <p v-if="profile?.bio" class="mt-1 text-sm text-[rgb(var(--color-text-muted))]">{{ profile.bio }}</p>
+            <h3 class="text-xl font-bold text-heading">{{ profile?.nickname }}</h3>
+            <p v-if="profile?.bio" class="mt-1 text-sm text-text-muted">{{ profile.bio }}</p>
           </div>
         </div>
       </div>
@@ -401,14 +401,14 @@ function getInitials(name: string): string {
 function getActivityIconClass(type: string) {
   switch (type) {
     case 'post':
-      return 'bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-info))]';
+      return 'bg-info/20 text-info';
     case 'comment':
-      return 'bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-success))]';
+      return 'bg-success/20 text-success';
     case 'post-like':
     case 'comment-like':
-      return 'bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-error))]';
+      return 'bg-error/20 text-error';
     default:
-      return 'bg-[rgb(var(--color-surface-accent))] text-[rgb(var(--color-text-muted))]';
+      return 'bg-text/10 text-text';
   }
 }
 

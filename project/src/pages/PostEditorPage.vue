@@ -1,22 +1,22 @@
 <template>
   <div class="max-w-3xl mx-auto py-8">
     <div class="post-form glass-card p-6">
-      <h1 class="text-2xl font-bold mb-6 text-[rgb(var(--color-heading))]">{{ isEditMode ? '投稿を編集' : '新しい投稿を作成' }}</h1>
+      <h1 class="text-2xl font-bold mb-6 text-heading">{{ isEditMode ? '投稿を編集' : '新しい投稿を作成' }}</h1>
       
       <!-- エラーメッセージ -->
-      <div v-if="formError" class="bg-[rgb(var(--color-error)/0.2)] border border-[rgb(var(--color-error-dark)/0.5)] text-[rgb(var(--color-error))] px-4 py-3 rounded mb-6">
+      <div v-if="formError" class="bg-error/20 border border-error-dark/50 text-error px-4 py-3 rounded mb-6">
         {{ formError }}
       </div>
       
       <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- タイトル -->
         <div>
-          <label for="title" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">タイトル <span class="text-[rgb(var(--color-error))]">*</span></label>
+          <label for="title" class="block text-sm font-medium mb-1 text-heading">タイトル <span class="text-error">*</span></label>
           <input
             id="title"
             v-model="formData.title"
             type="text"
-            class="w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))]"
+            class="w-full px-4 py-2 rounded border border-border bg-surface text-heading focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="投稿のタイトル"
             required
           />
@@ -24,22 +24,22 @@
         
         <!-- 抜粋 -->
         <div>
-          <label for="excerpt" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">抜粋</label>
+          <label for="excerpt" class="block text-sm font-medium mb-1 text-text-muted">抜粋</label>
           <textarea
             id="excerpt"
             v-model="formData.excerpt"
             rows="3"
-            class="w-full px-4 py-2 rounded border border-[rgb(var(--color-border))] bg-[rgb(var(--color-surface))] text-[rgb(var(--color-text))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))]"
+            class="w-full px-4 py-2 rounded border border-border bg-surface text-text-muted focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="投稿の短い説明（オプション）"
           ></textarea>
         </div>
         
         <!-- アイキャッチ画像 -->
         <div>
-          <label class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">アイキャッチ画像</label>
+          <label class="block text-sm font-medium mb-1 text-text-muted">アイキャッチ画像</label>
           <div class="flex items-center space-x-4">
             <!-- 画像プレビュー -->
-            <div v-if="featuredImagePreview || formData.cover_image_path" class="relative w-32 h-24 bg-[rgb(var(--color-surface-variant))] rounded overflow-hidden">
+            <div v-if="featuredImagePreview || formData.cover_image_path" class="relative w-32 h-24 bg-surface-variant rounded overflow-hidden">
               <img 
                 :src="featuredImagePreview || getCoverImageUrl(formData.cover_image_path as string)" 
                 alt="プレビュー" 
@@ -48,7 +48,7 @@
               <button 
                 type="button"
                 @click="clearImage" 
-                class="absolute top-1 right-1 bg-[rgb(var(--color-error))] text-[rgb(var(--color-text-white))] p-1 rounded-full hover:bg-[rgb(var(--color-error-dark))] focus:outline-none"
+                class="btn-icon btn-icon-error btn-icon-sm absolute top-1 right-1"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -58,7 +58,7 @@
             
             <!-- アップロードボタン -->
             <div>
-              <label class="inline-flex items-center px-4 py-2 rounded font-medium transition-all bg-[rgb(var(--color-secondary))] text-[rgb(var(--color-text-white))] hover:bg-[rgb(var(--color-secondary)/0.8)] cursor-pointer">
+              <label class="btn btn-outline-secondary cursor-pointer">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
@@ -70,14 +70,14 @@
                   @change="handleImageUpload"
                 />
               </label>
-              <p class="text-xs text-[rgb(var(--color-text-muted))] mt-1">最大サイズ: 2MB</p>
+              <p class="text-xs text-text-muted mt-1">最大サイズ: 2MB</p>
             </div>
           </div>
         </div>
         
         <!-- 本文 -->
         <div>
-          <label for="content" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">本文 <span class="text-[rgb(var(--color-error))]">*</span></label>
+          <label for="content" class="block text-sm font-medium mb-1 text-text-muted">本文 <span class="text-error">*</span></label>
           <RichTextEditor
             v-model="formData.content"
             placeholder="投稿の本文を入力してください"
@@ -87,7 +87,7 @@
         
         <!-- カテゴリ -->
         <div>
-          <label class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">カテゴリ <span class="text-[rgb(var(--color-error))]">*</span></label>
+          <label class="block text-sm font-medium mb-1 text-text-muted">カテゴリ <span class="text-error">*</span></label>
           <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
             <div 
               v-for="category in availableCategories" 
@@ -99,49 +99,49 @@
                 :id="`category-${category.id}`" 
                 :value="category.id" 
                 v-model="formData.categories"
-                class="w-4 h-4 rounded focus:ring-[rgb(var(--color-primary))]"
+                class="w-4 h-4 rounded focus:ring-primary"
               />
-              <label :for="`category-${category.id}`" class="block ml-2 text-sm text-[rgb(var(--color-text))]">
+              <label :for="`category-${category.id}`" class="block ml-2 text-sm text-text-muted">
                 {{ category.name }}
               </label>
             </div>
           </div>
-          <p v-if="formData.categories.length === 0" class="text-xs mt-1 text-[rgb(var(--color-error))]">
+          <p v-if="formData.categories.length === 0" class="text-xs mt-1 text-error">
             少なくとも1つのカテゴリを選択してください
           </p>
         </div>
         
         <!-- 公開設定 -->
         <div>
-          <label class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">公開設定</label>
+          <label class="block text-sm font-medium mb-1 text-text-muted">公開設定</label>
           <div class="flex items-center space-x-4">
             <label class="inline-flex items-center">
               <input 
                 type="radio" 
                 v-model="formData.published" 
                 :value="true"
-                class="w-4 h-4 text-[rgb(var(--color-primary))] focus:ring-[rgb(var(--color-primary))]"
+                class="w-4 h-4 text-primary focus:ring-primary"
               />
-              <span class="ml-2 text-[rgb(var(--color-text))]">公開</span>
+              <span class="ml-2 text-text-muted">公開</span>
             </label>
             <label class="inline-flex items-center">
               <input 
                 type="radio" 
                 v-model="formData.published" 
                 :value="false"
-                class="w-4 h-4 text-[rgb(var(--color-primary))] focus:ring-[rgb(var(--color-primary))]"
+                class="w-4 h-4 text-primary focus:ring-primary"
               />
-              <span class="ml-2 text-[rgb(var(--color-text))]">下書き</span>
+              <span class="ml-2 text-text-muted">下書き</span>
             </label>
           </div>
         </div>
         
         <!-- 送信ボタン -->
         <div class="flex justify-between pt-4">
-          <router-link to="/" class="px-4 py-2 rounded font-medium transition-all bg-transparent text-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-primary)/0.1)]">キャンセル</router-link>
+          <router-link to="/" class="btn btn-outline-secondary">キャンセル</router-link>
           <button 
             type="submit" 
-            class="px-6 py-2 rounded font-medium transition-all bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] hover:bg-[rgb(var(--color-primary-dark))] disabled:opacity-70 disabled:cursor-not-allowed"
+            class="btn btn-primary"
             :disabled="submitting || !isFormValid"
           >
             <svg v-if="submitting" class="w-5 h-5 mr-2 animate-spin" viewBox="0 0 24 24">
