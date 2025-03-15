@@ -85,9 +85,9 @@
           />
         </div>
         
-        <!-- カテゴリー -->
+        <!-- カテゴリ -->
         <div>
-          <label class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">カテゴリー <span class="text-[rgb(var(--color-error))]">*</span></label>
+          <label class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">カテゴリ <span class="text-[rgb(var(--color-error))]">*</span></label>
           <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
             <div 
               v-for="category in availableCategories" 
@@ -107,7 +107,7 @@
             </div>
           </div>
           <p v-if="formData.categories.length === 0" class="text-xs mt-1 text-[rgb(var(--color-error))]">
-            少なくとも1つのカテゴリーを選択してください
+            少なくとも1つのカテゴリを選択してください
           </p>
         </div>
         

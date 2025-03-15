@@ -117,45 +117,6 @@
 }
 
 /* ====================================
- * フォーム要素スタイル
- * ==================================== */
-
-/* 入力フィールド基本スタイル */
-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.25rem;
-  background-color: var(--color-surface) !important;
-  color: var(--color-text) !important;
-  border-color: var(--color-border) !important;
-}
-
-/* プレースホルダーテキストスタイル */
-::placeholder {
-  color: var(--color-text-muted);
-}
-
-/* フォーカス時のスタイル強調 */
-input:focus,
-textarea:focus,
-select:focus {
-  border-color: var(--color-primary) !important;
-  outline: none !important;
-  box-shadow: 0 0 0 1px var(--color-primary) !important;
-}
-
-/* 特殊な入力フィールド - フレックスレイアウト内など */
-.flex input,
-input.flex-1,
-.flex-1,
-[class*="rounded-r"] {
-  background-color: #1e293b !important;
-  color: #f1f5f9 !important;
-  border: 1px solid #475569 !important;
-}
-
-/* ====================================
  * レスポンシブデザイン（モバイルファースト）
  * ==================================== */
 

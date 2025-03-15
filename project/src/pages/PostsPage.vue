@@ -26,9 +26,9 @@
     <!-- フィルターとソート -->
     <div class="glass-card p-4 mb-6">
       <div class="flex flex-wrap items-center gap-4">
-        <!-- カテゴリーフィルター -->
+        <!-- カテゴリフィルター -->
         <div class="w-full sm:w-auto">
-          <label for="category-filter" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">カテゴリー</label>
+          <label for="category-filter" class="block text-sm font-medium mb-1 text-[rgb(var(--color-text))]">カテゴリ</label>
           <select
             id="category-filter"
             v-model="selectedCategoryId"
@@ -82,40 +82,40 @@
     
     <!-- メインコンテンツ -->
     <div class="flex flex-col gap-8 md:flex-row">
-      <!-- カテゴリーサイドバー -->
+      <!-- カテゴリサイドバー -->
       <div class="w-full md:w-1/4 lg:w-1/5">
         <div class="glass-card p-4 mb-6">
-          <h2 class="text-xl font-bold mb-4 text-[rgb(var(--color-heading))]">カテゴリー一覧</h2>
+          <h2 class="text-xl font-bold mb-4 text-[rgb(var(--color-heading))]">カテゴリ</h2>
           
-          <!-- カテゴリーローディング -->
+          <!-- カテゴリローディング -->
           <div v-if="categoriesLoading" class="flex justify-center py-4">
             <div class="w-8 h-8 border-4 rounded-full border-[rgb(var(--color-surface-accent))] border-t-[rgb(var(--color-primary))] animate-spin"></div>
           </div>
           
-          <!-- カテゴリーエラー -->
+          <!-- カテゴリエラー -->
           <div v-else-if="categoriesError" class="text-sm mb-2 text-[rgb(var(--color-error))]">
             {{ categoriesError }}
             <button @click="fetchCategories" class="ml-2 text-[rgb(var(--color-primary))] hover:underline">再試行</button>
           </div>
           
-          <!-- カテゴリーリスト -->
+          <!-- カテゴリリスト -->
           <div v-else-if="categories.length === 0" class="py-2 text-center text-[rgb(var(--color-text-muted))]">
-            カテゴリーはまだありません
+            カテゴリはまだありません
           </div>
           
           <div v-else class="space-y-2">
             <button 
               @click="selectCategory(null)" 
-              class="w-full px-3 py-2 text-left rounded-lg transition-colors"
+              class="w-full px-3 py-2 text-left rounded-lg transition-colors text-[rgb(var(--color-text))]"
               :class="selectedCategoryId === null ? 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-text-white))]' : 'hover:bg-[rgb(var(--color-surface-accent)/0.5)]'"
             >
-              すべてのカテゴリー
+              すべてのカテゴリ
             </button>
             <button 
               v-for="category in categories" 
               :key="category.id"
               @click="selectCategory(category.id)"
-              class="w-full flex items-center justify-between px-3 py-2 text-left rounded-lg transition-colors"
+              class="w-full flex items-center justify-between px-3 py-2 text-left rounded-lg transition-colors text-[rgb(var(--color-text))]"
               :class="selectedCategoryId === category.id ? 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-text-white))]' : 'hover:bg-[rgb(var(--color-surface-accent)/0.5)]'"
             >
               <span>{{ category.name }}</span>
@@ -141,7 +141,7 @@
           <div v-else class="space-y-2">
             <button 
               @click="selectDisabilityType(null)" 
-              class="w-full px-3 py-2 text-left rounded-lg transition-colors"
+              class="w-full px-3 py-2 text-left rounded-lg transition-colors text-[rgb(var(--color-text))]"
               :class="selectedDisabilityType === null ? 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-text-white))]' : 'hover:bg-[rgb(var(--color-surface-accent)/0.5)]'"
             >
               すべてのタイプ
@@ -150,7 +150,7 @@
               v-for="type in disabilityTypes" 
               :key="type.id"
               @click="selectDisabilityType(type.id)"
-              class="w-full px-3 py-2 text-left rounded-lg transition-colors"
+              class="w-full px-3 py-2 text-left rounded-lg transition-colors text-[rgb(var(--color-text))]"
               :class="selectedDisabilityType === type.id ? 'bg-[rgb(var(--color-primary)/0.2)] text-[rgb(var(--color-text-white))]' : 'hover:bg-[rgb(var(--color-surface-accent)/0.5)]'"
             >
               {{ type.name }}
@@ -172,7 +172,7 @@
           <button @click="refreshData" class="mt-2 px-4 py-2 text-sm rounded font-medium shadow-[0_2px_4px_rgba(var(--color-primary-dark)/0.5)] bg-[rgb(var(--color-primary))] text-[rgb(var(--color-text-white))] transition-all">再試行</button>
         </div>
         
-        <!-- 選択されたカテゴリータイトル -->
+        <!-- 選択されたカテゴリタイトル -->
         <div v-else-if="selectedCategoryId && selectedCategory" class="mb-6">
           <div class="flex items-center justify-between">
             <h2 class="text-2xl font-bold text-[rgb(var(--color-heading))]">{{ selectedCategory.name }}</h2>
@@ -263,7 +263,7 @@ import { debounce } from 'lodash';
 import { supabase } from '@/lib/supabase';
 import PostCard from '../components/common/PostCard.vue';
 
-// カテゴリーの型定義
+// カテゴリの型定義
 interface Category {
   id: number;
   name: string;
@@ -414,13 +414,13 @@ function resetFilters() {
   refreshData();
 }
 
-// カテゴリー一覧を取得
+// カテゴリ一覧を取得
 async function fetchCategories() {
   categoriesLoading.value = true;
   categoriesError.value = '';
   
   try {
-    // カテゴリーの取得
+    // カテゴリの取得
     const { data: categoriesData, error: categoriesError } = await supabase
       .from('categories')
       .select('*')
@@ -428,7 +428,7 @@ async function fetchCategories() {
     
     if (categoriesError) throw categoriesError;
     
-    // 各カテゴリーの投稿数を取得
+    // 各カテゴリの投稿数を取得
     const categoriesWithPostCount = await Promise.all((categoriesData || []).map(async (category) => {
       const { count, error: countError } = await supabase
         .from('post_categories')
@@ -446,7 +446,7 @@ async function fetchCategories() {
     categories.value = categoriesWithPostCount;
   } catch (err: any) {
     console.error('カテゴリ取得エラー:', err);
-    categoriesError.value = err.message || 'カテゴリーの読み込みに失敗しました';
+    categoriesError.value = err.message || 'カテゴリの読み込みに失敗しました';
   } finally {
     categoriesLoading.value = false;
   }
@@ -472,7 +472,7 @@ async function fetchDisabilityTypes() {
   }
 }
 
-// 選択されたカテゴリーの詳細を取得
+// 選択されたカテゴリの詳細を取得
 async function fetchCategoryDetails(categoryId: number) {
   try {
     const { data, error } = await supabase
@@ -484,7 +484,7 @@ async function fetchCategoryDetails(categoryId: number) {
     if (error) throw error;
     selectedCategory.value = data;
   } catch (err: any) {
-    console.error('カテゴリー詳細取得エラー:', err);
+    console.error('カテゴリ詳細取得エラー:', err);
     // エラーは表示しない（メインコンテンツのエラーと重複するため）
   }
 }
@@ -495,7 +495,7 @@ const debouncedSearch = debounce(() => {
   refreshData();
 }, 500);
 
-// データ更新（検索または選択されたカテゴリーの投稿を取得）
+// データ更新（検索または選択されたカテゴリの投稿を取得）
 async function refreshData() {
   loading.value = true;
   error.value = '';
@@ -635,7 +635,7 @@ async function fetchFilteredPosts() {
       .select('*', { count: 'exact' })
       .eq('published', true);
     
-    // カテゴリーによるフィルタリング
+    // カテゴリによるフィルタリング
     if (selectedCategoryId.value) {
       const { data: postIds } = await supabase
         .from('post_categories')
@@ -754,7 +754,7 @@ function sortPosts(posts: any[]) {
   });
 }
 
-// カテゴリーを選択
+// カテゴリを選択
 function selectCategory(categoryId: number | null) {
   selectedCategoryId.value = categoryId;
 }

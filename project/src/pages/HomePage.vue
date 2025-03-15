@@ -10,7 +10,7 @@
       </div>
       
       <div class="relative z-10 mx-auto max-w-3xl text-center">
-        <h1 class="animate-bounce mb-6 text-4xl font-bold text-[rgb(var(--color-primary-light))] md:text-6xl">見えない障害と共に生きる</h1>
+        <h1 class="mb-6 text-4xl font-bold text-[rgb(var(--color-primary-light))] md:text-6xl">見えない障害と共に生きる</h1>
         <p class="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-[rgb(var(--color-text))] md:text-xl">経験を共有し、互いに学び、支え合うコミュニティへようこそ</p>
         <div class="relative z-10 flex flex-col justify-center gap-4 sm:flex-row">
           <router-link 
@@ -90,12 +90,24 @@
           <div class="mb-8 rounded-lg border border-[rgba(var(--color-primary),0.2)] bg-[rgba(var(--color-primary),0.1)] p-6">
             <h3 class="mb-3 text-xl font-semibold text-[rgb(var(--color-primary-light))]">対象となる障害・症状</h3>
             <ul class="grid grid-cols-2 gap-x-4 gap-y-2 md:grid-cols-3">
-              <li class="flex items-center"><span class="mr-2 h-2 w-2 rounded-full bg-[rgb(var(--color-primary-light))]"></span>発達障害（ASD、ADHD、LD等）</li>
-              <li class="flex items-center"><span class="mr-2 h-2 w-2 rounded-full bg-[rgb(var(--color-primary-light))]"></span>精神障害（うつ病、統合失調症等）</li>
-              <li class="flex items-center"><span class="mr-2 h-2 w-2 rounded-full bg-[rgb(var(--color-primary-light))]"></span>慢性疲労症候群</li>
-              <li class="flex items-center"><span class="mr-2 h-2 w-2 rounded-full bg-[rgb(var(--color-primary-light))]"></span>線維筋痛症</li>
-              <li class="flex items-center"><span class="mr-2 h-2 w-2 rounded-full bg-[rgb(var(--color-primary-light))]"></span>内部障害</li>
-              <li class="flex items-center"><span class="mr-2 h-2 w-2 rounded-full bg-[rgb(var(--color-primary-light))]"></span>その他の見えない障害</li>
+              <li class="flex items-center text-[rgb(var(--color-text-white))]">
+                <span class="mr-2 h-3 w-3 rounded-full bg-[rgb(var(--color-primary))]"></span>発達障害（ASD、ADHD、LD等）
+              </li>
+              <li class="flex items-center text-[rgb(var(--color-text-white))]">
+                <span class="mr-2 h-3 w-3 rounded-full bg-[rgb(var(--color-primary))]"></span>精神障害（うつ病、統合失調症等）
+              </li>
+              <li class="flex items-center text-[rgb(var(--color-text-white))]">
+                <span class="mr-2 h-3 w-3 rounded-full bg-[rgb(var(--color-primary))]"></span>慢性疲労症候群
+              </li>
+              <li class="flex items-center text-[rgb(var(--color-text-white))]">
+                <span class="mr-2 h-3 w-3 rounded-full bg-[rgb(var(--color-primary))]"></span>線維筋痛症
+              </li>
+              <li class="flex items-center text-[rgb(var(--color-text-white))]">
+                <span class="mr-2 h-3 w-3 rounded-full bg-[rgb(var(--color-primary))]"></span>内部障害
+              </li>
+              <li class="flex items-center text-[rgb(var(--color-text-white))]">
+                <span class="mr-2 h-3 w-3 rounded-full bg-[rgb(var(--color-primary))]"></span>その他の見えない障害
+              </li>
             </ul>
           </div>
           

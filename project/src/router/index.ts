@@ -12,7 +12,7 @@ const router = createRouter({
       component: HomePage
     },
     
-    // 投稿一覧・検索・カテゴリー（統合ページ）
+    // 投稿一覧・検索・カテゴリ（統合ページ）
     {
       path: '/posts',
       name: 'posts',

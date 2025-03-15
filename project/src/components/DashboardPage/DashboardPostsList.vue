@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-posts-list">
     <div class="flex items-center justify-between mb-4">
-      <h2 class="text-xl font-bold">投稿管理</h2>
+      <h2 class="text-xl font-bold text-[rgb(var(--color-heading))]">投稿管理</h2>
       <div class="text-sm text-[rgb(var(--color-text-muted))]">
         全 {{ totalPosts }} 件
       </div>
@@ -30,7 +30,7 @@
       <div v-for="post in posts" :key="post.id" class="glass-card p-4">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div class="flex-1">
-            <h3 class="mb-1 text-lg font-bold">
+            <h3 class="mb-1 text-lg font-bold text-[rgb(var(--color-heading))]">
               <router-link :to="`/posts/${post.id}`" class="hover:text-[rgb(var(--color-primary))]">
                 {{ post.title }}
               </router-link>
@@ -40,7 +40,7 @@
                 {{ post.published ? '公開中' : '下書き' }}
               </div>
               <div class="ml-2">
-                <span class="text-sm">{{ formatDate(post.updated_at || post.created_at) }}</span>
+                <span class="text-sm text-[rgb(var(--color-text))]">{{ formatDate(post.updated_at || post.created_at) }}</span>
               </div>
             </div>
             <p class="mb-2 text-sm text-[rgb(var(--color-text-muted))]">
@@ -106,7 +106,7 @@
     <!-- 削除確認モーダル -->
     <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-[rgb(var(--color-background))/0.8]">
       <div class="glass-card p-6 mx-auto max-w-md">
-        <h3 class="mb-4 text-xl font-bold">投稿を削除しますか？</h3>
+        <h3 class="mb-4 text-xl font-bold text-[rgb(var(--color-heading))]">投稿を削除しますか？</h3>
         <p class="mb-6 text-[rgb(var(--color-text-muted))]">この操作は取り消せません。本当にこの投稿を削除しますか？</p>
         <div class="flex justify-end space-x-3">
           <button @click="showDeleteModal = false" class="btn px-3 py-1 bg-transparent text-[rgb(var(--color-primary))] hover:bg-[rgb(var(--color-primary)/0.1)]">キャンセル</button>
@@ -189,7 +189,7 @@ async function fetchPosts() {
     
     if (postsError) throw postsError;
     
-    // 各投稿のカテゴリーを取得
+    // 各投稿のカテゴリを取得
     const postsWithCategories = await Promise.all((postsData || []).map(async (post) => {
       const { data: categories } = await supabase
         .from('post_categories')

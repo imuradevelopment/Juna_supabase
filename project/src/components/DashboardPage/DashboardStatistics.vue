@@ -37,37 +37,37 @@
         <div class="divide-y divide-[rgb(var(--color-border))]">
           <div class="flex justify-between py-3">
             <span class="text-[rgb(var(--color-text-muted))]">公開中の投稿</span>
-            <span class="font-semibold">{{ stats.publishedPostsCount }}</span>
+            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.publishedPostsCount }}</span>
           </div>
           
           <div class="flex justify-between py-3">
             <span class="text-[rgb(var(--color-text-muted))]">下書き</span>
-            <span class="font-semibold">{{ stats.draftsCount }}</span>
+            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.draftsCount }}</span>
           </div>
           
           <div class="flex justify-between py-3">
             <span class="text-[rgb(var(--color-text-muted))]">総閲覧数</span>
-            <span class="font-semibold">{{ stats.totalViews }}</span>
+            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.totalViews }}</span>
           </div>
           
           <div class="flex justify-between py-3">
             <span class="text-[rgb(var(--color-text-muted))]">投稿への返信コメント</span>
-            <span class="font-semibold">{{ stats.commentsOnPostsCount }}</span>
+            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.commentsOnPostsCount }}</span>
           </div>
           
           <div class="flex justify-between py-3">
             <span class="text-[rgb(var(--color-text-muted))]">自分がいいねした投稿</span>
-            <span class="font-semibold">{{ stats.postLikesGivenCount }}</span>
+            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.postLikesGivenCount }}</span>
           </div>
           
           <div class="flex justify-between py-3">
             <span class="text-[rgb(var(--color-text-muted))]">自分がいいねしたコメント</span>
-            <span class="font-semibold">{{ stats.commentLikesGivenCount }}</span>
+            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.commentLikesGivenCount }}</span>
           </div>
           
           <div class="flex justify-between py-3">
             <span class="text-[rgb(var(--color-text-muted))]">自分の投稿が受けたいいね</span>
-            <span class="font-semibold">{{ stats.likesReceivedCount }}</span>
+            <span class="font-semibold text-[rgb(var(--color-text))]">{{ stats.likesReceivedCount }}</span>
           </div>
         </div>
       </div>
@@ -79,7 +79,7 @@
         <div class="space-y-3">
           <div v-for="post in stats.popularPosts" :key="post.id" class="flex items-center justify-between">
             <div class="flex-1">
-              <router-link :to="`/posts/${post.id}`" class="font-medium hover:text-[rgb(var(--color-primary))]">
+              <router-link :to="`/posts/${post.id}`" class="font-medium text-[rgb(var(--color-text))] hover:text-[rgb(var(--color-primary))]">
                 {{ post.title }}
               </router-link>
               <div class="flex items-center text-sm text-[rgb(var(--color-text-muted))]">

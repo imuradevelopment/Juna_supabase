@@ -41,7 +41,7 @@
               :alt="post.title"
               class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
             />
-            <!-- カテゴリーを画像内に配置 -->
+            <!-- カテゴリを画像内に配置 -->
             <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
               <div class="flex flex-wrap gap-1.5">
                 <router-link 
@@ -94,7 +94,7 @@
                   <span v-else>{{ getInitials(post.profiles?.nickname || '不明なユーザー') }}</span>
                 </div>
                 <div>
-                  <p class="text-base font-medium transition-colors group-hover:text-[rgb(var(--color-primary))]">
+                  <p class="text-base font-medium text-[rgb(var(--color-text))] transition-colors group-hover:text-[rgb(var(--color-primary))]">
                     {{ post.profiles?.nickname || '不明なユーザー' }}
                   </p>
                   <p class="flex items-center text-xs text-[rgb(var(--color-text-muted))]">
@@ -108,7 +108,7 @@
                 <!-- いいねボタン -->
                 <button 
                   @click="toggleLike" 
-                  class="flex items-center justify-center px-3 py-1.5 text-sm rounded-lg bg-[rgb(var(--color-surface-variant))/30] border border-[rgb(var(--color-border-light))/30] transition-all hover:bg-[rgb(var(--color-surface-variant))/50] hover:border-[rgb(var(--color-border-light))/50]"
+                  class="flex items-center justify-center px-3 py-1.5 text-sm rounded-lg bg-[rgb(var(--color-surface-variant))/30] border border-[rgb(var(--color-border-light))/30] transition-all hover:bg-[rgb(var(--color-surface-variant))/50] hover:border-[rgb(var(--color-border-light))/50] text-[rgb(var(--color-text))]"
                   :class="{ 'text-[rgb(var(--color-primary-light))]': isLiked }"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{ 'fill-current': isLiked }">
@@ -120,7 +120,7 @@
                 <!-- シェアボタン -->
                 <button 
                   @click="sharePost" 
-                  class="flex items-center justify-center px-3 py-1.5 text-sm rounded-lg bg-[rgb(var(--color-surface-variant))/30] border border-[rgb(var(--color-border-light))/30] transition-all hover:bg-[rgb(var(--color-surface-variant))/50] hover:border-[rgb(var(--color-border-light))/50]"
+                  class="flex items-center justify-center px-3 py-1.5 text-sm rounded-lg bg-[rgb(var(--color-surface-variant))/30] border border-[rgb(var(--color-border-light))/30] transition-all hover:bg-[rgb(var(--color-surface-variant))/50] hover:border-[rgb(var(--color-border-light))/50] text-[rgb(var(--color-text))]"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -132,7 +132,7 @@
                 <div v-if="isAuthor" class="flex space-x-2">
                   <router-link 
                     :to="`/editor/${post.id}`" 
-                    class="flex items-center justify-center px-3 py-1.5 text-sm rounded-lg bg-[rgb(var(--color-surface-variant))/30] border border-[rgb(var(--color-border-light))/30] transition-all hover:bg-[rgb(var(--color-primary))/10] hover:text-[rgb(var(--color-primary))] hover:border-[rgb(var(--color-primary))/30]"
+                    class="flex items-center justify-center px-3 py-1.5 text-sm rounded-lg bg-[rgb(var(--color-surface-variant))/30] border border-[rgb(var(--color-border-light))/30] transition-all hover:bg-[rgb(var(--color-primary))/10] hover:text-[rgb(var(--color-primary))] hover:border-[rgb(var(--color-primary))/30] text-[rgb(var(--color-text))]"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -142,7 +142,7 @@
                   
                   <button 
                     @click="showDeleteModal = true" 
-                    class="flex items-center justify-center px-3 py-1.5 text-sm rounded-lg bg-[rgb(var(--color-surface-variant))/30] border border-[rgb(var(--color-border-light))/30] transition-all hover:bg-[rgb(var(--color-error))/10] hover:text-[rgb(var(--color-error))] hover:border-[rgb(var(--color-error))/30]"
+                    class="flex items-center justify-center px-3 py-1.5 text-sm rounded-lg bg-[rgb(var(--color-surface-variant))/30] border border-[rgb(var(--color-border-light))/30] transition-all hover:bg-[rgb(var(--color-error))/10] hover:text-[rgb(var(--color-error))] hover:border-[rgb(var(--color-error))/30] text-[rgb(var(--color-text))]"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
