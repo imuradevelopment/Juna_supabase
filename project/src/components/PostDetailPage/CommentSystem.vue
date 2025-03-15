@@ -91,13 +91,13 @@
                   <div class="mt-2 flex justify-end space-x-2">
                     <button 
                       @click="cancelEdit" 
-                      class="btn-link text-text-muted hover:text-text-white"
+                      class="btn btn-outline-secondary btn-sm"
                     >
                       キャンセル
                     </button>
                     <button 
                       @click="saveEdit(comment)" 
-                      class="btn-link"
+                      class="btn btn-outline-accent3 btn-sm"
                       :disabled="!editedContent.trim() || editedContent === comment.content"
                     >
                       保存
@@ -110,25 +110,25 @@
               </div>
               
               <!-- アクションボタン -->
-              <div class="mt-1 flex space-x-4 text-xs">
+              <div class="mt-1 flex space-x-2 text-xs">
                 <button 
                   @click="setReplyTo(comment)" 
-                  class="btn btn-primary btn-sm"
+                  class="btn btn-outline-primary btn-sm"
                   :disabled="submitting || !commentText.trim()"
                 >
                   返信
                 </button>
                 
-                <div v-if="isCommentOwner(comment)">
+                <div v-if="isCommentOwner(comment)" class="flex space-x-2">
                   <button 
                     @click="startEdit(comment)" 
-                    class="btn-link"
+                    class="btn btn-outline-warning btn-sm"
                   >
                     編集
                   </button>
                   <button 
                     @click="confirmDelete(comment)" 
-                    class="btn-link text-error"
+                    class="btn btn-outline-error btn-sm"
                   >
                     削除
                   </button>
@@ -136,7 +136,7 @@
                 
                 <button 
                   @click="toggleLike(comment)" 
-                  class="ml-4 flex items-center"
+                  class="flex items-center"
                   :class="{ 'text-primary-light': isCommentLiked(comment.id), 'text-text-muted': !isCommentLiked(comment.id) }"
                 >
                   <span class="flex items-center">
@@ -169,7 +169,7 @@
                   <button 
                     type="button"
                     @click="cancelReply" 
-                    class="btn-link"
+                    class="btn btn-outline-secondary btn-sm"
                   >
                     キャンセル
                   </button>
@@ -227,13 +227,13 @@
                       <div class="mt-2 flex justify-end space-x-2">
                         <button 
                           @click="cancelEdit" 
-                          class="btn-link text-text-muted hover:text-text-white"
+                          class="btn btn-outline-secondary btn-sm"
                         >
                           キャンセル
                         </button>
                         <button 
                           @click="saveEdit(reply)" 
-                          class="btn-link"
+                          class="btn btn-outline-accent3 btn-sm"
                           :disabled="!editedContent.trim() || editedContent === reply.content"
                         >
                           保存
@@ -246,25 +246,25 @@
                   </div>
                   
                   <!-- アクションボタン -->
-                  <div class="mt-1 flex space-x-4 text-xs">
+                  <div class="mt-1 flex space-x-2 text-xs">
                     <button 
                       @click="setReplyTo(comment)" 
-                      class="btn btn-primary btn-sm"
+                      class="btn btn-outline-primary btn-sm"
                       :disabled="submitting || !commentText.trim()"
                     >
                       返信
                     </button>
                     
-                    <div v-if="isCommentOwner(reply)">
+                    <div v-if="isCommentOwner(reply)" class="flex space-x-2">
                       <button 
                         @click="startEdit(reply)" 
-                        class="btn-link"
+                        class="btn btn-outline-warning btn-sm"
                       >
                         編集
                       </button>
                       <button 
                         @click="confirmDelete(reply)" 
-                        class="btn-link text-error"
+                        class="btn btn-outline-error btn-sm"
                       >
                         削除
                       </button>
@@ -272,7 +272,7 @@
                     
                     <button 
                       @click="toggleLike(reply)" 
-                      class="ml-4 flex items-center"
+                      class="flex items-center"
                       :class="{ 'text-primary-light': isCommentLiked(reply.id), 'text-text-muted': !isCommentLiked(reply.id) }"
                     >
                       <span class="flex items-center">
@@ -301,7 +301,7 @@
         <div class="flex justify-end space-x-4">
           <button 
             @click="showDeleteModal = false" 
-            class="btn btn-outline-primary"
+            class="btn btn-outline-secondary"
           >
             キャンセル
           </button>

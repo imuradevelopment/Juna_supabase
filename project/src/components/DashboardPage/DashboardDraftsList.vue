@@ -40,18 +40,18 @@
           
           <!-- アクションボタン -->
           <div class="flex mt-3 space-x-2 md:mt-0">
-            <router-link :to="`/editor/${draft.id}`" class="btn btn-outline-secondary">
+            <router-link :to="`/editor/${draft.id}`" class="btn btn-outline-secondary btn-sm">
               編集
             </router-link>
             <button 
               @click="confirmPublish(draft)" 
-              class="btn btn-outline-warning"
+              class="btn btn-outline-accent1 btn-sm"
             >
               公開
             </button>
             <button 
               @click="confirmDelete(draft)" 
-              class="btn btn-outline-error"
+              class="btn btn-outline-error btn-sm"
             >
               削除
             </button>
