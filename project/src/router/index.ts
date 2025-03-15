@@ -83,6 +83,13 @@ const router = createRouter({
 router.beforeEach((to, _, next) => {
   const authStore = useAuthStore();
   
+  // 認証状態の初期化が完了していない場合は、認証チェックを保留して次に進む
+  if (!authStore.isAuthReady) {
+    // まだ認証状態が初期化されていない場合は、認証が必要なページへの移動を一時的に許可する
+    return next();
+  }
+  
+  // 認証状態の初期化が完了している場合は、通常の認証チェックを実行
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ path: '/auth', query: { redirect: to.fullPath } });
   } 

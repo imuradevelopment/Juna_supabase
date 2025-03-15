@@ -9,11 +9,20 @@
     <Navbar />
     
     <main class="flex-1 relative z-10 mx-auto px-5 py-8 container">
-      <router-view v-slot="{ Component }">
-        <transition name="page" mode="out-in">
-          <component :is="Component" />
-        </transition>
-      </router-view>
+      <div v-if="initialAuthCheckComplete">
+        <router-view v-slot="{ Component }">
+          <transition name="page" mode="out-in">
+            <component :is="Component" />
+          </transition>
+        </router-view>
+      </div>
+      <div v-else class="flex justify-center items-center h-full">
+        <!-- 認証初期化中のローディング表示 -->
+        <div class="animate-pulse flex flex-col items-center">
+          <div class="w-12 h-12 rounded-full bg-[rgb(var(--color-primary)/0.3)] mb-4"></div>
+          <div class="h-2 w-24 bg-[rgb(var(--color-text-muted)/0.3)] rounded"></div>
+        </div>
+      </div>
     </main>
     
     <Footer />
@@ -24,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, provide } from 'vue';
+import { ref, onMounted, nextTick, provide, onBeforeMount } from 'vue';
 import { useAuthStore } from './stores/auth';
 import Navbar from './components/App/Navbar.vue';
 import Footer from './components/App/Footer.vue';
@@ -32,6 +41,7 @@ import Notifications from './components/App/Notifications.vue';
 
 const authStore = useAuthStore();
 const notificationsRef = ref<any>(null);
+const initialAuthCheckComplete = ref(false);
 
 // 通知を表示する機能
 function showNotification(type: 'success' | 'error' | 'info' | 'warning', title: string, message: string) {
@@ -47,11 +57,15 @@ function showNotification(type: 'success' | 'error' | 'info' | 'warning', title:
 // この関数をコンポーネントから使用できるようにする
 provide('showNotification', showNotification);
 
-// 初期化
-onMounted(async () => {
+// アプリケーション初期化前に認証状態をチェック
+onBeforeMount(async () => {
   // ログイン状態の確認
   await authStore.checkSession();
-  
+  initialAuthCheckComplete.value = true;
+});
+
+// 初期化
+onMounted(async () => {
   // 通知コンポーネントの参照が解決されるまで待機
   await nextTick();
   

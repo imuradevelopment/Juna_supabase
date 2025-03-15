@@ -23,6 +23,8 @@ export const useAuthStore = defineStore('auth', () => {
   const profile = ref<Profile | null>(null);
   const loading = ref(false);
   const error = ref<string | null>(null);
+  // 認証状態の初期化が完了したかどうかを示すフラグを追加
+  const isAuthReady = ref(false);
   
   // 計算プロパティ
   const isAuthenticated = computed(() => !!user.value);
@@ -49,6 +51,9 @@ export const useAuthStore = defineStore('auth', () => {
       console.error('セッション確認エラー:', error);
       user.value = null;
       profile.value = null;
+    } finally {
+      // 認証状態の初期化が完了したことを示す
+      isAuthReady.value = true;
     }
   };
   
@@ -306,6 +311,7 @@ export const useAuthStore = defineStore('auth', () => {
     profile,
     loading,
     error,
+    isAuthReady, // 新しいフラグを公開
     
     // 計算プロパティ
     isAuthenticated,
