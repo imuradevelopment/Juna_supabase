@@ -39,9 +39,9 @@ export default {
     function({ addBase, addComponents }) {
       addBase({
         ':root': {
-          '--color-primary': '167 139 250',
-          '--color-primary-dark': '139 92 246',
-          '--color-primary-light': '196 181 253',
+          '--color-primary': '150 105 255',
+          '--color-primary-dark': '124 58 237',
+          '--color-primary-light': '178 145 255',
           '--color-background': '10 12 18',
           '--color-surface': '22 32 48',
           '--color-surface-variant': '25 33 52',
