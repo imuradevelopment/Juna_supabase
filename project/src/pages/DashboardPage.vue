@@ -104,9 +104,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useAuthStore } from '../stores/auth';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import DashboardPostsList from '../components/DashboardPage/DashboardPostsList.vue';
 import DashboardDraftsList from '../components/DashboardPage/DashboardDraftsList.vue';
 import DashboardCommentsList from '../components/DashboardPage/DashboardCommentsList.vue';
@@ -114,19 +114,34 @@ import DashboardLikesList from '../components/DashboardPage/DashboardLikesList.v
 import DashboardStatistics from '../components/DashboardPage/DashboardStatistics.vue';
 
 const router = useRouter();
+const route = useRoute();  // ルート情報を取得するために追加
 const authStore = useAuthStore();
 
 // 状態
 const activeTab = ref('posts');
 const loading = ref(true);
 
-// 認証チェック
+// URLからタブ情報を取得
+function getTabFromUrl() {
+  const tabParam = route.query.tab as string;
+  const validTabs = ['posts', 'drafts', 'comments', 'likes', 'stats'];
+  return validTabs.includes(tabParam) ? tabParam : 'posts';
+}
+
+// タブ変更時にURLを更新
+watch(activeTab, (newTab) => {
+  router.replace({ query: { tab: newTab } });
+});
+
+// 認証チェックとタブの初期化
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
     router.push('/login');
     return;
   }
   
+  // URLからタブを取得してセット
+  activeTab.value = getTabFromUrl();
   loading.value = false;
 });
 </script> 
