@@ -8,7 +8,7 @@
         {{ formError }}
       </div>
       
-      <form @submit.prevent="handleSubmit" class="space-y-6">
+      <form @submit.prevent="handleSubmit" @keydown.enter.prevent="preventEnterSubmit" class="space-y-6" novalidate>
         <!-- タイトル -->
         <div>
           <label for="title" class="block text-sm font-medium mb-1 text-heading">タイトル <span class="text-error">*</span></label>
@@ -50,24 +50,21 @@
                 @click="clearImage" 
                 class="btn-icon btn-icon-error btn-icon-sm absolute top-1 right-1"
               >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
+                <PhX class="w-4 h-4" />
               </button>
             </div>
             
             <!-- アップロードボタン -->
             <div>
-              <label class="btn btn-outline-secondary cursor-pointer">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                画像をアップロード
+              <label class="btn btn-outline-secondary cursor-pointer inline-flex items-center whitespace-nowrap">
+                <PhImage class="w-5 h-5 mr-2" />
+                <span>画像をアップロード</span>
                 <input
                   type="file"
                   accept="image/*"
-                  class="hidden"
+                  class="hidden w-px h-px opacity-0 absolute"
                   @change="handleImageUpload"
+                  ref="featuredImageInput"
                 />
               </label>
               <p class="text-xs text-text-muted mt-1">最大サイズ: 2MB</p>
@@ -75,37 +72,90 @@
           </div>
         </div>
         
-        <!-- 本文 -->
+        <!-- 本文 - 参照を追加 -->
         <div>
           <label for="content" class="block text-sm font-medium mb-1 text-text-muted">本文 <span class="text-error">*</span></label>
           <RichTextEditor
+            ref="richTextEditorRef"
             v-model="formData.content"
             placeholder="投稿の本文を入力してください"
-            @images-uploaded="handleImagesUploaded"
+            :uploadingExternalImages="isUploading"
+            @upload-status-changed="handleUploadStatusChange"
+            @pending-images-updated="handlePendingImagesUpdated"
           />
         </div>
         
         <!-- カテゴリ -->
         <div>
           <label class="block text-sm font-medium mb-1 text-text-muted">カテゴリ <span class="text-error">*</span></label>
-          <div class="grid grid-cols-2 gap-2 md:grid-cols-3">
+          
+          <!-- カテゴリ選択コンポーネント -->
+          <div class="relative">
             <div 
-              v-for="category in availableCategories" 
-              :key="category.id"
-              class="flex items-center"
+              class="min-h-10 w-full px-4 py-2 rounded border border-border bg-surface flex flex-wrap gap-2 items-center cursor-text"
+              @click="isCategoryDropdownOpen = true"
             >
-              <input 
-                type="checkbox" 
-                :id="`category-${category.id}`" 
-                :value="category.id" 
-                v-model="formData.categories"
-                class="w-4 h-4 rounded focus:ring-primary"
+              <!-- 選択済みカテゴリタグ -->
+              <div 
+                v-for="categoryId in formData.categories" 
+                :key="categoryId"
+                class="inline-flex items-center bg-primary/10 text-primary rounded-full px-3 py-1 text-sm"
+              >
+                {{ getCategoryName(categoryId) }}
+                <button 
+                  type="button" 
+                  @click.stop="removeCategory(categoryId)"
+                  class="ml-1 text-primary hover:text-primary-dark"
+                >
+                  <PhX class="w-4 h-4" />
+                </button>
+              </div>
+              
+              <!-- 入力フィールド -->
+              <input
+                ref="categoryInputRef"
+                v-model="categorySearchQuery"
+                @focus="isCategoryDropdownOpen = true"
+                @blur="handleCategoryBlur"
+                @keydown.enter.prevent="handleCategoryEnterKey"
+                class="flex-1 min-w-[120px] bg-transparent outline-none text-text"
+                placeholder="カテゴリを選択または入力..."
               />
-              <label :for="`category-${category.id}`" class="block ml-2 text-sm text-text-muted">
+            </div>
+            
+            <!-- ドロップダウンメニュー -->
+            <div 
+              v-if="isCategoryDropdownOpen" 
+              class="absolute z-10 w-full mt-1 max-h-60 overflow-y-auto glass-card border border-border rounded shadow-lg"
+            >
+              <!-- 新規カテゴリ追加オプション -->
+              <div 
+                v-if="categorySearchQuery && filteredCategories.length === 0" 
+                @click="createNewCategory"
+                class="cursor-pointer px-4 py-2 hover:bg-surface-variant text-text-muted flex items-center"
+              >
+                <PhPlus class="w-5 h-5 mr-2 text-success" />
+                <span>「{{ categorySearchQuery }}」を新しいカテゴリとして追加</span>
+              </div>
+              
+              <!-- カテゴリ候補リスト -->
+              <div 
+                v-for="category in filteredCategories" 
+                :key="category.id"
+                @click="addCategory(category.id)"
+                class="cursor-pointer px-4 py-2 hover:bg-surface-variant text-text"
+                :class="{'bg-surface-variant': formData.categories.includes(category.id.toString())}"
+              >
                 {{ category.name }}
-              </label>
+              </div>
+              
+              <!-- 結果なしメッセージ -->
+              <div v-if="!categorySearchQuery && !filteredCategories.length" class="px-4 py-2 text-text-muted">
+                利用可能なカテゴリがありません
+              </div>
             </div>
           </div>
+          
           <p v-if="formData.categories.length === 0" class="text-xs mt-1 text-error">
             少なくとも1つのカテゴリを選択してください
           </p>
@@ -136,18 +186,15 @@
           </div>
         </div>
         
-        <!-- 送信ボタン -->
+        <!-- 送信ボタン - isUploading時には無効化 -->
         <div class="flex justify-between pt-4">
-          <router-link to="/" class="btn btn-outline-secondary">キャンセル</router-link>
+          <router-link to="/" class="btn btn-outline-secondary" type="button">キャンセル</router-link>
           <button 
             type="submit" 
             class="btn btn-primary"
-            :disabled="submitting || !isFormValid"
+            :disabled="submitting || !isFormValid || isUploading"
           >
-            <svg v-if="submitting" class="w-5 h-5 mr-2 animate-spin" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+            <PhSpinner v-if="submitting" class="w-5 h-5 mr-2 animate-spin" />
             {{ submitting ? '保存中...' : (isEditMode ? '更新する' : '投稿する') }}
           </button>
         </div>
@@ -164,6 +211,7 @@ import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
 import RichTextEditor from '../components/PostEditorPage/RichTextEditor.vue';
 import { getCoverImageUrl } from '../lib/storage';
+import { PhX, PhImage, PhSpinner, PhPlus } from '@phosphor-icons/vue';
 
 // 型定義
 interface FormData {
@@ -209,22 +257,71 @@ const submitting = ref(false);
 const formError = ref('');
 const isEditMode = computed(() => !!props.id);  // postId から id に変更
 const isFormValid = computed(() => {
+  // contentがオブジェクトの場合の検証を改善
+  let contentValid = false;
+  
+  if (typeof formData.content === 'string') {
+    contentValid = formData.content.trim() !== '';
+  } else if (typeof formData.content === 'object' && formData.content !== null) {
+    // JSONオブジェクトが有効かつ空でないことを確認
+    contentValid = true;
+    
+    // tiptap形式の場合、contentプロパティを確認
+    if (formData.content.type === 'doc' && formData.content.content) {
+      // 空のドキュメントでないことを確認（段落がある）
+      contentValid = formData.content.content.length > 0;
+    }
+  }
+  
   return formData.title.trim() !== '' && 
-         (typeof formData.content === 'string' ? formData.content.trim() !== '' : true) &&
+         contentValid &&
          formData.categories.length > 0;
 });
 
 // アップロードされた画像を追跡
 const uploadedImages = ref<{path: string, userId: string}[]>([]);
 
+// カテゴリ選択関連
+const isCategoryDropdownOpen = ref(false);
+const categorySearchQuery = ref('');
+const filteredCategories = computed(() => {
+  if (!categorySearchQuery.value.trim()) {
+    return availableCategories.value.filter(
+      cat => !formData.categories.includes(cat.id.toString())
+    );
+  }
+  
+  const query = categorySearchQuery.value.toLowerCase().trim();
+  return availableCategories.value.filter(
+    cat => cat.name.toLowerCase().includes(query) && 
+           !formData.categories.includes(cat.id.toString())
+  );
+});
+const categoryInputRef = ref<HTMLInputElement | null>(null);
+
+// 画像アップロード状態の追跡
+const isUploading = ref(false);
+
+// 一時保存された画像を追跡
+const pendingImages = ref<{file: File, id: string}[]>([]);
+
+// RichTextEditorへの参照を追加
+const richTextEditorRef = ref<InstanceType<typeof RichTextEditor> | null>(null);
+
+// アップロードボタンの参照を追加
+const featuredImageInput = ref<HTMLInputElement | null>(null);
+
 // 初期化
 onMounted(async () => {
+  // 状態をリセット
+  resetUploadState();
+  
   // カテゴリ一覧を取得
   await fetchCategories();
   
   // 編集モードの場合、既存の投稿を取得
-  if (props.id) {  // postId から id に変更
-    await fetchPost(props.id);  // postId から id に変更
+  if (props.id) {
+    await fetchPost(props.id);
   }
 });
 
@@ -297,53 +394,161 @@ async function fetchPost(postId: string) {
   }
 }
 
-// フォーム送信処理
+// Enterキーによる自動送信防止
+function preventEnterSubmit(e: KeyboardEvent) {
+  // 最初に対象が存在するか確認
+  if (!e.target) return;
+  
+  const target = e.target as HTMLElement;
+  
+  // テキストエリア内でのEnterキーは許可
+  if (target.tagName === 'TEXTAREA') return;
+  
+  // リッチテキストエディタ内でのEnterキーは許可
+  if (target.closest('.ProseMirror')) return;
+  
+  // それ以外の入力フィールドでのEnterキーは送信をキャンセル
+  if (target.tagName === 'INPUT' && e.key === 'Enter') {
+    e.preventDefault();
+  }
+}
+
+// アイキャッチ画像処理を改善
+async function handleImageUpload(event: Event) {
+  event.preventDefault();
+  event.stopPropagation();
+  
+  const input = event.target as HTMLInputElement;
+  
+  if (!input.files || input.files.length === 0) return;
+  
+  try {
+    const file = input.files[0];
+    
+    // ファイルサイズをチェック（2MB以下）
+    if (file.size > 2 * 1024 * 1024) {
+      throw new Error('画像サイズは2MB以下にしてください');
+    }
+    
+    if (richTextEditorRef.value) {
+      // RichTextEditorのBase64エンコード機能を使用
+      featuredImagePreview.value = await richTextEditorRef.value.encodeImageToBase64(file);
+      featuredImageFile.value = file;
+    } else {
+      // フォールバック処理
+      featuredImageFile.value = file;
+      featuredImagePreview.value = URL.createObjectURL(file);
+    }
+  } catch (error: any) {
+    console.error('画像処理エラー:', error);
+    alert(error.message || '画像の処理に失敗しました');
+  } finally {
+    // ファイル選択をリセット（再選択できるようにする）
+    const input = event.target as HTMLInputElement;
+    if (input) input.value = '';
+  }
+}
+
+// アップロード状態の変更を追跡
+function handleUploadStatusChange(status: boolean) {
+  isUploading.value = status;
+}
+
+// 画像の一時保存状態を更新するハンドラ追加
+function handlePendingImagesUpdated(images: {file: File, id: string}[]) {
+  pendingImages.value = images;
+}
+
+// フォーム送信処理を修正
 async function handleSubmit() {
-  // バリデーション
-  if (formData.title.trim() === '') {
-    formError.value = 'タイトルを入力してください';
-    return;
-  }
-  
-  if (formData.categories.length === 0) {
-    formError.value = '少なくとも1つのカテゴリを選択してください';
-    return;
-  }
-  
   submitting.value = true;
   formError.value = '';
   
   try {
-    // アイキャッチ画像のアップロード処理
+    // 認証情報を更新
+    const refreshResult = await authStore.refreshSession();
+    if (!refreshResult) {
+      // セッション更新に失敗した場合、再取得を試みる
+      await authStore.checkSession();
+    }
+    
+    // 現在のセッション情報を取得
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError) {
+      console.error('セッションエラー:', sessionError);
+      throw new Error('認証セッションの取得に失敗しました。再ログインしてください。');
+    }
+    
+    if (!session) {
+      // セッションがない場合は認証ページにリダイレクト
+      router.push('/login?redirect=' + encodeURIComponent(router.currentRoute.value.fullPath));
+      throw new Error('認証セッションが見つかりません。再ログインしてください。');
+    }
+    
+    const userId = session.user.id;
+    
+    // 2. アイキャッチ画像のアップロード
     if (featuredImageFile.value) {
-      const userId = authStore.user?.id;
-      if (!userId) throw new Error('ユーザーIDが取得できません');
-      
-      // ファイル名を一意にする
       const fileExt = featuredImageFile.value.name.split('.').pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
-      const filePath = `${userId}/${fileName}`;
+      const fileName = `${userId}/${uuidv4()}.${fileExt}`;
       
-      // アップロード - バケット名を'post_images'から'cover_images'に修正
       const { error: uploadError } = await supabase.storage
-        .from('cover_images')  // 'post_images'から修正
-        .upload(filePath, featuredImageFile.value);
+        .from('cover_images')
+        .upload(fileName, featuredImageFile.value);
       
       if (uploadError) throw uploadError;
-      
-      // 画像パスを更新
-      formData.cover_image_path = filePath;
+      formData.cover_image_path = fileName;
     }
     
-    // 編集モードの場合は更新、そうでなければ新規作成
-    if (props.id) {  // postId から id に変更
-      await updatePost(formData);
-      router.push(`/posts/${props.id}`);  // postId から id に変更
+    // 3. 保留中の本文画像をすべてアップロード
+    const uploadedImageMap = new Map<string, string>(); // 一時ID → パスのマッピング
+    
+    // 保留中の画像を並行してアップロード
+    if (pendingImages.value.length > 0) {
+      const uploadPromises = pendingImages.value.map(async (img) => {
+        const fileExt = img.file.name.split('.').pop();
+        const fileName = `${userId}/${uuidv4()}.${fileExt}`;
+        const filePath = fileName;
+        
+        const { error } = await supabase.storage
+          .from('post_images')
+          .upload(filePath, img.file);
+        
+        if (error) throw error;
+        
+        // IDとパスのマッピングを保存
+        uploadedImageMap.set(img.id, filePath);
+        return { path: filePath, userId };
+      });
+      
+      // 全てのアップロードを待機
+      uploadedImages.value = await Promise.all(uploadPromises);
+    }
+    
+    // 4. 本文のBase64画像をアップロード済み画像URLに置換
+    let finalContent = formData.content;
+    if (typeof finalContent === 'string' && uploadedImageMap.size > 0) {
+      // 一時IDを持つ画像タグをSupabaseのURLに置換
+      for (const [tempId, filePath] of uploadedImageMap.entries()) {
+        const publicUrl = supabase.storage
+          .from('post_images')
+          .getPublicUrl(filePath).data.publicUrl;
+        
+        // data-temp-id属性を持つ画像タグを検索して置換
+        const regex = new RegExp(`<img[^>]*data-temp-id="${tempId}"[^>]*>`, 'g');
+        finalContent = finalContent.replace(regex, `<img src="${publicUrl}">`);
+      }
+    }
+    
+    // 5. 投稿を作成または更新
+    if (props.id) {
+      await updatePost({...formData, content: finalContent});
+      router.push(`/posts/${props.id}`);
     } else {
-      const newPost = await createPost(formData);
+      const newPost = await createPost({...formData, content: finalContent});
       router.push(`/posts/${newPost.id}`);
     }
-    
   } catch (err: any) {
     console.error('投稿保存エラー:', err);
     formError.value = err.message || '投稿の保存に失敗しました';
@@ -352,24 +557,30 @@ async function handleSubmit() {
   }
 }
 
-// エディタからのアップロード画像を取得
-function handleImagesUploaded(images: {path: string, userId: string}[]) {
-  uploadedImages.value = images;
-}
-
 // 新規投稿作成
 async function createPost(postData: any) {
   try {
-    // ユーザーIDを確認
-    if (!authStore.user || !authStore.user.id) {
-      throw new Error('ユーザー情報が取得できません。再ログインしてください。');
+    // 認証情報を更新
+    await authStore.refreshSession();
+    
+    // 現在のセッション情報を取得（トークンが有効か確認）
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError) {
+      throw new Error('認証セッションの取得に失敗しました。再ログインしてください。');
     }
+    
+    if (!session) {
+      throw new Error('認証セッションが見つかりません。再ログインしてください。');
+    }
+    
+    const userId = session.user.id;
     
     // プロフィールが存在するか確認
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id')
-      .eq('id', authStore.user.id)
+      .eq('id', userId)
       .single();
     
     if (profileError || !profile) {
@@ -403,7 +614,7 @@ async function createPost(postData: any) {
         cover_image_path: postData.cover_image_path,
         published: postData.published,
         published_at: postData.published ? new Date().toISOString() : null,
-        author_id: authStore.user.id
+        author_id: userId
       })
       .select('id')
       .single();
@@ -454,16 +665,27 @@ async function createPost(postData: any) {
 // 投稿更新
 async function updatePost(postData: any) {
   try {
-    // ユーザーIDを確認
-    if (!authStore.user || !authStore.user.id) {
-      throw new Error('ユーザー情報が取得できません。再ログインしてください。');
+    // 認証情報を更新
+    await authStore.refreshSession();
+    
+    // 現在のセッション情報を取得（トークンが有効か確認）
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError) {
+      throw new Error('認証セッションの取得に失敗しました。再ログインしてください。');
     }
+    
+    if (!session) {
+      throw new Error('認証セッションが見つかりません。再ログインしてください。');
+    }
+    
+    const userId = session.user.id;
     
     // プロフィールが存在するか確認
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('id')
-      .eq('id', authStore.user.id)
+      .eq('id', userId)
       .single();
     
     if (profileError || !profile) {
@@ -498,10 +720,10 @@ async function updatePost(postData: any) {
         published: postData.published,
         published_at: postData.published ? new Date().toISOString() : null,
         updated_at: new Date().toISOString(),
-        last_edited_by: authStore.user!.id
+        last_edited_by: userId
       })
       .eq('id', props.id)  // postId から id に変更
-      .eq('author_id', authStore.user!.id);
+      .eq('author_id', userId);
     
     if (updateError) throw updateError;
     
@@ -549,20 +771,76 @@ async function updatePost(postData: any) {
   }
 }
 
-// 画像プレビュー設定
-function handleImageUpload(event: Event) {
-  const input = event.target as HTMLInputElement;
-  
-  if (input.files && input.files.length > 0) {
-    featuredImageFile.value = input.files[0];
-    featuredImagePreview.value = URL.createObjectURL(input.files[0]);
-  }
-}
-
 // 画像削除
 function clearImage() {
   featuredImageFile.value = null;
   featuredImagePreview.value = null;
   formData.cover_image_path = null;
 }
+
+// カテゴリ選択関連
+function handleCategoryBlur() {
+  setTimeout(() => {
+    isCategoryDropdownOpen.value = false;
+  }, 150);
+}
+
+function handleCategoryEnterKey() {
+  if (categorySearchQuery.value.trim() && filteredCategories.value.length > 0) {
+    addCategory(filteredCategories.value[0].id);
+  } else if (categorySearchQuery.value.trim()) {
+    createNewCategory();
+  }
+}
+
+async function createNewCategory() {
+  if (!categorySearchQuery.value.trim()) return;
+  
+  try {
+    const { data, error } = await supabase
+      .from('categories')
+      .insert([{ name: categorySearchQuery.value.trim() }])
+      .select('*')
+      .single();
+    
+    if (error) throw error;
+    
+    if (data) {
+      availableCategories.value.push(data);
+      addCategory(data.id);
+      categorySearchQuery.value = '';
+    }
+  } catch (err) {
+    console.error('カテゴリ作成エラー:', err);
+    formError.value = 'カテゴリの作成に失敗しました';
+  }
+}
+
+function addCategory(categoryId: number) {
+  const categoryIdStr = categoryId.toString();
+  if (!formData.categories.includes(categoryIdStr)) {
+    formData.categories.push(categoryIdStr);
+  }
+  categorySearchQuery.value = '';
+  categoryInputRef.value?.focus();
+}
+
+function removeCategory(categoryId: string) {
+  formData.categories = formData.categories.filter(id => id !== categoryId);
+}
+
+function getCategoryName(categoryId: string): string {
+  const category = availableCategories.value.find(c => c.id.toString() === categoryId);
+  return category ? category.name : 'カテゴリなし';
+}
+
+// 念のためアップロード状態をリセットする処理を追加
+function resetUploadState() {
+  isUploading.value = false;
+}
+
+// 必要に応じて、featuredImageInputを公開
+defineExpose({
+  featuredImageInput
+});
 </script> 

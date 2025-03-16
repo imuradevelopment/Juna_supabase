@@ -1,170 +1,139 @@
 <template>
   <router-link 
     :to="`/posts/${post.id}`" 
-    class="glass-card relative block overflow-hidden rounded-xl transition-all"
-    :class="[
-      layout === 'vertical' ? 'flex-col' : 'p-4',
-      hoverEffect ? 'duration-300 hover:shadow-primary/30' : '',
-      layout === 'vertical' && hoverEffect ? 'hover:-translate-y-[5px] hover:shadow-primary-dark/40' : '',
-      customClass
-    ]"
+    class="glass-card relative block overflow-hidden rounded-xl transition-all flex-col duration-300 hover:shadow-primary-dark/40 hover:-translate-y-[5px]"
   >
-    <!-- 縦型レイアウト用アクセント装飾 -->
-    <div 
-      v-if="layout === 'vertical'" 
-      class="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-primary to-primary-light opacity-70"
-    ></div>
+    <!-- アクセント装飾 - プライマリカラーのグラデーションに統一 -->
+    <div class="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-primary to-primary-light opacity-70"></div>
     
-    <div :class="layout === 'vertical' ? 'relative flex h-full flex-col' : 'flex'">
-      <!-- 画像コンテナ - レイアウトに応じてサイズ変更 -->
-      <div 
-        :class="[
-          'relative overflow-hidden',
-          layout === 'vertical' ? 'aspect-video' : 'mr-4 flex-shrink-0 rounded-lg',
-          layout === 'horizontal' ? 'h-24 w-24' : ''
-        ]"
-      >
+    <div class="relative flex h-full flex-col">
+      <!-- 画像コンテナ -->
+      <div class="relative overflow-hidden aspect-video">
         <img 
           v-if="post.cover_image_path" 
           :src="getImageUrl(post.cover_image_path)" 
           :alt="post.title"
-          class="h-full w-full object-cover"
-          :class="{ 'transition-transform duration-700 hover:scale-110': layout === 'vertical' }"
+          class="h-full w-full object-cover transition-transform duration-700 hover:scale-110"
           loading="lazy"
         />
         <div 
           v-else 
           class="flex h-full w-full items-center justify-center bg-surface-variant/50"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" 
-               :class="layout === 'vertical' ? 'h-12 w-12' : 'h-8 w-8'" 
-               class="text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
+          <PhImage class="h-12 w-12 text-text-muted" />
         </div>
         
-        <!-- 日付オーバーレイ - 縦型レイアウトのみ -->
-        <div 
-          v-if="layout === 'vertical'" 
-          class="absolute bottom-3 right-3 rounded px-2 py-1 text-xs backdrop-blur-sm bg-background/40 text-text-white"
-        >
+        <!-- 日付オーバーレイ - 背景色を統一 -->
+        <div class="absolute bottom-3 right-3 rounded px-2 py-1 text-xs backdrop-blur-sm bg-background/70 text-text-white">
           {{ formatDate(post.published_at || post.created_at) }}
         </div>
       </div>
       
       <!-- コンテンツ部分 -->
-      <div :class="layout === 'vertical' ? 'flex flex-1 flex-col p-5' : 'flex-1'">
-        <!-- タイトル - ハイライト対応 -->
+      <div class="flex flex-1 flex-col px-5 pt-5">
+        <!-- タイトル - 見出し色に統一 -->
         <h3 
-          :class="[
-            'overflow-hidden',
-            layout === 'vertical' ? 'mb-2 text-xl font-semibold text-heading' : 'mb-2 text-lg font-semibold text-heading'
-          ]"
-          :style="layout === 'vertical' ? {} : {'-webkit-line-clamp': 2, display: '-webkit-box', '-webkit-box-orient': 'vertical'}"
+          class="mb-2 text-xl font-semibold text-heading line-clamp-2"
           v-if="post.title_highlight" 
           v-html="post.title_highlight"
         ></h3>
         <h3 
-          :class="[
-            'overflow-hidden',
-            layout === 'vertical' ? 'mb-2 text-xl font-semibold text-heading' : 'mb-2 text-lg font-semibold text-heading'
-          ]"
-          :style="layout === 'vertical' ? {} : {'-webkit-line-clamp': 2, display: '-webkit-box', '-webkit-box-orient': 'vertical'}"
+          class="mb-2 text-xl font-semibold text-heading line-clamp-2"
           v-else
         >{{ post.title }}</h3>
         
-        <!-- 抜粋 - ハイライト対応 -->
+        <!-- カテゴリバッジ表示の修正 - 表示数制限と高さ制限を追加 -->
+        <div v-if="post.categories && post.categories.length > 0" class="flex flex-wrap gap-1.5 mb-3 max-h-[60px] overflow-hidden">
+          <span 
+            v-for="category in limitedCategories" 
+            :key="category.id"
+            class="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary-light"
+          >
+            {{ category.name }}
+          </span>
+          <span 
+            v-if="post.categories.length > maxCategories" 
+            class="text-xs px-2 py-0.5 rounded-full bg-surface-variant text-text-muted"
+          >
+            +{{ post.categories.length - maxCategories }}
+          </span>
+        </div>
+        
+        <!-- 抜粋 - 二次テキスト色に統一 -->
         <p 
           v-if="post.excerpt_highlight" 
-          :class="[
-            'overflow-hidden',
-            layout === 'vertical' ? 'mb-4 text-sm text-text-muted' : 'mb-2 text-sm text-text-muted'
-          ]"
-          :style="{'-webkit-line-clamp': layout === 'vertical' ? 3 : 2, display: '-webkit-box', '-webkit-box-orient': 'vertical'}"
+          class="mb-4 text-sm text-text-muted line-clamp-3"
           v-html="post.excerpt_highlight"
         ></p>
         <p 
           v-else-if="post.excerpt" 
-          :class="[
-            'overflow-hidden',
-            layout === 'vertical' ? 'mb-4 text-sm text-text-muted' : 'mb-2 text-sm text-text-muted'
-          ]"
-          :style="{'-webkit-line-clamp': layout === 'vertical' ? 3 : 2, display: '-webkit-box', '-webkit-box-orient': 'vertical'}"
+          class="mb-4 text-sm text-text-muted line-clamp-3"
         >
           {{ post.excerpt }}
         </p>
         
-        <!-- フッター部分 -->
-        <div 
-          v-if="layout === 'vertical'" 
-          class="mt-auto flex items-center border-t border-border-light pt-3"
-        >
-          <!-- ユーザーアバター -->
-          <div class="mr-3 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full">
-            <img 
-              v-if="post.profiles?.avatar_data || post.avatar_url" 
-              :src="getAvatarUrl(post.profiles?.avatar_data || post.avatar_url!)" 
-              :alt="getUserName()"
-              class="h-full w-full rounded-full object-cover"
-            />
-            <div 
-              v-else 
-              class="flex h-full w-full items-center justify-center bg-primary-dark/30 text-text"
-            >
-              {{ getInitials(getUserName()) }}
+        <!-- フッター部分 - 2行レイアウトに変更 -->
+        <div class="mt-auto flex flex-col border-t border-border-light pt-3">
+          <!-- 上段：著者情報 -->
+          <div class="flex items-center mb-2">
+            <!-- ユーザーアバター -->
+            <div class="mr-3 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full flex-shrink-0">
+              <img 
+                v-if="post.profiles?.avatar_data || post.avatar_url" 
+                :src="getAvatarUrl(post.profiles?.avatar_data || post.avatar_url!)" 
+                :alt="getUserName()"
+                class="h-full w-full rounded-full object-cover"
+              />
+              <div 
+                v-else 
+                class="flex h-full w-full items-center justify-center bg-primary/30 text-text-white"
+              >
+                {{ getInitials(getUserName()) }}
+              </div>
             </div>
-          </div>
-          <span class="text-sm text-text">{{ getUserName() }}</span>
-          
-          <!-- 統計情報（オプション） -->
-          <div v-if="showStats" class="ml-auto flex space-x-3">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
-            <span class="text-text-muted">{{ post.views || 0 }}</span>
-          </div>
-          <div class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4 text-accent2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-            <span class="text-text-muted">{{ post.like_count || post.likes_count || 0 }}</span>
-          </div>
-          <div class="flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4 text-accent3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-            </svg>
-            <span class="text-text-muted">{{ post.comment_count || post.comments_count || 0 }}</span>
-          </div>
-        </div>
-        
-        <!-- 横型レイアウト用フッター -->
-        <div v-else class="flex items-center justify-between text-xs text-text-muted">
-          <div class="flex items-center">
-            <span class="mr-3">{{ formatDate(post.published_at || post.created_at) }}</span>
-            <span class="mr-1">{{ getUserName() }}</span>
+            
+            <!-- 著者情報 -->
+            <div class="flex flex-col min-w-0 flex-grow">
+              <!-- ユーザー名 - 切り詰めを最大幅設定で制御 -->
+              <span class="text-sm text-text overflow-hidden text-ellipsis mb-1" :class="{'truncate': isLongUsername}">
+                {{ getUserName() }}
+              </span>
+              
+              <!-- 障害タイプバッジ表示 - 著者名の下に配置 -->
+              <div class="flex flex-wrap gap-1 overflow-hidden">
+                <span 
+                  v-if="post.profiles?.disability_types && post.profiles.disability_types.length > 0" 
+                  v-for="type in limitedDisabilityTypes"
+                  :key="type.id"
+                  class="text-xs px-1.5 py-0.5 rounded-full bg-primary/20 text-primary-light inline-block truncate"
+                >
+                  {{ type.name }}
+                </span>
+                <span 
+                  v-if="post.profiles?.disability_types && post.profiles.disability_types.length > maxDisabilityTypes" 
+                  class="text-xs px-1.5 py-0.5 rounded-full bg-surface-variant text-text-muted"
+                >
+                  +{{ post.profiles.disability_types.length - maxDisabilityTypes }}
+                </span>
+              </div>
+            </div>
           </div>
           
-          <!-- 統計情報（横型では常に表示） -->
-          <div class="flex space-x-3">
+          <!-- 下段：統計情報 -->
+          <div class="flex items-center justify-end gap-4">
             <div class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-              <span>{{ post.views || 0 }}</span>
+              <PhEye class="mr-1 h-4 w-4 text-text-muted" />
+              <span class="text-text-muted text-sm">{{ post.views || 0 }}</span>
             </div>
+            
             <div class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4 text-accent2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-              <span>{{ post.like_count || post.likes_count || 0 }}</span>
+              <PhHeart class="mr-1 h-4 w-4 text-error" />
+              <span class="text-error text-sm">{{ post.like_count || post.likes_count || 0 }}</span>
             </div>
+            
             <div class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4 text-accent3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
-              <span>{{ post.comment_count || post.comments_count || 0 }}</span>
+              <PhChatText class="mr-1 h-4 w-4 text-info" />
+              <span class="text-info text-sm">{{ post.comment_count || post.comments_count || 0 }}</span>
             </div>
           </div>
         </div>
@@ -177,6 +146,19 @@
 import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { getProfileImageUrl, getCoverImageUrl } from '../../lib/storage';
+import { 
+  PhImage, 
+  PhEye, 
+  PhHeart, 
+  PhChatText 
+} from '@phosphor-icons/vue';
+import { computed } from 'vue';
+
+// カテゴリの型定義
+interface Category {
+  id: number;
+  name: string;
+}
 
 // 投稿の型定義
 interface Post {
@@ -190,7 +172,12 @@ interface Post {
   profiles?: {
     nickname?: string | null;
     avatar_data?: string | null;
+    disability_types?: Array<{
+      id: number;
+      name: string;
+    }>;
   };
+  author_id?: string;
   nickname?: string | null;
   author_name?: string | null;
   like_count?: number;
@@ -200,6 +187,7 @@ interface Post {
   title_highlight?: string;
   excerpt_highlight?: string;
   avatar_url?: string | null;
+  categories?: Category[];
 }
 
 // プロップス定義
@@ -207,23 +195,6 @@ const props = defineProps({
   post: {
     type: Object as () => Post,
     required: true
-  },
-  layout: {
-    type: String,
-    default: 'vertical',
-    validator: (value: string) => ['vertical', 'horizontal'].includes(value)
-  },
-  showStats: {
-    type: Boolean,
-    default: false
-  },
-  hoverEffect: {
-    type: Boolean,
-    default: true
-  },
-  customClass: {
-    type: String,
-    default: ''
   }
 });
 
@@ -259,4 +230,57 @@ function getImageUrl(path: string): string {
 function getAvatarUrl(path: string): string {
   return getProfileImageUrl(path);
 }
-</script> 
+
+// 名前が長いかどうかを判定する計算プロパティ
+const isLongUsername = computed(() => {
+  const name = getUserName();
+  return name.length > 10; // 10文字以上を長い名前と判断
+});
+
+// カテゴリの最大表示数
+const maxCategories = 3;
+
+// 表示するカテゴリを制限する計算プロパティ
+const limitedCategories = computed(() => {
+  if (!props.post.categories) return [];
+  return props.post.categories.slice(0, maxCategories);
+});
+
+// 障害タイプの最大表示数
+const maxDisabilityTypes = 2;
+
+// 表示する障害タイプを制限する計算プロパティ
+const limitedDisabilityTypes = computed(() => {
+  if (!props.post.profiles?.disability_types) return [];
+  // 配列かどうかチェック
+  const types = Array.isArray(props.post.profiles.disability_types) 
+    ? props.post.profiles.disability_types 
+    : [props.post.profiles.disability_types];
+  return types.slice(0, maxDisabilityTypes);
+});
+</script>
+
+<style>
+/* Tailwind の line-clamp クラスがうまく動作しない場合のバックアップ */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+</style> 

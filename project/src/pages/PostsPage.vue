@@ -16,9 +16,7 @@
           @click="refreshData"
           class="btn-icon-primary absolute right-2 top-1/2 transform -translate-y-1/2"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          <PhMagnifyingGlass class="h-6 w-6" />
         </button>
       </div>
     </div>
@@ -36,7 +34,7 @@
           >
             <option :value="null">すべて</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
-              {{ category.name }}
+              {{ category.name }} ({{ category.post_count || 0 }})
             </option>
           </select>
         </div>
@@ -51,7 +49,7 @@
           >
             <option :value="null">すべて</option>
             <option v-for="type in disabilityTypes" :key="type.id" :value="type.id">
-              {{ type.name }}
+              {{ type.name }} ({{ type.post_count || 0 }})
             </option>
           </select>
         </div>
@@ -73,7 +71,8 @@
         
         <!-- フィルターリセットボタン -->
         <div class="w-full mt-auto ml-auto sm:w-auto">
-          <button @click="resetFilters" class="btn btn-outline-primary">
+          <button @click="resetFilters" class="btn btn-outline-primary flex items-center">
+            <PhArrowCounterClockwise class="h-5 w-5 mr-1" />
             フィルターをリセット
           </button>
         </div>
@@ -81,174 +80,92 @@
     </div>
     
     <!-- メインコンテンツ -->
-    <div class="flex flex-col gap-8 md:flex-row">
-      <!-- カテゴリサイドバー -->
-      <div class="w-full md:w-1/4 lg:w-1/5">
-        <div class="glass-card p-4 mb-6">
-          <h2 class="text-xl font-bold mb-4 text-heading">カテゴリ</h2>
-          
-          <!-- カテゴリローディング -->
-          <div v-if="categoriesLoading" class="flex justify-center py-4">
-            <div class="w-8 h-8 border-4 rounded-full border-surface-accent border-t-primary animate-spin"></div>
-          </div>
-          
-          <!-- カテゴリエラー -->
-          <div v-else-if="categoriesError" class="text-sm mb-2 text-error">
-            {{ categoriesError }}
-            <button @click="fetchCategories" class="ml-2 text-primary hover:underline">再試行</button>
-          </div>
-          
-          <!-- カテゴリリスト -->
-          <div v-else-if="categories.length === 0" class="py-2 text-center text-text-muted">
-            カテゴリはまだありません
-          </div>
-          
-          <div v-else class="space-y-2">
-            <button 
-              @click="selectCategory(null)" 
-              class="w-full px-3 py-2 text-left rounded-lg transition-colors btn-ghost"
-              :class="selectedCategoryId === null ? 'bg-primary/20 text-text-white' : ''"
-            >
-              すべてのカテゴリ
-            </button>
-            <button 
-              v-for="category in categories" 
-              :key="category.id"
-              @click="selectCategory(category.id)"
-              class="w-full flex items-center justify-between px-3 py-2 text-left rounded-lg transition-colors btn-ghost"
-              :class="selectedCategoryId === category.id ? 'bg-primary/20 text-text-white' : ''"
-            >
-              <span>{{ category.name }}</span>
-              <span class="text-xs text-primary">{{ category.post_count || 0 }}</span>
-            </button>
-          </div>
-        </div>
-        
-        <!-- 障害タイプサイドバー -->
-        <div class="glass-card p-4">
-          <h2 class="text-xl font-bold mb-4 text-heading">障害タイプ</h2>
-          
-          <!-- 障害タイプローディング -->
-          <div v-if="disabilityTypesLoading" class="flex justify-center py-4">
-            <div class="w-8 h-8 border-4 rounded-full border-surface-accent border-t-primary animate-spin"></div>
-          </div>
-          
-          <!-- 障害タイプリスト -->
-          <div v-else-if="disabilityTypes.length === 0" class="py-2 text-center text-text-muted">
-            障害タイプはまだありません
-          </div>
-          
-          <div v-else class="space-y-2">
-            <button 
-              @click="selectDisabilityType(null)" 
-              class="w-full px-3 py-2 text-left rounded-lg transition-colors btn-ghost"
-              :class="selectedDisabilityType === null ? 'bg-primary/20 text-text-white' : ''"
-            >
-              すべてのタイプ
-            </button>
-            <button 
-              v-for="type in disabilityTypes" 
-              :key="type.id"
-              @click="selectDisabilityType(type.id)"
-              class="w-full px-3 py-2 text-left rounded-lg transition-colors btn-ghost"
-              :class="selectedDisabilityType === type.id ? 'bg-primary/20 text-text-white' : ''"
-            >
-              {{ type.name }}
-            </button>
-          </div>
-        </div>
+    <div>
+      <!-- 検索中ローディング -->
+      <div v-if="loading" class="flex items-center justify-center h-32">
+        <PhSpinner class="w-8 h-8 animate-spin text-primary" />
       </div>
       
-      <!-- 検索結果/投稿一覧 -->
-      <div class="w-full md:w-3/4 lg:w-4/5">
-        <!-- 検索中ローディング -->
-        <div v-if="loading" class="flex items-center justify-center h-32">
-          <div class="w-8 h-8 border-4 rounded-full border-surface-accent border-t-primary animate-spin"></div>
+      <!-- エラー表示 -->
+      <div v-else-if="error" class="glass-card p-4 text-error">
+        <p>{{ error }}</p>
+        <button @click="refreshData" class="btn btn-error mt-2">再試行</button>
+      </div>
+      
+      <!-- 選択されたカテゴリタイトル -->
+      <div v-else-if="selectedCategoryId && selectedCategory" class="mb-6">
+        <div class="flex items-center justify-between">
+          <h2 class="text-2xl font-bold text-heading">{{ selectedCategory.name }}</h2>
+        </div>
+        <p v-if="selectedCategory.description" class="mt-2 text-text-muted">
+          {{ selectedCategory.description }}
+        </p>
+      </div>
+      
+      <!-- 検索キーワードがあれば表示 -->
+      <div v-else-if="searchQuery.trim()" class="mb-6">
+        <h2 class="text-2xl font-bold text-heading">「{{ searchQuery }}」の検索結果</h2>
+      </div>
+      
+      <!-- 投稿が存在しない場合 -->
+      <div v-if="!loading && posts.length === 0" class="glass-card p-8 text-center">
+        <p v-if="searchQuery.trim() || selectedCategoryId || selectedDisabilityType" class="text-text-muted">
+          条件に一致する投稿は見つかりませんでした
+        </p>
+        <p v-else class="text-text-muted">
+          投稿がありません
+        </p>
+        <button v-if="searchQuery.trim() || selectedCategoryId || selectedDisabilityType" 
+                @click="resetFilters" 
+                class="btn btn-outline-primary mt-4">
+          フィルターをリセット
+        </button>
+      </div>
+      
+      <!-- 投稿一覧 -->
+      <div v-else-if="posts.length > 0">
+        <div v-if="totalResults > 0" class="mb-2 text-sm text-text-muted">
+          {{ totalResults }}件中 {{ startIndex + 1 }}～{{ endIndex }}件を表示
         </div>
         
-        <!-- エラー表示 -->
-        <div v-else-if="error" class="glass-card p-4 text-error">
-          <p>{{ error }}</p>
-          <button @click="refreshData" class="btn btn-error mt-2">再試行</button>
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <PostCard 
+            v-for="post in posts" 
+            :key="post.id"
+            :post="post"
+          />
         </div>
         
-        <!-- 選択されたカテゴリタイトル -->
-        <div v-else-if="selectedCategoryId && selectedCategory" class="mb-6">
-          <div class="flex items-center justify-between">
-            <h2 class="text-2xl font-bold text-heading">{{ selectedCategory.name }}</h2>
-          </div>
-          <p v-if="selectedCategory.description" class="mt-2 text-text-muted">
-            {{ selectedCategory.description }}
-          </p>
-        </div>
-        
-        <!-- 検索キーワードがあれば表示 -->
-        <div v-else-if="searchQuery.trim()" class="mb-6">
-          <h2 class="text-2xl font-bold text-heading">「{{ searchQuery }}」の検索結果</h2>
-        </div>
-        
-        <!-- 投稿が存在しない場合 -->
-        <div v-if="!loading && posts.length === 0" class="glass-card p-8 text-center">
-          <p v-if="searchQuery.trim() || selectedCategoryId || selectedDisabilityType" class="text-text-muted">
-            条件に一致する投稿は見つかりませんでした
-          </p>
-          <p v-else class="text-text-muted">
-            投稿がありません
-          </p>
-          <button v-if="searchQuery.trim() || selectedCategoryId || selectedDisabilityType" 
-                  @click="resetFilters" 
-                  class="btn btn-outline-primary mt-4">
-            フィルターをリセット
-          </button>
-        </div>
-        
-        <!-- 投稿一覧 -->
-        <div v-else-if="posts.length > 0">
-          <div v-if="totalResults > 0" class="mb-2 text-sm text-text-muted">
-            {{ totalResults }}件中 {{ startIndex + 1 }}～{{ endIndex }}件を表示
-          </div>
-          
-          <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <PostCard 
-              v-for="post in posts" 
-              :key="post.id"
-              :post="post"
-              layout="vertical"
-              :showStats="true"
-              :hoverEffect="true"
-              customClass="h-full"
-            />
-          </div>
-          
-          <!-- ページネーション -->
-          <div v-if="totalPages > 1" class="flex justify-center mt-8">
-            <div class="flex space-x-2">
-              <button 
-                @click="changePage(currentPage - 1)" 
-                class="btn btn-outline-primary btn-sm"
-                :disabled="currentPage === 1"
-              >
-                前へ
-              </button>
-              
-              <button
-                v-for="page in getPageNumbers()"
-                :key="page"
-                @click="changePage(Number(page))"
-                class="btn btn-sm"
-                :class="currentPage === page ? 'btn-primary' : 'btn-outline-primary'"
-              >
-                {{ page }}
-              </button>
-              
-              <button 
-                @click="changePage(currentPage + 1)" 
-                class="btn btn-outline-primary btn-sm"
-                :disabled="currentPage === totalPages"
-              >
-                次へ
-              </button>
-            </div>
+        <!-- ページネーション -->
+        <div v-if="totalPages > 1" class="flex justify-center mt-8">
+          <div class="flex space-x-2">
+            <button 
+              @click="changePage(currentPage - 1)" 
+              class="btn btn-outline-primary btn-sm flex items-center"
+              :disabled="currentPage === 1"
+            >
+              <PhCaretLeft class="h-4 w-4 mr-1" />
+              前へ
+            </button>
+            
+            <button
+              v-for="page in getPageNumbers()"
+              :key="page"
+              @click="changePage(Number(page))"
+              class="btn btn-sm"
+              :class="currentPage === page ? 'btn-primary' : 'btn-outline-primary'"
+            >
+              {{ page }}
+            </button>
+            
+            <button 
+              @click="changePage(currentPage + 1)" 
+              class="btn btn-outline-primary btn-sm flex items-center"
+              :disabled="currentPage === totalPages"
+            >
+              次へ
+              <PhCaretRight class="h-4 w-4 ml-1" />
+            </button>
           </div>
         </div>
       </div>
@@ -262,6 +179,13 @@ import { useRoute, useRouter } from 'vue-router';
 import { debounce } from 'lodash';
 import { supabase } from '@/lib/supabase';
 import PostCard from '../components/common/PostCard.vue';
+import { 
+  PhMagnifyingGlass, 
+  PhArrowCounterClockwise, 
+  PhCaretLeft, 
+  PhCaretRight,
+  PhSpinner
+} from '@phosphor-icons/vue';
 
 // カテゴリの型定義
 interface Category {
@@ -324,6 +248,10 @@ const totalPages = computed(() => Math.ceil(totalResults.value / pageSize));
 // ルート・ルーターの取得
 const route = useRoute();
 const router = useRouter();
+
+// 変数追加（スクリプト部分の上部）
+const isUpdatingCategoryCounts = ref(false);
+const isUpdatingDisabilityTypeCounts = ref(false);
 
 // 初期化
 onMounted(() => {
@@ -428,12 +356,31 @@ async function fetchCategories() {
     
     if (categoriesError) throw categoriesError;
     
-    // 各カテゴリの投稿数を取得
+    // 各カテゴリの投稿数を取得（公開済み投稿のみカウント）
     const categoriesWithPostCount = await Promise.all((categoriesData || []).map(async (category) => {
+      // 2つのクエリを組み合わせて公開済み投稿数を取得
+      const { data: postIds, error: postIdError } = await supabase
+        .from('posts')
+        .select('id')
+        .eq('published', true);
+        
+      if (postIdError) {
+        console.error(`公開済み投稿ID取得エラー:`, postIdError);
+        return {
+          ...category,
+          post_count: 0
+        };
+      }
+        
+      // 公開済み投稿IDのリストを取得
+      const publicPostIds = postIds.map(post => post.id);
+        
+      // 該当カテゴリーかつ公開済み投稿のみをカウント
       const { count, error: countError } = await supabase
         .from('post_categories')
         .select('*', { count: 'exact', head: true })
-        .eq('category_id', category.id);
+        .eq('category_id', category.id)
+        .in('post_id', publicPostIds);
       
       if (countError) console.error(`カテゴリ ${category.id} の投稿数取得エラー:`, countError);
       
@@ -463,7 +410,49 @@ async function fetchDisabilityTypes() {
       .order('name');
     
     if (error) throw error;
-    disabilityTypes.value = data || [];
+    
+    // 各障害タイプの投稿数を取得（公開済み投稿のみカウント）
+    const typesWithPostCount = await Promise.all((data || []).map(async (type) => {
+      // 1. この障害タイプを持つユーザーIDを取得
+      const { data: profileIds, error: profileError } = await supabase
+        .from('user_disability_types')
+        .select('user_id')
+        .eq('disability_type_id', type.id);
+        
+      if (profileError) {
+        console.error(`障害タイプ ${type.id} のユーザー取得エラー:`, profileError);
+        return {
+          ...type,
+          post_count: 0
+        };
+      }
+      
+      if (!profileIds || profileIds.length === 0) {
+        return {
+          ...type,
+          post_count: 0
+        };
+      }
+      
+      // 2. ユーザーIDリストを作成
+      const userIds = profileIds.map(profile => profile.user_id);
+      
+      // 3. 該当ユーザーが書いた公開済み投稿をカウント
+      const { count, error: countError } = await supabase
+        .from('posts')
+        .select('*', { count: 'exact', head: true })
+        .in('author_id', userIds)
+        .eq('published', true);
+      
+      if (countError) console.error(`障害タイプ ${type.id} の投稿数取得エラー:`, countError);
+      
+      return {
+        ...type,
+        post_count: count || 0
+      };
+    }));
+    
+    disabilityTypes.value = typesWithPostCount;
   } catch (err: any) {
     console.error('障害タイプ取得エラー:', err);
     // エラーは表示しない（UIに影響しないため）
@@ -517,6 +506,7 @@ async function refreshData() {
   } finally {
     loading.value = false;
     isSearching.value = false;
+    await updateFilterCounts();
   }
 }
 
@@ -537,7 +527,7 @@ async function performSearch() {
     if (searchError) throw searchError;
     
     if (data && data.length > 0) {
-      let filteredData = data;
+      let filteredData: any[] = data;
       
       // カテゴリでさらにフィルタリング
       if (selectedCategoryId.value) {
@@ -559,12 +549,12 @@ async function performSearch() {
       // 障害タイプでさらにフィルタリング
       if (selectedDisabilityType.value) {
         const { data: userIds } = await supabase
-          .from('profiles')
-          .select('id')
+          .from('user_disability_types')
+          .select('user_id')
           .eq('disability_type_id', selectedDisabilityType.value);
           
         if (userIds && userIds.length > 0) {
-          const userIdSet = new Set(userIds.map(u => u.id));
+          const userIdSet = new Set(userIds.map(u => u.user_id));
           filteredData = filteredData.filter((post: PostResult) => userIdSet.has(post.author_id));
         } else {
           posts.value = [];
@@ -628,11 +618,23 @@ async function performSearch() {
 
 // フィルター適用した投稿を取得
 async function fetchFilteredPosts() {
+  loading.value = true;
+  error.value = '';
+  
   try {
     // 基本クエリ
     let query = supabase
       .from('posts')
-      .select('*', { count: 'exact' })
+      .select(`
+        *, 
+        profiles:author_id(
+          nickname, 
+          avatar_data,
+          user_disability_types(
+            disability_types(id, name)
+          )
+        )
+      `, { count: 'exact' })
       .eq('published', true);
     
     // カテゴリによるフィルタリング
@@ -648,6 +650,7 @@ async function fetchFilteredPosts() {
         // カテゴリに一致する投稿がない場合
         posts.value = [];
         totalResults.value = 0;
+        loading.value = false;
         return;
       }
     }
@@ -655,16 +658,35 @@ async function fetchFilteredPosts() {
     // 障害タイプによるフィルタリング
     if (selectedDisabilityType.value) {
       const { data: userIds } = await supabase
-        .from('profiles')
-        .select('id')
+        .from('user_disability_types')
+        .select('user_id')
         .eq('disability_type_id', selectedDisabilityType.value);
         
       if (userIds && userIds.length > 0) {
-        query = query.in('author_id', userIds.map(u => u.id));
+        const userIdList = userIds.map(u => u.user_id);
+        query = query.in('author_id', userIdList);
       } else {
         // 障害タイプに一致するユーザーがない場合
         posts.value = [];
         totalResults.value = 0;
+        loading.value = false;
+        return;
+      }
+    }
+    
+    // 検索クエリによるフィルタリング
+    if (searchQuery.value.trim()) {
+      const { data: searchResults } = await supabase.rpc('search_posts', {
+        search_term: searchQuery.value
+      });
+      
+      if (searchResults && searchResults.length > 0) {
+        query = query.in('id', searchResults.map((result: any) => result.id));
+      } else {
+        // 検索結果がない場合
+        posts.value = [];
+        totalResults.value = 0;
+        loading.value = false;
         return;
       }
     }
@@ -695,45 +717,54 @@ async function fetchFilteredPosts() {
     if (fetchError) throw fetchError;
     totalResults.value = count || 0;
     
-    if (data) {
-      // 投稿の詳細情報を取得（著者情報、いいね数）
-      const postsWithDetails = await Promise.all(data.map(async (post) => {
-        // プロフィール情報取得
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('avatar_data, nickname')
-          .eq('id', post.author_id)
-          .single();
-        
-        // いいね数を取得
-        const { count: likeCount, error: likeError } = await supabase
-          .from('post_likes')
-          .select('*', { count: 'exact', head: true })
-          .eq('post_id', post.id);
-        
-        if (likeError) console.error(`投稿 ${post.id} のいいね数取得エラー:`, likeError);
-        
-        // コメント数を取得
-        const { count: commentCount, error: commentError } = await supabase
-          .from('comments')
-          .select('*', { count: 'exact', head: true })
-          .eq('post_id', post.id);
-          
-        if (commentError) console.error(`投稿 ${post.id} のコメント数取得エラー:`, commentError);
-        
-        return {
-          ...post,
-          avatar_url: profileData?.avatar_data || null,
-          author_name: profileData?.nickname || '不明なユーザー',
-          like_count: likeCount || 0,
-          comment_count: commentCount || 0
-        };
-      }));
+    // 各投稿に必要な追加データを取得
+    const postsWithDetails = await Promise.all((data || []).map(async (post) => {
+      // いいね数、コメント数を並行取得
+      const [{ count: likeCount }, { count: commentCount }, { data: categoryData }] = await Promise.all([
+        supabase.from('post_likes').select('*', { count: 'exact', head: true }).eq('post_id', post.id),
+        supabase.from('comments').select('*', { count: 'exact', head: true }).eq('post_id', post.id),
+        supabase.from('post_categories').select('categories(id, name)').eq('post_id', post.id)
+      ]);
       
-      posts.value = postsWithDetails;
-    }
+      // カテゴリデータの整形
+      const categories = (categoryData || [])
+        .filter(item => item.categories && typeof item.categories === 'object')
+        .map(item => {
+          // 配列かオブジェクトかをチェック
+          const cat = Array.isArray(item.categories) 
+            ? (item.categories.length > 0 ? item.categories[0] : { id: 0, name: '' })
+            : item.categories;
+          
+          return {
+            id: Number(cat.id),
+            name: String(cat.name)
+          };
+        });
+      
+      // disability_typesの整形を追加
+      if (post.profiles?.user_disability_types) {
+        post.profiles.disability_types = post.profiles.user_disability_types
+          .map((udt: any) => udt.disability_types)
+          .filter(Boolean);
+        
+        // 元のプロパティを削除
+        delete post.profiles.user_disability_types;
+      }
+
+      return {
+        ...post,
+        like_count: likeCount || 0,
+        comment_count: commentCount || 0,
+        categories
+      };
+    }));
+    
+    posts.value = postsWithDetails;
   } catch (err) {
-    throw err;
+    console.error('投稿取得エラー:', err);
+    error.value = '投稿の読み込みに失敗しました';
+  } finally {
+    loading.value = false;
   }
 }
 
@@ -752,16 +783,6 @@ function sortPosts(posts: any[]) {
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     }
   });
-}
-
-// カテゴリを選択
-function selectCategory(categoryId: number | null) {
-  selectedCategoryId.value = categoryId;
-}
-
-// 障害タイプを選択
-function selectDisabilityType(typeId: number | null) {
-  selectedDisabilityType.value = typeId;
 }
 
 // ページネーション
@@ -803,4 +824,162 @@ function getPageNumbers(): (number | string)[] {
   
   return pages;
 }
+
+// フィルターカウントを更新するための関数を追加
+async function updateFilterCounts() {
+  if (loading.value) return;
+  
+  try {
+    // 基本クエリ - 公開済みの投稿を取得
+    let baseQuery = supabase.from('posts').select('id').eq('published', true);
+    
+    // 検索クエリがある場合
+    if (searchQuery.value.trim()) {
+      const { data: searchResults } = await supabase.rpc('search_posts', {
+        search_term: searchQuery.value
+      });
+      
+      if (searchResults && searchResults.length > 0) {
+        const postIds = searchResults.map((post: any) => post.id);
+        baseQuery = baseQuery.in('id', postIds);
+      } else {
+        // 検索結果がない場合は空のカウントを設定して終了
+        updateEmptyCounts();
+        return;
+      }
+    }
+    
+    // カテゴリが選択されている場合
+    if (selectedCategoryId.value && !isUpdatingCategoryCounts.value) {
+      const { data: categoryPostIds } = await supabase
+        .from('post_categories')
+        .select('post_id')
+        .eq('category_id', selectedCategoryId.value);
+        
+      if (categoryPostIds && categoryPostIds.length > 0) {
+        const postIds = categoryPostIds.map(item => item.post_id);
+        baseQuery = baseQuery.in('id', postIds);
+      } else {
+        // 選択されたカテゴリに投稿がない場合は空のカウントを設定して終了
+        updateEmptyCounts();
+        return;
+      }
+    }
+    
+    // 障害タイプが選択されている場合
+    if (selectedDisabilityType.value && !isUpdatingDisabilityTypeCounts.value) {
+      const { data: profileIds } = await supabase
+        .from('user_disability_types')
+        .select('user_id')
+        .eq('disability_type_id', selectedDisabilityType.value);
+        
+      if (profileIds && profileIds.length > 0) {
+        const userIds = profileIds.map(profile => profile.user_id);
+        baseQuery = baseQuery.in('author_id', userIds);
+      } else {
+        // 選択された障害タイプに該当するユーザーがいない場合は空のカウントを設定して終了
+        updateEmptyCounts();
+        return;
+      }
+    }
+    
+    // 現在のフィルター条件に一致する投稿IDを取得
+    const { data: filteredPosts, error: postsError } = await baseQuery;
+    
+    if (postsError) throw postsError;
+    
+    if (!filteredPosts || filteredPosts.length === 0) {
+      updateEmptyCounts();
+      return;
+    }
+    
+    // 投稿IDリスト
+    const postIds = filteredPosts.map(post => post.id);
+    
+    // 障害タイプカウントの更新（カテゴリが選択されている場合）
+    if (!isUpdatingDisabilityTypeCounts.value) {
+      isUpdatingDisabilityTypeCounts.value = true;
+      
+      // 投稿IDから著者IDを取得
+      const { data: postsWithAuthors } = await supabase
+        .from('posts')
+        .select('author_id')
+        .in('id', postIds);
+        
+      const authorIds = postsWithAuthors ? postsWithAuthors.map(post => post.author_id) : [];
+      
+      // 障害タイプごとの投稿数をカウント
+      const updatedTypes = await Promise.all(disabilityTypes.value.map(async (type) => {
+        if (authorIds.length === 0) {
+          return { ...type, post_count: 0 };
+        }
+        
+        // この障害タイプを持つユーザーIDを取得
+        const { data: typeUserIds } = await supabase
+          .from('user_disability_types')
+          .select('user_id')
+          .eq('disability_type_id', type.id)
+          .in('user_id', authorIds);
+          
+        const userIds = typeUserIds ? typeUserIds.map(item => item.user_id) : [];
+        
+        // この障害タイプの著者による投稿数をカウント
+        const { count } = await supabase
+          .from('posts')
+          .select('*', { count: 'exact', head: true })
+          .in('author_id', userIds)
+          .in('id', postIds);
+          
+        return { ...type, post_count: count || 0 };
+      }));
+      
+      disabilityTypes.value = updatedTypes;
+      isUpdatingDisabilityTypeCounts.value = false;
+    }
+    
+    // カテゴリカウントの更新（障害タイプが選択されている場合）
+    if (!isUpdatingCategoryCounts.value) {
+      isUpdatingCategoryCounts.value = true;
+      
+      // カテゴリごとの投稿数をカウント
+      const updatedCategories = await Promise.all(categories.value.map(async (category) => {
+        // この投稿IDリストに含まれる、このカテゴリに属する投稿をカウント
+        const { count } = await supabase
+          .from('post_categories')
+          .select('*', { count: 'exact', head: true })
+          .eq('category_id', category.id)
+          .in('post_id', postIds);
+          
+        return { ...category, post_count: count || 0 };
+      }));
+      
+      categories.value = updatedCategories;
+      isUpdatingCategoryCounts.value = false;
+    }
+  } catch (err) {
+    console.error('フィルターカウント更新エラー:', err);
+  }
+}
+
+// 空のカウントに更新する補助関数
+function updateEmptyCounts() {
+  if (!isUpdatingCategoryCounts.value) {
+    categories.value = categories.value.map(category => ({ ...category, post_count: 0 }));
+  }
+  
+  if (!isUpdatingDisabilityTypeCounts.value) {
+    disabilityTypes.value = disabilityTypes.value.map(type => ({ ...type, post_count: 0 }));
+  }
+}
+
+// 選択変更時にもカウントを更新するために、watch関数を追加
+watch([selectedCategoryId, selectedDisabilityType, searchQuery], (newValues, oldValues) => {
+  // 値が実際に変わった場合のみ更新
+  if (JSON.stringify(newValues) !== JSON.stringify(oldValues)) {
+    // ページロードなど初期状態では更新しない
+    if (oldValues[0] !== undefined || oldValues[1] !== undefined || oldValues[2] !== undefined) {
+      updateFilterCounts();
+    }
+  }
+});
 </script>

@@ -6,23 +6,25 @@
         <button 
           @click="activeTab = 'login'"
           :class="[
-            'py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium focus:outline-none',
+            'py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium focus:outline-none flex items-center',
             activeTab === 'login' 
               ? 'border-b-2 border-primary text-primary' 
               : 'text-text-muted hover:text-text'
           ]"
         >
+          <PhSignIn class="h-4 w-4 mr-1" />
           ログイン
         </button>
         <button 
           @click="activeTab = 'register'"
           :class="[
-            'py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium focus:outline-none',
+            'py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium focus:outline-none flex items-center',
             activeTab === 'register' 
               ? 'border-b-2 border-primary text-primary' 
               : 'text-text-muted hover:text-text'
           ]"
         >
+          <PhUserPlus class="h-4 w-4 mr-1" />
           会員登録
         </button>
       </div>
@@ -68,10 +70,7 @@
               class="btn btn-primary flex w-full justify-center items-center"
               :disabled="loginLoading"
             >
-              <svg v-if="loginLoading" class="h-4 w-4 mr-2 sm:h-5 sm:w-5 animate-spin" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+              <PhSpinner v-if="loginLoading" class="h-4 w-4 mr-2 sm:h-5 sm:w-5 animate-spin" />
               {{ loginLoading ? 'ログイン中...' : 'ログイン' }}
             </button>
           </div>
@@ -195,10 +194,7 @@
               class="btn btn-primary flex w-full justify-center items-center"
               :disabled="registerLoading || !isRegisterFormValid"
             >
-              <svg v-if="registerLoading" class="h-4 w-4 mr-2 sm:h-5 sm:w-5 animate-spin" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+              <PhSpinner v-if="registerLoading" class="h-4 w-4 mr-2 sm:h-5 sm:w-5 animate-spin" />
               {{ registerLoading ? '登録中...' : '登録する' }}
             </button>
           </div>
@@ -218,6 +214,7 @@
 import { ref, computed, inject, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+import { PhSpinner, PhSignIn, PhUserPlus } from '@phosphor-icons/vue';
 
 const router = useRouter();
 const route = useRoute();

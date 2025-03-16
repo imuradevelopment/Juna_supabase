@@ -1,49 +1,44 @@
 <template>
-  <div>
+  <div class="rounded-lg border p-5 shadow-background/20 bg-surface-variant border-border">
     <!-- コメント投稿フォーム -->
     <div class="mb-6">
-      <div class="rounded-lg border p-5 shadow-background/20 bg-surface-variant border-border">
-        <div v-if="!authStore.isAuthenticated" class="py-4 text-center">
-          <p class="mb-3 text-text-muted">
-            コメントするにはログインが必要です
-          </p>
-          <router-link to="/login" class="btn btn-primary">
-            ログインする
-          </router-link>
+      <div v-if="!authStore.isAuthenticated" class="py-4 text-center">
+        <p class="mb-3 text-text-muted">
+          コメントするにはログインが必要です
+        </p>
+        <router-link to="/login" class="btn btn-primary">
+          ログインする
+        </router-link>
+      </div>
+      
+      <form v-else @submit.prevent="submitComment" class="space-y-3">
+        <div class="mb-3">
+          <textarea 
+            v-model="commentText" 
+            class="w-full rounded-lg border p-4 transition-all placeholder-text-muted focus:outline-none focus:shadow-primary/20 focus:border-primary bg-surface text-text border-border" 
+            rows="3"
+            :placeholder="parentCommentId ? '返信を入力...' : 'コメントを入力...'"
+            :disabled="submitting"
+            required
+          ></textarea>
         </div>
         
-        <form v-else @submit.prevent="submitComment" class="space-y-3">
-          <div class="mb-3">
-            <textarea 
-              v-model="commentText" 
-              class="w-full rounded-lg border p-4 transition-all placeholder-text-muted focus:outline-none focus:shadow-primary/20 focus:border-primary bg-surface text-text border-border" 
-              rows="3"
-              :placeholder="parentCommentId ? '返信を入力...' : 'コメントを入力...'"
-              :disabled="submitting"
-              required
-            ></textarea>
-          </div>
-          
-          <div class="flex justify-end">
-            <button 
-              type="submit" 
-              class="btn btn-primary"
-              :disabled="submitting || !commentText.trim()"
-            >
-              <svg v-if="submitting" class="h-5 w-5 mr-2 animate-spin" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              {{ submitting ? '送信中...' : parentCommentId ? '返信する' : '送信する' }}
-            </button>
-          </div>
-        </form>
-      </div>
+        <div class="flex justify-end">
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            :disabled="submitting || !commentText.trim()"
+          >
+            <PhSpinner v-if="submitting" class="h-5 w-5 mr-2 animate-spin" />
+            {{ submitting ? '送信中...' : parentCommentId ? '返信する' : '送信する' }}
+          </button>
+        </div>
+      </form>
     </div>
 
     <!-- コメント一覧 -->
     <div v-if="loading" class="flex justify-center p-4">
-      <div class="h-6 w-6 rounded-full border-2 border-t-transparent animate-spin border-primary-light"></div>
+      <PhSpinner class="h-6 w-6 animate-spin text-primary-light" />
     </div>
 
     <div v-else-if="comments.length === 0" class="py-8 text-center">
@@ -53,242 +48,29 @@
     </div>
 
     <div v-else class="space-y-6">
-      <!-- ルートコメントのみ表示（返信は子コンポーネント内で処理） -->
-      <div v-for="comment in rootComments" :key="comment.id">
-        <!-- 個別コメント表示 -->
-        <div class="mb-4">
-          <!-- コメント本体 -->
-          <div class="mb-4 flex">
-            <!-- アバター -->
-            <div class="mr-3 flex-shrink-0">
-              <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-primary-light text-text-white">
-                <img 
-                  v-if="comment.profiles?.avatar_data" 
-                  :src="getAvatarUrl(comment.profiles.avatar_data)" 
-                  :alt="comment.profiles.nickname"
-                  class="h-full w-full object-cover"
-                />
-                <span v-else>{{ getInitials(comment.profiles?.nickname || '?') }}</span>
-              </div>
-            </div>
-            
-            <!-- コメント内容 -->
-            <div class="flex-1">
-              <div class="rounded-lg border p-3 backdrop-blur-sm bg-surface/80 border-border-light/60 shadow-background/30">
-                <!-- ユーザー情報と日時 -->
-                <div class="mb-2 flex items-center justify-between">
-                  <span class="font-medium text-text">{{ comment.profiles?.nickname }}</span>
-                  <span class="text-xs text-text-muted">{{ formatDate(comment.created_at) }}</span>
-                </div>
-                
-                <!-- 編集フォーム -->
-                <div v-if="editingCommentId === comment.id" class="mb-2">
-                  <textarea 
-                    v-model="editedContent" 
-                    class="w-full rounded border px-3 py-2 focus:outline-none bg-surface text-text border-border shadow-primary/20"
-                    rows="2"
-                  ></textarea>
-                  <div class="mt-2 flex justify-end space-x-2">
-                    <button 
-                      @click="cancelEdit" 
-                      class="btn btn-outline-secondary btn-sm"
-                    >
-                      キャンセル
-                    </button>
-                    <button 
-                      @click="saveEdit(comment)" 
-                      class="btn btn-outline-accent3 btn-sm"
-                      :disabled="!editedContent.trim() || editedContent === comment.content"
-                    >
-                      保存
-                    </button>
-                  </div>
-                </div>
-                
-                <!-- コメント表示 -->
-                <p v-else class="whitespace-pre-wrap text-sm text-text">{{ comment.content }}</p>
-              </div>
-              
-              <!-- アクションボタン -->
-              <div class="mt-1 flex space-x-2 text-xs">
-                <button 
-                  @click="setReplyTo(comment)" 
-                  class="btn btn-outline-primary btn-sm"
-                  :disabled="submitting || !commentText.trim()"
-                >
-                  返信
-                </button>
-                
-                <div v-if="isCommentOwner(comment)" class="flex space-x-2">
-                  <button 
-                    @click="startEdit(comment)" 
-                    class="btn btn-outline-warning btn-sm"
-                  >
-                    編集
-                  </button>
-                  <button 
-                    @click="confirmDelete(comment)" 
-                    class="btn btn-outline-error btn-sm"
-                  >
-                    削除
-                  </button>
-                </div>
-                
-                <button 
-                  @click="toggleLike(comment)" 
-                  class="flex items-center"
-                  :class="{ 'text-primary-light': isCommentLiked(comment.id), 'text-text-muted': !isCommentLiked(comment.id) }"
-                >
-                  <span class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{ 'fill-current': isCommentLiked(comment.id) }">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                    {{ getCommentLikeCount(comment) }}
-                  </span>
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 返信フォーム -->
-          <div v-if="parentCommentId === comment.id" class="mb-4 ml-12">
-            <div class="rounded-lg border p-5 shadow-background/20 bg-surface-variant border-border">
-              <form @submit.prevent="submitComment" class="space-y-3">
-                <div class="mb-3">
-                  <textarea 
-                    v-model="commentText" 
-                    class="w-full rounded-lg border p-4 transition-all placeholder-text-muted focus:outline-none focus:shadow-primary/20 focus:border-primary bg-surface text-text border-border"
-                    rows="3"
-                    placeholder="返信を入力..."
-                    :disabled="submitting"
-                    required
-                  ></textarea>
-                </div>
-                
-                <div class="flex justify-between">
-                  <button 
-                    type="button"
-                    @click="cancelReply" 
-                    class="btn btn-outline-secondary btn-sm"
-                  >
-                    キャンセル
-                  </button>
-                
-                  <button 
-                    type="submit" 
-                    class="btn btn-primary"
-                    :disabled="submitting || !commentText.trim()"
-                  >
-                    <svg v-if="submitting" class="mr-2 h-5 w-5 animate-spin" viewBox="0 0 24 24">
-                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    {{ submitting ? '送信中...' : '返信する' }}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-          
-          <!-- 子コメント（返信）-->
-          <div v-if="getCommentReplies(comment.id).length > 0" class="ml-12">
-            <div v-for="reply in getCommentReplies(comment.id)" :key="reply.id" class="mb-4">
-              <!-- 返信コメント本体 -->
-              <div class="mb-4 flex">
-                <!-- アバター -->
-                <div class="mr-3 flex-shrink-0">
-                  <div class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-primary-light text-text-white">
-                    <img 
-                      v-if="reply.profiles?.avatar_data" 
-                      :src="getAvatarUrl(reply.profiles.avatar_data)" 
-                      :alt="reply.profiles.nickname"
-                      class="h-full w-full object-cover"
-                    />
-                    <span v-else>{{ getInitials(reply.profiles?.nickname || '?') }}</span>
-                  </div>
-                </div>
-                
-                <!-- 返信コメント内容 -->
-                <div class="flex-1">
-                  <div class="rounded-lg border p-3 backdrop-blur-sm bg-surface/80 border-border-light/60 shadow-background/30">
-                    <!-- ユーザー情報と日時 -->
-                    <div class="mb-2 flex items-center justify-between">
-                      <span class="font-medium text-text">{{ reply.profiles?.nickname }}</span>
-                      <span class="text-xs text-text-muted">{{ formatDate(reply.created_at) }}</span>
-                    </div>
-                    
-                    <!-- 編集フォーム -->
-                    <div v-if="editingCommentId === reply.id" class="mb-2">
-                      <textarea 
-                        v-model="editedContent" 
-                        class="w-full rounded border px-3 py-2 focus:outline-none bg-surface text-text border-border shadow-primary/20"
-                        rows="2"
-                      ></textarea>
-                      <div class="mt-2 flex justify-end space-x-2">
-                        <button 
-                          @click="cancelEdit" 
-                          class="btn btn-outline-secondary btn-sm"
-                        >
-                          キャンセル
-                        </button>
-                        <button 
-                          @click="saveEdit(reply)" 
-                          class="btn btn-outline-accent3 btn-sm"
-                          :disabled="!editedContent.trim() || editedContent === reply.content"
-                        >
-                          保存
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <!-- コメント表示 -->
-                    <p v-else class="whitespace-pre-wrap text-sm text-text">{{ reply.content }}</p>
-                  </div>
-                  
-                  <!-- アクションボタン -->
-                  <div class="mt-1 flex space-x-2 text-xs">
-                    <button 
-                      @click="setReplyTo(comment)" 
-                      class="btn btn-outline-primary btn-sm"
-                      :disabled="submitting || !commentText.trim()"
-                    >
-                      返信
-                    </button>
-                    
-                    <div v-if="isCommentOwner(reply)" class="flex space-x-2">
-                      <button 
-                        @click="startEdit(reply)" 
-                        class="btn btn-outline-warning btn-sm"
-                      >
-                        編集
-                      </button>
-                      <button 
-                        @click="confirmDelete(reply)" 
-                        class="btn btn-outline-error btn-sm"
-                      >
-                        削除
-                      </button>
-                    </div>
-                    
-                    <button 
-                      @click="toggleLike(reply)" 
-                      class="flex items-center"
-                      :class="{ 'text-primary-light': isCommentLiked(reply.id), 'text-text-muted': !isCommentLiked(reply.id) }"
-                    >
-                      <span class="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{ 'fill-current': isCommentLiked(reply.id) }">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                        {{ getCommentLikeCount(reply) }}
-                      </span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- ルートコメントのみ表示（子コメントは再帰的に表示） -->
+      <comment-item 
+        v-for="comment in rootComments" 
+        :key="comment.id"
+        :comment="comment"
+        :comments="comments"
+        :submitting="submitting"
+        :editing-comment-id="editingCommentId"
+        :edited-content="editedContent"
+        :liked-comments="likedComments"
+        :comment-like-counts="commentLikeCounts"
+        :replying-to-id="parentCommentId"
+        :is-last-nested-level="!hasNestedChildren(comment.id)"
+        @reply="setReplyTo"
+        @edit="startEdit"
+        @delete="confirmDelete"
+        @toggle-like="toggleLike"
+        @save-edit="saveEdit"
+        @cancel-edit="cancelEdit"
+        @update:edited-content="editedContent = $event"
+        @submit-reply="submitReply"
+        @cancel-reply="cancelReply"
+      />
     </div>
 
     <!-- 削除確認モーダル -->
@@ -310,6 +92,7 @@
             class="btn btn-error"
             :disabled="deleteSubmitting"
           >
+            <PhSpinner v-if="deleteSubmitting" class="h-5 w-5 mr-2 animate-spin" />
             {{ deleteSubmitting ? '削除中...' : '削除する' }}
           </button>
         </div>
@@ -320,12 +103,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { format, parseISO } from 'date-fns';
-import { ja } from 'date-fns/locale';
 import { useAuthStore } from '../../stores/auth';
 import { supabase } from '../../lib/supabase';
 import { useRouter } from 'vue-router';
-import { getProfileImageUrl } from '../../lib/storage';
+import { PhSpinner } from '@phosphor-icons/vue';
+import CommentItem from './CommentItem.vue'; // 新しく作成する再帰的コンポーネント
 
 const props = defineProps({
   postId: {
@@ -343,6 +125,7 @@ const authStore = useAuthStore();
 const comments = ref<any[]>([]);
 const loading = ref(true);
 const commentText = ref('');
+const replyText = ref('');
 const submitting = ref(false);
 const parentCommentId = ref<string | null>(null);
 const editingCommentId = ref<string | null>(null);
@@ -359,11 +142,6 @@ const commentLikeCounts = ref<Record<string, number>>({});
 const rootComments = computed(() => {
   return comments.value.filter(comment => !comment.parent_comment_id);
 });
-
-// 特定のコメントの返信を取得
-function getCommentReplies(commentId: string) {
-  return comments.value.filter(comment => comment.parent_comment_id === commentId);
-}
 
 // コメント一覧を取得
 async function fetchComments() {
@@ -389,6 +167,9 @@ async function fetchComments() {
       await checkIfLiked(comment.id);
     }));
     
+    // 追加: 初期ロード時にもコメント数を親コンポーネントに通知
+    emit('comments-updated', comments.value.length);
+    
   } catch (err) {
     console.error('コメント取得エラー:', err);
   } finally {
@@ -396,18 +177,21 @@ async function fetchComments() {
   }
 }
 
-// コメントを投稿
-async function submitComment() {
-  if (!commentText.value.trim() || !authStore.user || submitting.value) return;
+// コメントを投稿（共通関数）
+async function submitCommentOrReply(isReply = false, parentId: string | null = null) {
+  const content = isReply ? replyText.value : commentText.value;
+  const parentCommentIdValue = isReply ? (parentId || parentCommentId.value) : null;
+  
+  if (!content.trim() || !authStore.user || submitting.value) return;
   
   submitting.value = true;
   
   try {
     const newComment = {
-      content: commentText.value.trim(),
+      content: content.trim(),
       post_id: props.postId,
       author_id: authStore.user.id,
-      parent_comment_id: parentCommentId.value || null
+      parent_comment_id: parentCommentIdValue
     };
     
     // コメントの作成
@@ -418,7 +202,7 @@ async function submitComment() {
       .single();
     
     if (error) {
-      console.error('コメント投稿エラー詳細:', error);
+      console.error(`${isReply ? '返信' : 'コメント'}投稿エラー詳細:`, error);
       throw error;
     }
     
@@ -431,14 +215,40 @@ async function submitComment() {
     emit('comments-updated', comments.value.length);
     
     // フォームをリセット
-    commentText.value = '';
-    parentCommentId.value = null;
+    if (isReply) {
+      replyText.value = '';
+      parentCommentId.value = null;
+    } else {
+      commentText.value = '';
+    }
   } catch (err: any) {
-    console.error('コメント投稿エラー:', err);
-    alert('コメントの投稿に失敗しました: ' + err.message);
+    console.error(`${isReply ? '返信' : 'コメント'}投稿エラー:`, err);
+    alert(`${isReply ? '返信' : 'コメント'}の投稿に失敗しました: ${err.message}`);
   } finally {
     submitting.value = false;
   }
+}
+
+// コメント投稿
+function submitComment() {
+  submitCommentOrReply(false);
+}
+
+// 返信を送信
+function submitReply(parentId: string, content: string) {
+  if (!parentId) return;
+  
+  if (content) {
+    replyText.value = content;
+  }
+  
+  // デバッグ用に値を確認
+  console.log('送信する返信:', {
+    parentId,
+    content: content || replyText.value
+  });
+  
+  submitCommentOrReply(true, parentId);
 }
 
 // 編集を開始
@@ -481,7 +291,7 @@ async function saveEdit(comment: any) {
     editedContent.value = '';
     
     // 親コンポーネントに通知
-    emit('comments-updated');
+    emit('comments-updated', comments.value.length);
   } catch (err) {
     console.error('コメント更新エラー:', err);
     alert('コメントの更新に失敗しました');
@@ -496,13 +306,13 @@ function setReplyTo(comment: any) {
   }
   
   parentCommentId.value = comment.id;
-  commentText.value = '';
+  replyText.value = '';
 }
 
 // 返信をキャンセル
 function cancelReply() {
   parentCommentId.value = null;
-  commentText.value = '';
+  replyText.value = '';
 }
 
 // 削除確認
@@ -536,7 +346,7 @@ async function deleteComment() {
     comments.value = comments.value.filter(c => c.parent_comment_id !== commentToDelete.value.id);
     
     // 親コンポーネントに通知
-    emit('comments-updated');
+    emit('comments-updated', comments.value.length);
   } catch (err) {
     console.error('コメント削除エラー:', err);
     alert('コメントの削除に失敗しました');
@@ -591,7 +401,7 @@ async function toggleLike(comment: any) {
   }
   
   try {
-    if (isCommentLiked(comment.id)) {
+    if (likedComments.value[comment.id]) {
       // いいねを削除
       const { error: deleteError } = await supabase
         .from('comment_likes')
@@ -622,33 +432,9 @@ async function toggleLike(comment: any) {
   }
 }
 
-// ヘルパー関数
-function isCommentOwner(comment: any): boolean {
-  return Boolean(authStore.user && comment.author_id === authStore.user.id);
-}
-
-function getCommentLikeCount(comment: any): number {
-  return commentLikeCounts.value[comment.id] || 0;
-}
-
-function isCommentLiked(commentId: string): boolean {
-  return likedComments.value[commentId] || false;
-}
-
-function formatDate(dateString: string): string {
-  try {
-    return format(parseISO(dateString), 'yyyy年M月d日 HH:mm', { locale: ja });
-  } catch (e) {
-    return dateString;
-  }
-}
-
-function getInitials(name: string): string {
-  return name.charAt(0).toUpperCase();
-}
-
-function getAvatarUrl(path: string): string {
-  return getProfileImageUrl(path);
+// コメントに子コメントがあるかどうかを確認する関数
+function hasNestedChildren(commentId: string): boolean {
+  return comments.value.some(c => c.parent_comment_id === commentId);
 }
 
 // 投稿IDが変更されたらコメントを再取得

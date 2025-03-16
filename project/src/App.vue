@@ -18,9 +18,9 @@
       </div>
       <div v-else class="flex justify-center items-center h-full">
         <!-- 認証初期化中のローディング表示 -->
-        <div class="animate-pulse flex flex-col items-center">
-          <div class="w-12 h-12 rounded-full bg-primary/30 mb-4"></div>
-          <div class="h-2 w-24 bg-text-muted/30 rounded"></div>
+        <div class="flex flex-col items-center">
+          <PhSpinner class="w-12 h-12 mb-4 text-primary animate-spin" />
+          <div class="text-text-muted">読み込み中...</div>
         </div>
       </div>
     </main>
@@ -38,6 +38,7 @@ import { useAuthStore } from './stores/auth';
 import Navbar from './components/App/Navbar.vue';
 import Footer from './components/App/Footer.vue';
 import Notifications from './components/App/Notifications.vue';
+import { PhSpinner } from '@phosphor-icons/vue';
 
 const authStore = useAuthStore();
 const notificationsRef = ref<any>(null);
@@ -82,7 +83,7 @@ onMounted(async () => {
 });
 </script>
 
-<style>
+<style lang="postcss">
 .page-enter-active,
 .page-leave-active {
   transition: opacity 0.4s ease, transform 0.4s ease;

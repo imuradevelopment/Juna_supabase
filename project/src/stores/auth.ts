@@ -11,7 +11,6 @@ type Profile = {
   nickname: string | null;
   bio: string | null;
   avatar_data: string | null;
-  disability_type_id: number | null;
   disability_description: string | null;
   created_at: string;
   updated_at: string;
@@ -39,21 +38,54 @@ export const useAuthStore = defineStore('auth', () => {
   // 初期化
   const checkSession = async () => {
     try {
-      const { data } = await supabase.auth.getSession();
+      // まずローカルストレージをチェック
+      loading.value = true;
+      
+      // Supabaseからセッションを取得
+      const { data, error } = await supabase.auth.getSession();
+      
+      if (error) {
+        console.error('セッション確認エラー:', error);
+        // エラーがあればセッションをクリア
+        await clearUser();
+        throw error;
+      }
+      
       if (data?.session) {
+        // セッションがある場合は、ユーザー情報を設定
         user.value = data.session.user;
-        await fetchUserProfile();
+        
+        // セッショントークンが有効であることを確認
+        try {
+          const { data: userData, error: userError } = await supabase.auth.getUser();
+          
+          if (userError || !userData.user) {
+            // ユーザー取得に失敗した場合はセッションが無効
+            console.error('ユーザー情報取得エラー:', userError);
+            await clearUser();
+            throw new Error('認証セッションが無効です');
+          }
+          
+          // 最新のユーザー情報で更新
+          user.value = userData.user;
+          await fetchUserProfile();
+        } catch (userErr) {
+          console.error('ユーザー確認エラー:', userErr);
+          await clearUser();
+        }
       } else {
+        // セッションがない場合
         user.value = null;
         profile.value = null;
       }
-    } catch (error) {
-      console.error('セッション確認エラー:', error);
+    } catch (err) {
+      console.error('セッション確認エラー:', err);
       user.value = null;
       profile.value = null;
     } finally {
       // 認証状態の初期化が完了したことを示す
       isAuthReady.value = true;
+      loading.value = false;
     }
   };
   
@@ -259,6 +291,11 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       if (!user.value) throw new Error('ユーザーが認証されていません');
       
+      // profileDataからdisability_type_idを削除
+      if ('disability_type_id' in profileData) {
+        delete profileData.disability_type_id;
+      }
+      
       const { error: updateError } = await supabase
         .from('profiles')
         .update(profileData)
@@ -305,6 +342,34 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
   
+  // 再認証を試みる関数
+  const refreshSession = async () => {
+    try {
+      loading.value = true;
+      
+      // セッションの更新を試みる
+      const { data, error } = await supabase.auth.refreshSession();
+      
+      if (error) {
+        console.error('セッション更新エラー:', error);
+        return false;
+      }
+      
+      if (data.session) {
+        user.value = data.session.user;
+        await fetchUserProfile();
+        return true;
+      }
+      
+      return false;
+    } catch (err) {
+      console.error('セッション更新エラー:', err);
+      return false;
+    } finally {
+      loading.value = false;
+    }
+  };
+  
   return {
     // 状態
     user,
@@ -327,6 +392,7 @@ export const useAuthStore = defineStore('auth', () => {
     resetPassword,
     updatePassword,
     updateProfile,
-    clearUser
+    clearUser,
+    refreshSession
   };
 }); 

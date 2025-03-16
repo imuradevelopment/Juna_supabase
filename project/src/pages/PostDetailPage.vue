@@ -3,16 +3,14 @@
     <!-- ローディング状態 -->
     <div v-if="loading" class="glass-card flex items-center justify-center min-h-[300px] p-8">
       <div class="flex flex-col items-center">
-        <div class="w-10 h-10 rounded-full border-3 border-text-white/10 border-t-primary animate-spin mb-4"></div>
+        <PhSpinner class="w-10 h-10 animate-spin text-primary mb-4" />
         <p class="text-text-muted animate-pulse">投稿を読み込んでいます...</p>
       </div>
     </div>
     
     <!-- エラー状態 -->
     <div v-else-if="error" class="glass-card flex flex-col items-center justify-center min-h-[300px] p-8 text-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-error animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
+      <PhWarning class="h-16 w-16 mx-auto mb-4 text-error animate-pulse" />
       <h2 class="text-xl font-bold mb-2">投稿の読み込みに失敗しました</h2>
       <p class="text-text-muted mb-4">{{ error }}</p>
       <router-link to="/" class="btn btn-primary">ホームに戻る</router-link>
@@ -20,9 +18,7 @@
     
     <!-- 投稿が見つからない -->
     <div v-else-if="!post" class="glass-card flex flex-col items-center justify-center min-h-[300px] p-8 text-center">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto mb-4 text-text-muted transform rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
+      <PhSmiley class="h-16 w-16 mx-auto mb-4 text-text-muted transform rotate-12" />
       <h2 class="text-xl font-bold mb-2">投稿が見つかりませんでした</h2>
       <p class="text-text-muted mb-4">お探しの投稿は削除されたか、存在しない可能性があります。</p>
       <router-link to="/" class="btn btn-primary">ホームに戻る</router-link>
@@ -64,16 +60,11 @@
             <!-- 閲覧数・更新情報 -->
             <div class="flex items-center mb-3 text-sm text-text-muted">
               <span class="flex items-center mr-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
+                <PhEye class="h-4 w-4 mr-1" />
                 {{ post.views || 0 }}
               </span>
               <span class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                <PhClock class="h-4 w-4 mr-1" />
                 <p class="flex items-center text-xs text-text-muted">
                   {{ formatDate(post.updated_at || post.created_at) }}
                 </p>
@@ -81,7 +72,7 @@
             </div>
             
             <!-- 著者情報と操作ボタン -->
-            <div class="flex flex-row items-center justify-between mb-2">
+            <div class="flex flex-col space-y-4 mb-4">
               <!-- 著者情報 -->
               <router-link :to="`/profile/${post.author_id}`" class="flex items-center group">
                 <div class="flex items-center justify-center w-10 h-10 mr-3 overflow-hidden text-text-white bg-primary-light rounded-full border-2 border-transparent transition-all group-hover:border-primary">
@@ -97,59 +88,62 @@
                   <p class="text-base font-medium text-text transition-colors group-hover:text-primary">
                     {{ post.profiles?.nickname || '不明なユーザー' }}
                   </p>
-                  <p class="flex items-center text-xs text-text-muted">
-                    {{ formatDate(post.created_at) }}
-                  </p>
+                  <div class="flex items-center flex-wrap gap-1.5">
+                    <p class="text-xs text-text-muted">
+                      {{ formatDate(post.created_at) }}
+                    </p>
+                    <div v-if="authorDisabilityTypes.length > 0" class="flex flex-wrap gap-1 ml-2">
+                      <span 
+                        v-for="type in authorDisabilityTypes" 
+                        :key="type.id"
+                        class="px-1.5 py-0.5 text-xs rounded-full bg-primary-light/20 text-primary"
+                      >
+                        {{ type.name }}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </router-link>
               
               <!-- アクションボタン -->
-              <div class="flex space-x-2">
+              <div class="flex flex-wrap gap-2">
                 <!-- いいねボタン -->
                 <button 
                   @click="toggleLike" 
-                  class="btn btn-outline-primary"
+                  class="btn btn-outline-primary btn-sm"
                   :class="{ 'text-primary-light': isLiked }"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" :class="{ 'fill-current': isLiked }">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
+                  <PhHeart class="h-5 w-5 mr-1.5" :weight="isLiked ? 'fill' : 'regular'" />
                   <span>{{ likeCount }}</span>
                 </button>
                 
                 <!-- シェアボタン -->
                 <button 
                   @click="sharePost" 
-                  class="btn btn-outline-info"
+                  class="btn btn-outline-info btn-sm"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                  </svg>
+                  <PhShareNetwork class="h-5 w-5 mr-1.5" />
                   <span>シェア</span>
                 </button>
                 
                 <!-- 投稿の編集/削除 (投稿者または管理者のみ) -->
-                <div v-if="isAuthor" class="flex space-x-2">
+                <template v-if="isAuthor">
                   <router-link 
                     :to="`/editor/${post.id}`" 
-                    class="btn btn-outline-warning"
+                    class="btn btn-outline-warning btn-sm"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
+                    <PhPencilSimple class="h-5 w-5 mr-1.5" />
                     <span>編集</span>
                   </router-link>
                   
                   <button 
                     @click="showDeleteModal = true" 
-                    class="btn btn-outline-error"
+                    class="btn btn-outline-error btn-sm"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+                    <PhTrash class="h-5 w-5 mr-1.5" />
                     <span>削除</span>
                   </button>
-                </div>
+                </template>
               </div>
             </div>
           </div>
@@ -182,25 +176,13 @@
           
           <div class="space-y-4">
             <div>
-              <div class="flex mb-4 space-x-4">
+              <div class="flex mb-4 justify-center">
                 <button 
                   @click="shareVia('twitter')" 
-                  class="btn btn-info flex-1"
+                  class="btn btn-info"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                  </svg>
+                  <PhTwitterLogo class="h-5 w-5" />
                   <span class="ml-2">X (Twitter)</span>
-                </button>
-                
-                <button 
-                  @click="shareVia('facebook')" 
-                  class="btn btn-primary-dark flex-1"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
-                  </svg>
-                  <span class="ml-2">Facebook</span>
                 </button>
               </div>
               
@@ -218,8 +200,8 @@
                     @click="copyPageUrl" 
                     class="btn btn-primary"
                   >
-                    <span v-if="copied">コピー済み</span>
-                    <span v-else>コピー</span>
+                    <span v-if="copied"><PhCopy class="h-5 w-5 mr-1.5" />コピー済み</span>
+                    <span v-else><PhCopy class="h-5 w-5 mr-1.5" />コピー</span>
                   </button>
                 </div>
               </div>
@@ -256,6 +238,7 @@
               class="btn btn-error"
               :disabled="deleteSubmitting"
             >
+              <PhSpinner v-if="deleteSubmitting" class="h-5 w-5 mr-1.5 animate-spin" />
               {{ deleteSubmitting ? '削除中...' : '削除する' }}
             </button>
           </div>
@@ -275,6 +258,19 @@ import { useAuthStore } from '../stores/auth';
 import RichTextContent from '../components/PostDetailPage/RichTextContent.vue';
 import CommentSystem from '../components/PostDetailPage/CommentSystem.vue';
 import { getProfileImageUrl, getCoverImageUrl } from '../lib/storage';
+import { 
+  PhSpinner,
+  PhWarning,
+  PhSmiley,
+  PhEye,
+  PhClock,
+  PhHeart,
+  PhShareNetwork,
+  PhPencilSimple,
+  PhTrash,
+  PhTwitterLogo,
+  PhCopy
+} from '@phosphor-icons/vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -297,6 +293,7 @@ const showShareModal = ref(false);
 const showDeleteModal = ref(false);
 const deleteSubmitting = ref(false);
 const urlInput = ref<HTMLInputElement | null>(null);
+const authorDisabilityTypes = ref<any[]>([]);
 
 // 投稿の著者かどうか
 const isAuthor = computed(() => {
@@ -340,6 +337,9 @@ async function fetchPost() {
     
     // カテゴリ取得
     fetchCategories();
+    
+    // 著者の障害種別を取得
+    fetchAuthorDisabilityTypes();
     
     // 投稿閲覧数を更新
     incrementViews();
@@ -479,7 +479,9 @@ async function toggleLike() {
 
 // コメント数の更新
 function updateCommentCount(count: number) {
-  commentCount.value = count;
+  if (typeof count === 'number') {
+    commentCount.value = count;
+  }
 }
 
 // 投稿シェア
@@ -495,8 +497,6 @@ function shareVia(platform: string) {
   
   if (platform === 'twitter') {
     shareUrl = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
-  } else if (platform === 'facebook') {
-    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
   } else if (platform === 'line') {
     shareUrl = `https://social-plugins.line.me/lineit/share?url=${encodedUrl}`;
   }
@@ -572,6 +572,27 @@ function getAvatarUrl(path: string): string {
 // イニシャル取得
 function getInitials(name: string): string {
   return name.charAt(0).toUpperCase();
+}
+
+// 著者の障害種別取得
+async function fetchAuthorDisabilityTypes() {
+  if (!post.value || !post.value.author_id) return;
+  
+  try {
+    const { data, error: disabilityError } = await supabase
+      .from('user_disability_types')
+      .select(`
+        disability_type_id,
+        disability_types(id, name)
+      `)
+      .eq('user_id', post.value.author_id);
+    
+    if (disabilityError) throw disabilityError;
+    
+    authorDisabilityTypes.value = data?.map(item => item.disability_types) || [];
+  } catch (err) {
+    console.error('障害種別取得エラー:', err);
+  }
 }
 
 // 初期化

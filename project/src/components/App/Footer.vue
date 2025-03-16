@@ -6,9 +6,7 @@
           <!-- ロゴと説明 -->
           <div class="col-span-1 md:col-span-2">
             <div class="flex items-center pt-4 mb-4 space-x-2">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 text-primary">
-                <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-12h2v6h-2zm0 8h2v2h-2z" />
-              </svg>
+              <PhInfo class="w-6 h-6 text-primary" />
               <span class="text-lg font-bold text-primary">Juna</span>
             </div>
             <p class="text-sm leading-relaxed mb-4 text-text-muted">
@@ -56,6 +54,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { PhInfo } from '@phosphor-icons/vue';
 
 const currentYear = computed(() => new Date().getFullYear());
 </script> 

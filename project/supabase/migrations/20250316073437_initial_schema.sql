@@ -130,6 +130,37 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- 最初にprofilesテーブルを作成
+-- ユーザープロフィールテーブル
+CREATE TABLE profiles (
+  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  account_id TEXT UNIQUE NOT NULL,
+  nickname TEXT,
+  avatar_data TEXT,
+  bio TEXT,
+  disability_description TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+CREATE TRIGGER update_profile_updated_at
+BEFORE UPDATE ON profiles
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "プロフィールは誰でも参照可能" 
+  ON profiles FOR SELECT USING (true);
+
+CREATE POLICY "ユーザーは自分のプロフィールのみ更新可能" 
+  ON profiles FOR UPDATE USING (auth.uid() = id);
+
+CREATE POLICY "認証済みユーザーのみプロフィール作成可能" 
+  ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
+
+CREATE POLICY "ユーザーは自分のプロフィールのみ削除可能" 
+  ON profiles FOR DELETE USING (auth.uid() = id);
+
 -- 管理者ユーザーテーブル
 CREATE TABLE admin_users (
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
@@ -158,38 +189,14 @@ CREATE POLICY "スーパー管理者のみ管理者削除可能"
   ON admin_users FOR DELETE 
   USING (is_super_admin(auth.uid()));
 
--- 障害種別テーブル
-CREATE TABLE disability_types (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL UNIQUE,
-  description TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
-);
-
-ALTER TABLE disability_types ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "障害種別は誰でも参照可能" 
-  ON disability_types FOR SELECT USING (true);
-
-CREATE POLICY "管理者のみ障害種別作成可能" 
-  ON disability_types FOR INSERT 
-  WITH CHECK (is_admin(auth.uid()));
-
-CREATE POLICY "管理者のみ障害種別更新可能" 
-  ON disability_types FOR UPDATE 
-  USING (is_admin(auth.uid()));
-
-CREATE POLICY "管理者のみ障害種別削除可能" 
-  ON disability_types FOR DELETE 
-  USING (is_admin(auth.uid()));
-
 -- カテゴリテーブル
 CREATE TABLE categories (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
   description TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  creator_id UUID REFERENCES profiles(id)
 );
 
 CREATE TRIGGER update_category_updated_at
@@ -201,48 +208,43 @@ ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "カテゴリは誰でも参照可能" 
   ON categories FOR SELECT USING (true);
 
-CREATE POLICY "管理者のみカテゴリ作成可能" 
+CREATE POLICY "認証済みユーザーはカテゴリを作成可能" 
   ON categories FOR INSERT 
-  WITH CHECK (is_admin(auth.uid()));
+  WITH CHECK (auth.uid() IS NOT NULL);
 
-CREATE POLICY "管理者のみカテゴリ更新可能" 
+CREATE POLICY "作成者と管理者はカテゴリを更新可能" 
   ON categories FOR UPDATE 
-  USING (is_admin(auth.uid()));
+  USING (creator_id = auth.uid() OR is_admin(auth.uid()));
 
-CREATE POLICY "管理者のみカテゴリ削除可能" 
+CREATE POLICY "作成者と管理者はカテゴリを削除可能" 
   ON categories FOR DELETE 
-  USING (is_admin(auth.uid()));
+  USING (creator_id = auth.uid() OR is_admin(auth.uid()));
 
--- ユーザープロフィールテーブル
-CREATE TABLE profiles (
-  id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  account_id TEXT UNIQUE NOT NULL,
-  nickname TEXT,
-  avatar_data TEXT,
-  bio TEXT,
-  disability_type_id INTEGER REFERENCES disability_types(id),
-  disability_description TEXT,
+-- 障害種別テーブル
+CREATE TABLE disability_types (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  description TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+  creator_id UUID REFERENCES profiles(id)
 );
 
-CREATE TRIGGER update_profile_updated_at
-BEFORE UPDATE ON profiles
-FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+ALTER TABLE disability_types ENABLE ROW LEVEL SECURITY;
 
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "障害種別は誰でも参照可能" 
+  ON disability_types FOR SELECT USING (true);
 
-CREATE POLICY "プロフィールは誰でも参照可能" 
-  ON profiles FOR SELECT USING (true);
+CREATE POLICY "認証済みユーザーは障害種別を作成可能" 
+  ON disability_types FOR INSERT 
+  WITH CHECK (auth.uid() IS NOT NULL);
 
-CREATE POLICY "ユーザーは自分のプロフィールのみ更新可能" 
-  ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "作成者と管理者は障害種別を更新可能" 
+  ON disability_types FOR UPDATE 
+  USING (creator_id = auth.uid() OR is_admin(auth.uid()));
 
-CREATE POLICY "認証済みユーザーのみプロフィール作成可能" 
-  ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
-
-CREATE POLICY "ユーザーは自分のプロフィールのみ削除可能" 
-  ON profiles FOR DELETE USING (auth.uid() = id);
+CREATE POLICY "作成者と管理者は障害種別を削除可能" 
+  ON disability_types FOR DELETE 
+  USING (creator_id = auth.uid() OR is_admin(auth.uid()));
 
 -- ブログ投稿テーブル
 CREATE TABLE posts (
@@ -741,3 +743,52 @@ INSERT INTO categories (name, description) VALUES
 
 -- または、より安全な方法として、bootstrap_admin関数を使用
 -- SELECT bootstrap_admin('admin@example.com', '00000000-0000-0000-0000-000000000000'); 
+
+-- profilesテーブルから単一のdisability_type_idを削除
+ALTER TABLE profiles DROP COLUMN IF EXISTS disability_type_id;
+
+-- ユーザーと障害種別の多対多関連テーブルを作成
+CREATE TABLE user_disability_types (
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  disability_type_id INTEGER REFERENCES disability_types(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  PRIMARY KEY (user_id, disability_type_id)
+);
+
+-- 行レベルセキュリティを有効化
+ALTER TABLE user_disability_types ENABLE ROW LEVEL SECURITY;
+
+-- セキュリティポリシーを設定
+CREATE POLICY "障害種別関連は誰でも参照可能" 
+  ON user_disability_types FOR SELECT USING (true);
+
+CREATE POLICY "ユーザーは自分の障害種別関連のみ作成可能" 
+  ON user_disability_types FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "ユーザーは自分の障害種別関連のみ削除可能" 
+  ON user_disability_types FOR DELETE USING (auth.uid() = user_id);
+
+CREATE POLICY "管理者は全ての障害種別関連を操作可能" 
+  ON user_disability_types FOR ALL 
+  USING (is_admin(auth.uid()));
+
+-- Realtimeサブスクリプションに新しいテーブルを追加
+ALTER PUBLICATION supabase_realtime ADD TABLE user_disability_types;
+
+-- 既存のデータに作成者情報を設定するトリガー関数
+CREATE OR REPLACE FUNCTION set_creator_id()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.creator_id = auth.uid();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 障害種別とカテゴリの作成者を自動設定するトリガー
+CREATE TRIGGER set_disability_type_creator
+BEFORE INSERT ON disability_types
+FOR EACH ROW EXECUTE FUNCTION set_creator_id();
+
+CREATE TRIGGER set_category_creator
+BEFORE INSERT ON categories
+FOR EACH ROW EXECUTE FUNCTION set_creator_id();

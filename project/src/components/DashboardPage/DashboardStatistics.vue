@@ -4,10 +4,7 @@
     
     <!-- ローディング状態 -->
     <div v-if="loading" class="flex justify-center p-6">
-      <svg class="h-8 w-8 animate-spin text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
+      <PhSpinner class="h-8 w-8 animate-spin text-primary" />
     </div>
     
     <!-- 統計表示 -->
@@ -83,10 +80,7 @@
                 {{ post.title }}
               </router-link>
               <div class="flex items-center text-sm text-text-muted">
-                <svg class="mr-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                </svg>
+                <PhEye class="mr-1 h-4 w-4" />
                 {{ post.views }} 閲覧
               </div>
             </div>
@@ -102,12 +96,10 @@
           <div v-for="activity in stats.recentActivities" :key="activity.id" class="flex items-start">
             <div class="mr-3 flex-shrink-0">
               <div :class="getActivityIconClass(activity.type)" class="rounded-full p-1.5 flex items-center justify-center">
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path v-if="activity.type === 'post'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  <path v-else-if="activity.type === 'comment'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                  <path v-else-if="activity.type === 'post-like'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  <path v-else-if="activity.type === 'comment-like'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
+                <PhArticle v-if="activity.type === 'post'" class="h-4 w-4" />
+                <PhChatText v-else-if="activity.type === 'comment'" class="h-4 w-4" />
+                <PhHeart v-else-if="activity.type === 'post-like'" class="h-4 w-4" weight="fill" />
+                <PhHeart v-else-if="activity.type === 'comment-like'" class="h-4 w-4" weight="fill" />
               </div>
             </div>
             
@@ -152,6 +144,7 @@ import { useAuthStore } from '../../stores/auth';
 import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { getProfileImageUrl } from '../../lib/storage';
+import { PhSpinner, PhEye, PhArticle, PhChatText, PhHeart } from '@phosphor-icons/vue';
 
 const authStore = useAuthStore();
 

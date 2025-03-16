@@ -3,19 +3,14 @@
     <!-- ローディング状態 -->
     <div v-if="loading" class="glass-card flex flex-col items-center justify-center p-8">
       <div class="flex flex-col items-center">
-        <svg class="h-10 w-10 mb-4 animate-spin text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
+        <PhSpinner class="h-10 w-10 mb-4 animate-spin text-primary" />
         <p class="text-text-muted">読み込み中...</p>
       </div>
     </div>
     
     <!-- エラー表示 -->
     <div v-else-if="error" class="glass-card p-8 text-center">
-      <svg class="h-16 w-16 mx-auto mb-4 text-error" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-      </svg>
+      <PhWarning class="h-16 w-16 mx-auto mb-4 text-error" />
       <h2 class="text-2xl font-bold mb-2">エラーが発生しました</h2>
       <p class="mb-4 text-text-muted">{{ error }}</p>
       <router-link to="/" class="btn btn-primary">ホームに戻る</router-link>
@@ -52,11 +47,17 @@
               <p>登録日: {{ formatDate(profile.created_at) }}</p>
             </div>
             
-            <!-- 障害タイプ情報 - 表示形式を調整 -->
-            <div v-if="profile.disability_types" class="mb-4">
-              <span class="rounded-full bg-primary/20 px-3 py-1 text-sm text-primary-light">
-                {{ profile.disability_types.name }}
-              </span>
+            <!-- 障害タイプ情報 - 複数表示対応に修正 -->
+            <div v-if="disabilityTypes.length > 0" class="mb-4">
+              <div class="flex flex-wrap gap-2">
+                <span 
+                  v-for="type in disabilityTypes" 
+                  :key="type.id" 
+                  class="rounded-full bg-primary/20 px-3 py-1 text-sm text-primary-light"
+                >
+                  {{ type.name }}
+                </span>
+              </div>
             </div>
             
             <!-- 自己紹介 -->
@@ -81,9 +82,7 @@
                 @click="shareProfile('twitter')" 
                 class="btn btn-accent3 btn-sm"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                </svg>
+                <PhTwitterLogo class="h-5 w-5" />
                 X(Twitter)でシェア
               </button>
               
@@ -91,9 +90,7 @@
                 @click="shareProfile('facebook')" 
                 class="btn btn-info btn-sm"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
-                </svg>
+                <PhFacebookLogo class="h-5 w-5" />
                 Facebookでシェア
               </button>
               
@@ -101,9 +98,7 @@
                 @click="copyProfileLink" 
                 class="btn btn-secondary btn-sm"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                </svg>
+                <PhCopy class="h-5 w-5" />
                 リンクをコピー
               </button>
             </div>
@@ -114,6 +109,7 @@
                 to="/profile/edit" 
                 class="btn btn-outline-primary"
               >
+                <PhPencilSimple class="h-5 w-5 mr-1.5" />
                 プロフィールを編集
               </router-link>
               
@@ -121,6 +117,7 @@
                 to="/dashboard" 
                 class="btn btn-outline-secondary"
               >
+                <PhChartBar class="h-5 w-5 mr-1.5" />
                 ダッシュボードを表示
               </router-link>
               
@@ -129,6 +126,7 @@
                 @click="showDeleteConfirmation = true" 
                 class="btn btn-outline-error"
               >
+                <PhTrash class="h-5 w-5 mr-1.5" />
                 プロフィールを削除
               </button>
             </div>
@@ -139,19 +137,16 @@
       <!-- 投稿一覧セクション - 視覚的改善 -->
       <div class="mb-8">
         <h2 class="mb-4 flex items-center text-2xl font-bold text-heading">
-          <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
-          </svg>
+          <PhArticle class="mr-2 h-6 w-6 text-primary" />
           投稿一覧
         </h2>
         
         <div v-if="posts.length === 0" class="glass-card p-8 text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto mb-4 h-16 w-16 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
+          <PhNote class="mx-auto mb-4 h-16 w-16 text-text-muted" />
           <p class="mb-3 text-text-muted">まだ投稿がありません</p>
           <div v-if="isOwnProfile">
-            <router-link to="/create-post" class="btn btn-primary">
+            <router-link to="/editor" class="btn btn-primary">
+              <PhPlus class="h-5 w-5 mr-1.5" />
               最初の投稿を作成
             </router-link>
           </div>
@@ -161,8 +156,7 @@
           <PostCard 
             v-for="post in posts" 
             :key="post.id" 
-            :post="post" 
-            layout="vertical"
+            :post="post"
           />
         </div>
       </div>
@@ -170,18 +164,16 @@
       <!-- カテゴリセクション -->
       <div v-if="topCategories && topCategories.length > 0" class="mb-8">
         <h2 class="mb-4 flex items-center text-2xl font-bold text-heading">
-          <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-          </svg>
+          <PhTag class="mr-2 h-6 w-6 text-primary" />
           関連カテゴリ
         </h2>
         
-        <div class="flex flex-wrap gap-3">
+        <div class="flex flex-wrap gap-2">
           <router-link 
             v-for="category in topCategories" 
             :key="category.id" 
             :to="{path: '/posts', query: {category: category.id}}"
-            class="btn btn-ghost btn-sm"
+            class="rounded-full bg-primary/20 px-3 py-1 text-sm text-primary-light hover:bg-primary/30 transition-colors"
           >
             {{ category.name }}
           </router-link>
@@ -212,6 +204,7 @@
             class="btn btn-error"
             :disabled="isDeleting"
           >
+            <PhSpinner v-if="isDeleting" class="h-5 w-5 mr-1.5 animate-spin" />
             <span v-if="isDeleting">削除中...</span>
             <span v-else>削除する</span>
           </button>
@@ -228,6 +221,20 @@ import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
 import { getProfileImageUrl } from '../lib/storage';
 import PostCard from '../components/common/PostCard.vue';
+import { 
+  PhSpinner,
+  PhWarning,
+  PhTwitterLogo,
+  PhFacebookLogo, 
+  PhCopy,
+  PhPencilSimple,
+  PhChartBar,
+  PhTrash,
+  PhArticle,
+  PhNote,
+  PhPlus,
+  PhTag
+} from '@phosphor-icons/vue';
 
 // 通知機能を注入
 const showNotification = inject('showNotification') as (type: 'success' | 'error' | 'info' | 'warning', title: string, message: string) => void;
@@ -245,6 +252,7 @@ const currentPage = ref(1);
 const pageSize = 10;
 const totalPosts = ref(0);
 const topCategories = ref<any[]>([]);
+const disabilityTypes = ref<any[]>([]);
 const showDeleteConfirmation = ref(false);
 const isDeleting = ref(false);
 
@@ -274,7 +282,7 @@ async function fetchProfile() {
     
     const { data, error: fetchError } = await supabase
       .from('profiles')
-      .select('*, disability_types:disability_type_id(*)')
+      .select('*')
       .eq('id', id)
       .single();
     
@@ -287,6 +295,9 @@ async function fetchProfile() {
     
     // データを設定
     profile.value = data;
+    
+    // 障害種別を別途取得
+    await fetchDisabilityTypes(id);
     
     // 追加情報を取得
     await Promise.all([
@@ -302,7 +313,27 @@ async function fetchProfile() {
   }
 }
 
-// 投稿一覧の取得
+// 障害種別の取得（修正済み）
+async function fetchDisabilityTypes(userId: string) {
+  try {
+    const { data, error: typesError } = await supabase
+      .from('user_disability_types')
+      .select('disability_type_id, disability_types:disability_type_id(id, name, description)')
+      .eq('user_id', userId);
+    
+    if (typesError) throw typesError;
+    
+    // 障害種別データの整形
+    disabilityTypes.value = (data || [])
+      .filter(item => item.disability_types)
+      .map(item => item.disability_types);
+      
+  } catch (err) {
+    console.error('障害種別取得エラー:', err);
+  }
+}
+
+// ユーザーの投稿一覧を取得
 async function fetchPosts() {
   if (!userId.value) {
     console.error('ユーザーIDが不明です');
@@ -322,20 +353,52 @@ async function fetchPosts() {
     totalPosts.value = count || 0;
     
     // 投稿を取得（ページネーション対応）
-    const from = (currentPage.value - 1) * pageSize;
-    const to = from + pageSize - 1;
+    const offset = (currentPage.value - 1) * pageSize;
+    const limit = pageSize;
     
     const { data, error: postsError } = await supabase
       .from('posts')
-      .select('*, profiles:author_id(*)')
+      .select('*, profiles:author_id(nickname, avatar_data)')
       .eq('author_id', userId.value)
       .eq('published', true)
       .order('created_at', { ascending: false })
-      .range(from, to);
+      .range(offset, offset + limit - 1);
     
     if (postsError) throw postsError;
-    posts.value = data || [];
     
+    // いいね数、コメント数、カテゴリ情報を追加
+    const postsWithDetails = await Promise.all((data || []).map(async (post) => {
+      // いいね数、コメント数、カテゴリを並行取得
+      const [{ count: likeCount }, { count: commentCount }, { data: categoryData }] = await Promise.all([
+        supabase.from('post_likes').select('*', { count: 'exact', head: true }).eq('post_id', post.id),
+        supabase.from('comments').select('*', { count: 'exact', head: true }).eq('post_id', post.id),
+        supabase.from('post_categories').select('categories(id, name)').eq('post_id', post.id)
+      ]);
+      
+      // カテゴリデータの整形
+      const categories = (categoryData || [])
+        .filter(item => item.categories)
+        .map(item => {
+          // 配列かオブジェクトかをチェック
+          const cat = Array.isArray(item.categories) 
+            ? (item.categories.length > 0 ? item.categories[0] : { id: 0, name: '' })
+            : item.categories;
+          
+          return {
+            id: Number(cat.id),
+            name: String(cat.name)
+          };
+        });
+      
+      return {
+        ...post,
+        like_count: likeCount || 0,
+        comment_count: commentCount || 0,
+        categories
+      };
+    }));
+    
+    posts.value = postsWithDetails;
   } catch (err: any) {
     console.error('投稿取得エラー:', err);
     error.value = '投稿の読み込みに失敗しました';
@@ -370,8 +433,11 @@ async function fetchTopCategories() {
     
     if (categoriesError) throw categoriesError;
     
-    // カテゴリの重複を除去
+    // カテゴリの重複を除去 - 明示的な型チェックを追加
     const uniqueCategories = data?.reduce((acc: any[], item: any) => {
+      if (!item.categories || typeof item.categories !== 'object') {
+        return acc;
+      }
       const exists = acc.some(cat => cat.id === item.categories.id);
       if (!exists) {
         acc.push(item.categories);

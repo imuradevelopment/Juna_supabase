@@ -1,4 +1,6 @@
+// @ts-ignore
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts';
+// @ts-ignore
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
@@ -20,7 +22,9 @@ serve(async (req) => {
     
     // サービスロールキーでクライアントを作成
     const supabaseAdmin = createClient(
+      // @ts-ignore
       Deno.env.get('SUPABASE_URL') ?? '',
+      // @ts-ignore
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
       { auth: { persistSession: false } }
     );

@@ -77,7 +77,7 @@ const router = createRouter({
       component: () => import('../pages/NotFoundPage.vue')
     }
   ],
-  scrollBehavior(to, from, savedPosition) {
+  scrollBehavior(to, _, savedPosition) {
     if (savedPosition) {
       return savedPosition;
     }

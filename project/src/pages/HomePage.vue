@@ -1,5 +1,5 @@
 <template>
-  <div class="p-8">
+  <div>
     <!-- ヒーローセクション - より魅力的に -->
     <section class="glass-card relative mb-10 overflow-hidden rounded-2xl p-8 md:p-12">
       <!-- 装飾的な背景要素 -->
@@ -17,9 +17,7 @@
             to="/editor"
             class="btn btn-primary rounded-full px-8"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
+            <PhPlusCircle :size="20" class="mr-2" weight="bold" />
             <span class="inline-block align-middle">投稿を始める</span>
           </router-link>
           
@@ -27,9 +25,7 @@
             to="/posts"
             class="btn btn-outline-primary rounded-full px-8"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <PhInfo :size="20" class="mr-2" weight="bold" />
             <span class="inline-block align-middle">投稿一覧</span>
           </router-link>
         </div>
@@ -56,9 +52,7 @@
             <!-- 特徴1 -->
             <div class="text-center">
               <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                </svg>
+                <PhBookOpen :size="32" weight="duotone" class="text-primary-light" />
               </div>
               <h3 class="mb-2 text-xl font-semibold text-heading">経験の共有</h3>
               <p class="text-text">日常生活での工夫や対処法、成功体験や困難を乗り越えた経験を共有できます。</p>
@@ -67,9 +61,7 @@
             <!-- 特徴2 -->
             <div class="text-center">
               <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
+                <PhUsersThree :size="32" weight="duotone" class="text-primary-light" />
               </div>
               <h3 class="mb-2 text-xl font-semibold text-heading">コミュニティ</h3>
               <p class="text-text">同じ障害や似た経験を持つ人とつながり、理解し合える関係を築けます。</p>
@@ -78,9 +70,7 @@
             <!-- 特徴3 -->
             <div class="text-center">
               <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/20">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-primary-light" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                </svg>
+                <PhShieldStar :size="32" weight="duotone" class="text-primary-light" />
               </div>
               <h3 class="mb-2 text-xl font-semibold text-heading">安心できる場所</h3>
               <p class="text-text">理解されにくい障害や症状について偏見なく話せる安全な環境を提供します。</p>
@@ -91,22 +81,22 @@
             <h3 class="mb-3 text-xl font-semibold text-primary-light">対象となる障害・症状</h3>
             <ul class="grid grid-cols-2 gap-x-4 gap-y-2 md:grid-cols-3">
               <li class="flex items-center text-text-white">
-                <span class="mr-2 h-3 w-3 rounded-full bg-primary"></span>発達障害（ASD、ADHD、LD等）
+                <div class="mr-2 h-3 w-3 min-w-[0.75rem] min-h-[0.75rem] rounded-full bg-primary"></div>発達障害（ASD、ADHD、LD等）
               </li>
               <li class="flex items-center text-text-white">
-                <span class="mr-2 h-3 w-3 rounded-full bg-primary"></span>精神障害（うつ病、統合失調症等）
+                <div class="mr-2 h-3 w-3 min-w-[0.75rem] min-h-[0.75rem] rounded-full bg-primary"></div>精神障害（うつ病、統合失調症等）
               </li>
               <li class="flex items-center text-text-white">
-                <span class="mr-2 h-3 w-3 rounded-full bg-primary"></span>慢性疲労症候群
+                <div class="mr-2 h-3 w-3 min-w-[0.75rem] min-h-[0.75rem] rounded-full bg-primary"></div>慢性疲労症候群
               </li>
               <li class="flex items-center text-text-white">
-                <span class="mr-2 h-3 w-3 rounded-full bg-primary"></span>線維筋痛症
+                <div class="mr-2 h-3 w-3 min-w-[0.75rem] min-h-[0.75rem] rounded-full bg-primary"></div>線維筋痛症
               </li>
               <li class="flex items-center text-text-white">
-                <span class="mr-2 h-3 w-3 rounded-full bg-primary"></span>内部障害
+                <div class="mr-2 h-3 w-3 min-w-[0.75rem] min-h-[0.75rem] rounded-full bg-primary"></div>内部障害
               </li>
               <li class="flex items-center text-text-white">
-                <span class="mr-2 h-3 w-3 rounded-full bg-primary"></span>その他の見えない障害
+                <div class="mr-2 h-3 w-3 min-w-[0.75rem] min-h-[0.75rem] rounded-full bg-primary"></div>その他の見えない障害
               </li>
             </ul>
           </div>
@@ -117,9 +107,7 @@
               to="/editor" 
               class="btn btn-primary rounded-full px-6"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-              </svg>
+              <PhPencilSimple :size="20" class="mr-2" weight="bold" />
               今すぐ投稿を始める
             </router-link>
           </div>
@@ -136,18 +124,13 @@
         </h2>
         <router-link to="/posts?sort=views.desc" class="flex items-center text-primary-light hover:underline">
           すべて見る
-          <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
-          </svg>
+          <PhArrowRight :size="20" class="ml-1" weight="bold" />
         </router-link>
       </div>
       
       <!-- ローディング状態 -->
       <div v-if="loading" class="flex justify-center py-8">
-        <svg class="h-10 w-10 animate-spin text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
+        <PhCircleNotch :size="40" class="animate-spin text-primary" weight="bold" />
       </div>
       
       <!-- エラー表示 -->
@@ -163,7 +146,6 @@
             v-for="post in featuredPosts" 
             :key="post.id" 
             :post="post"
-            layout="vertical"
           />
         </div>
       </div>
@@ -176,12 +158,11 @@
         <router-link to="/posts?sort=created_at.desc" class="text-primary hover:underline">すべて見る</router-link>
       </div>
       
-      <div class="space-y-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         <PostCard 
           v-for="post in recentPosts" 
           :key="post.id" 
           :post="post"
-          layout="horizontal"
         />
       </div>
     </section>
@@ -624,6 +605,17 @@
 import { ref, onMounted } from 'vue';
 import { supabase } from '../lib/supabase';
 import PostCard from '../components/common/PostCard.vue';
+// Phosphor Iconsのインポート（修正版）
+import { 
+  PhPlusCircle, 
+  PhInfo, 
+  PhBookOpen, 
+  PhUsersThree, 
+  PhShieldStar, 
+  PhPencilSimple, 
+  PhArrowRight,
+  PhCircleNotch
+} from '@phosphor-icons/vue';
 
 // 投稿の型定義を修正
 interface Post {
@@ -674,95 +666,123 @@ onMounted(async () => {
   }
 });
 
-// 注目の投稿を取得
+// 投稿の完全なデータを取得する共通関数 - パラメーターに型を追加
+async function fetchCompletePostData(baseQuery: any) {
+  const { data, error } = await baseQuery;
+  
+  if (error) throw error;
+  
+  // いいね数とコメント数を並行して取得して投稿データに追加
+  return await Promise.all((data || []).map(async (post: any) => {
+    // いいね数、コメント数、カテゴリを並行取得
+    const [{ count: likeCount }, { count: commentCount }, { data: categoryData }] = await Promise.all([
+      supabase.from('post_likes').select('*', { count: 'exact', head: true }).eq('post_id', post.id),
+      supabase.from('comments').select('*', { count: 'exact', head: true }).eq('post_id', post.id),
+      supabase.from('post_categories').select('categories(id, name)').eq('post_id', post.id)
+    ]);
+    
+    // カテゴリデータの整形 - 配列チェックを追加
+    const categories = (categoryData || [])
+      .filter(item => item.categories)
+      .map(item => {
+        // 配列かオブジェクトかをチェック
+        const cat = Array.isArray(item.categories) 
+          ? (item.categories.length > 0 ? item.categories[0] : { id: 0, name: '' })
+          : item.categories;
+          
+        return {
+          id: Number(cat.id),
+          name: String(cat.name)
+        };
+      });
+    
+    return {
+      ...post,
+      like_count: likeCount || 0,
+      comment_count: commentCount || 0,
+      categories
+    };
+  }));
+}
+
+// 注目の投稿を取得（共通関数を使用）
 async function fetchFeaturedPosts() {
+  loading.value = true;
+  
   try {
-    const { data, error: fetchError } = await supabase
+    const query = supabase
       .from('posts')
       .select(`
         *,
-        profiles:author_id(nickname, avatar_data)
+        profiles:author_id(
+          nickname, 
+          avatar_data,
+          user_disability_types(
+            disability_types(id, name)
+          )
+        )
       `)
       .eq('published', true)
       .order('views', { ascending: false })
       .limit(6);
     
-    if (fetchError) throw fetchError;
+    const posts = await fetchCompletePostData(query);
     
-    if (data) {
-      // いいね数とコメント数を取得して追加
-      featuredPosts.value = await Promise.all(data.map(async (post) => {
-        // いいね数を取得
-        const { count: likeCount } = await supabase
-          .from('post_likes')
-          .select('*', { count: 'exact', head: true })
-          .eq('post_id', post.id);
+    // disability_typesを整形
+    featuredPosts.value = posts.map(post => {
+      if (post.profiles?.user_disability_types) {
+        post.profiles.disability_types = post.profiles.user_disability_types
+          .map((udt: any) => udt.disability_types)
+          .filter(Boolean);
         
-        // コメント数を取得
-        const { count: commentCount } = await supabase
-          .from('comments')
-          .select('*', { count: 'exact', head: true })
-          .eq('post_id', post.id);
-        
-        return {
-          ...post,
-          like_count: likeCount || 0,
-          comment_count: commentCount || 0
-        };
-      }));
-    } else {
-      featuredPosts.value = [];
-    }
-  } catch (err: any) {
+        // 元のプロパティを削除
+        delete post.profiles.user_disability_types;
+      }
+      return post;
+    });
+  } catch (err) {
     console.error('注目投稿取得エラー:', err);
-    throw err;
+    error.value = '投稿の読み込みに失敗しました';
+  } finally {
+    loading.value = false;
   }
 }
 
-// 最新の投稿を取得
+// 最新の投稿を取得（共通関数を使用）
 async function fetchRecentPosts() {
   try {
-    const { data, error: fetchError } = await supabase
+    const query = supabase
       .from('posts')
       .select(`
         *,
-        profiles:author_id(nickname, avatar_data)
+        profiles:author_id(
+          nickname, 
+          avatar_data,
+          user_disability_types(
+            disability_types(id, name)
+          )
+        )
       `)
       .eq('published', true)
       .order('created_at', { ascending: false })
       .limit(5);
     
-    if (fetchError) throw fetchError;
+    const posts = await fetchCompletePostData(query);
     
-    if (data) {
-      // いいね数とコメント数を取得して追加
-      recentPosts.value = await Promise.all(data.map(async (post) => {
-        // いいね数を取得
-        const { count: likeCount } = await supabase
-          .from('post_likes')
-          .select('*', { count: 'exact', head: true })
-          .eq('post_id', post.id);
+    // disability_typesを整形
+    recentPosts.value = posts.map(post => {
+      if (post.profiles?.user_disability_types) {
+        post.profiles.disability_types = post.profiles.user_disability_types
+          .map((udt: any) => udt.disability_types)
+          .filter(Boolean);
         
-        // コメント数を取得
-        const { count: commentCount } = await supabase
-          .from('comments')
-          .select('*', { count: 'exact', head: true })
-          .eq('post_id', post.id);
-        
-        return {
-          ...post,
-          like_count: likeCount || 0,
-          comment_count: commentCount || 0
-        };
-      }));
-    } else {
-      recentPosts.value = [];
-    }
-  } catch (err: any) {
-    // すでにエラー状態の場合は上書きしない
-    if (!error.value) {
-      error.value = '投稿の読み込みに失敗しました';
-    }
+        // 元のプロパティを削除
+        delete post.profiles.user_disability_types;
+      }
+      return post;
+    });
+  } catch (err) {
+    console.error('最新投稿取得エラー:', err);
   }
 }
 

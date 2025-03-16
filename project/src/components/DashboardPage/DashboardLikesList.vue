@@ -11,30 +11,29 @@
     <div class="flex mb-4 border-b border-border">
       <button 
         @click="activeLikeType = 'post'" 
-        class="py-2 px-4 text-sm font-medium focus:outline-none"
+        class="py-2 px-4 text-sm font-medium focus:outline-none flex items-center"
         :class="activeLikeType === 'post' 
           ? 'border-b-2 border-primary text-primary' 
           : 'text-text-muted hover:text-text'"
       >
+        <PhArticle class="w-4 h-4 mr-1" />
         投稿のいいね
       </button>
       <button 
         @click="activeLikeType = 'comment'" 
-        class="py-2 px-4 text-sm font-medium focus:outline-none"
+        class="py-2 px-4 text-sm font-medium focus:outline-none flex items-center"
         :class="activeLikeType === 'comment' 
           ? 'border-b-2 border-primary text-primary' 
           : 'text-text-muted hover:text-text'"
       >
+        <PhChatText class="w-4 h-4 mr-1" />
         コメントのいいね
       </button>
     </div>
     
     <!-- ローディング状態 -->
     <div v-if="loading" class="flex justify-center p-6">
-      <svg class="w-8 h-8 animate-spin text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
+      <PhSpinner class="w-8 h-8 animate-spin text-primary" />
     </div>
     
     <!-- 投稿のいいね -->
@@ -84,9 +83,7 @@
                 @click="confirmUnlikePost(like)" 
                 class="btn btn-outline-error btn-sm"
               >
-                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                  <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
-                </svg>
+                <PhHeart class="w-4 h-4 mr-1" weight="fill" />
                 いいね解除
               </button>
             </div>
@@ -178,9 +175,7 @@
                 @click="confirmUnlikeComment(like)" 
                 class="btn btn-outline-error btn-sm"
               >
-                <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                  <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
-                </svg>
+                <PhHeart class="w-4 h-4 mr-1" weight="fill" />
                 いいね解除
               </button>
             </div>
@@ -232,11 +227,8 @@
             class="btn btn-error"
             :disabled="unlikeSubmitting"
           >
-            <svg v-if="unlikeSubmitting" class="inline w-5 h-5 mr-2 animate-spin" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            {{ unlikeSubmitting ? '解除中...' : '解除する' }}
+            <PhSpinner v-if="unlikeSubmitting" class="inline-block h-5 w-5 mr-2 animate-spin" />
+            {{ unlikeSubmitting ? '処理中...' : 'いいね解除' }}
           </button>
         </div>
       </div>
@@ -251,6 +243,12 @@ import { useAuthStore } from '../../stores/auth';
 import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { getProfileImageUrl } from '../../lib/storage';
+import { 
+  PhSpinner, 
+  PhHeart, 
+  PhArticle, 
+  PhChatText 
+} from '@phosphor-icons/vue';
 
 const authStore = useAuthStore();
 
