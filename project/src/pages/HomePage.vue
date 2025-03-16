@@ -224,99 +224,57 @@
           <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
             <div class="glass-card p-4">
               <h4 class="mb-2 font-medium text-primary">プライマリテキスト</h4>
-              <p class="text-primary">「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々のためのプラットフォームです。</p>
               <span class="mt-2 text-xs text-text-muted">.text-primary</span>
             </div>
             
             <div class="glass-card p-4">
               <h4 class="mb-2 font-medium text-primary-light">プライマリライト</h4>
-              <p class="text-primary-light">「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々のためのプラットフォームです。</p>
               <span class="mt-2 text-xs text-text-muted">.text-primary-light</span>
             </div>
             
             <div class="glass-card p-4">
               <h4 class="mb-2 font-medium text-primary-dark">プライマリダーク</h4>
-              <p class="text-primary-dark">「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々のためのプラットフォームです。</p>
               <span class="mt-2 text-xs text-text-muted">.text-primary-dark</span>
             </div>
             
             <div class="glass-card p-4">
               <h4 class="mb-2 font-medium text-secondary">セカンダリ</h4>
-              <p class="text-secondary">「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々のためのプラットフォームです。</p>
               <span class="mt-2 text-xs text-text-muted">.text-secondary</span>
             </div>
             
             <div class="glass-card p-4">
               <h4 class="mb-2 font-medium text-error">エラー</h4>
-              <p class="text-error">「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々のためのプラットフォームです。</p>
               <span class="mt-2 text-xs text-text-muted">.text-error</span>
             </div>
             
             <div class="glass-card p-4">
               <h4 class="mb-2 font-medium text-success">成功</h4>
-              <p class="text-success">「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々のためのプラットフォームです。</p>
               <span class="mt-2 text-xs text-text-muted">.text-success</span>
             </div>
             
             <div class="glass-card p-4">
               <h4 class="mb-2 font-medium text-warning">警告</h4>
-              <p class="text-warning">「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々のためのプラットフォームです。</p>
               <span class="mt-2 text-xs text-text-muted">.text-warning</span>
             </div>
             
             <div class="glass-card p-4">
               <h4 class="mb-2 font-medium text-info">情報</h4>
-              <p class="text-info">「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々のためのプラットフォームです。</p>
               <span class="mt-2 text-xs text-text-muted">.text-info</span>
             </div>
             
             <div class="glass-card p-4">
-              <h4 class="mb-2 font-medium text-accent1">アクセント1（ティール）</h4>
-              <p class="text-accent1">「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々のためのプラットフォームです。</p>
+              <h4 class="mb-2 font-medium text-accent1">アクセント1</h4>
               <span class="mt-2 text-xs text-text-muted">.text-accent1</span>
             </div>
             
             <div class="glass-card p-4">
               <h4 class="mb-2 font-medium text-accent2">アクセント2</h4>
-              <p class="text-accent2">「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々のためのプラットフォームです。</p>
               <span class="mt-2 text-xs text-text-muted">.text-accent2</span>
             </div>
             
             <div class="glass-card p-4">
               <h4 class="mb-2 font-medium text-accent3">アクセント3</h4>
-              <p class="text-accent3">「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々のためのプラットフォームです。</p>
               <span class="mt-2 text-xs text-text-muted">.text-accent3</span>
-            </div>
-          </div>
-          
-          <!-- 見出しスタイル -->
-          <div class="mb-12">
-            <h3 class="mb-4 text-xl font-semibold text-primary-light">見出しスタイル</h3>
-            <div class="space-y-4">
-              <div>
-                <h1 class="text-4xl font-bold text-heading">見出し 1</h1>
-                <span class="text-xs text-text-muted">text-4xl font-bold text-heading</span>
-              </div>
-              <div>
-                <h2 class="text-3xl font-bold text-heading">見出し 2</h2>
-                <span class="text-xs text-text-muted">text-3xl font-bold text-heading</span>
-              </div>
-              <div>
-                <h3 class="text-2xl font-semibold text-heading">見出し 3</h3>
-                <span class="text-xs text-text-muted">text-2xl font-semibold text-heading</span>
-              </div>
-              <div>
-                <h4 class="text-xl font-semibold text-heading">見出し 4</h4>
-                <span class="text-xs text-text-muted">text-xl font-semibold text-heading</span>
-              </div>
-              <div>
-                <h5 class="text-lg font-medium text-heading">見出し 5</h5>
-                <span class="text-xs text-text-muted">text-lg font-medium text-heading</span>
-              </div>
-              <div>
-                <h6 class="text-base font-medium text-heading">見出し 6</h6>
-                <span class="text-xs text-text-muted">text-base font-medium text-heading</span>
-              </div>
             </div>
           </div>
           
@@ -374,37 +332,6 @@
               <div class="glass-card p-4">
                 <p class="font-bold text-success">太字フォント - 最も強調したい要素に使用します。</p>
                 <span class="mt-2 text-xs text-text-muted">.font-bold</span>
-              </div>
-            </div>
-          </div>
-          
-          <!-- テキスト装飾 -->
-          <div>
-            <h3 class="mb-4 text-xl font-semibold text-primary-light">テキスト装飾</h3>
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-              <div class="glass-card p-4">
-                <p class="underline text-primary-light">下線付きテキスト - リンクや特に注目させたい部分に。</p>
-                <span class="mt-2 text-xs text-text-muted">.underline</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="line-through text-error">打ち消し線 - 削除された内容や無効な情報を示します。</p>
-                <span class="mt-2 text-xs text-text-muted">.line-through</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="italic text-warning">イタリック - 引用や特別な強調に使用します。</p>
-                <span class="mt-2 text-xs text-text-muted">.italic</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="uppercase text-accent2">大文字 - 見出しやボタンテキストに効果的です。</p>
-                <span class="mt-2 text-xs text-text-muted">.uppercase</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="lowercase text-info">小文字 - スタイリッシュな表現を目指す場合に。</p>
-                <span class="mt-2 text-xs text-text-muted">.lowercase</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="capitalize text-accent3">単語の先頭を大文字 - タイトルや項目名に適しています。</p>
-                <span class="mt-2 text-xs text-text-muted">.capitalize</span>
               </div>
             </div>
           </div>
