@@ -201,10 +201,31 @@
       </form>
     </div>
   </div>
+
+  <!-- テンプレート部分に追加 - formタグの後 -->
+  <div v-if="sessionExpiredModalOpen" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+    <div class="glass-card p-6 max-w-md w-full rounded-lg">
+      <h3 class="text-xl font-bold mb-4 text-heading">セッションが切れました</h3>
+      <p class="mb-4 text-text">長時間の操作がなかったため、ログインセッションが切れました。内容は一時保存されていますので、再ログイン後に編集を続けることができます。</p>
+      <div class="flex justify-end space-x-3">
+        <button 
+          @click="handleLoginRedirect()" 
+          class="btn btn-primary"
+        >
+          ログイン画面へ
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 自動保存通知（省略可） -->
+  <div v-if="lastAutoSaveTime" class="fixed bottom-4 right-4 text-sm text-text-muted bg-surface-variant p-2 rounded shadow-md opacity-70">
+    最終自動保存: {{ lastAutoSaveTime.toLocaleTimeString() }}
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed } from 'vue';
+import { ref, reactive, onMounted, computed, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '../lib/supabase';
@@ -311,6 +332,11 @@ const richTextEditorRef = ref<InstanceType<typeof RichTextEditor> | null>(null);
 // アップロードボタンの参照を追加
 const featuredImageInput = ref<HTMLInputElement | null>(null);
 
+// 定期的なセッションチェックを設定（5分ごと）
+const sessionCheckInterval = ref<number | null>(null);
+const sessionExpiredModalOpen = ref(false);
+const isSessionValid = ref(true);
+
 // 初期化
 onMounted(async () => {
   // 状態をリセット
@@ -322,6 +348,29 @@ onMounted(async () => {
   // 編集モードの場合、既存の投稿を取得
   if (props.id) {
     await fetchPost(props.id);
+  }
+  
+  // 定期的なセッションチェックを設定（5分ごと）
+  sessionCheckInterval.value = window.setInterval(async () => {
+    await checkSessionStatus();
+  }, 5 * 60 * 1000);
+
+  // ログインからの復帰を確認
+  const returnParam = new URLSearchParams(window.location.search).get('return');
+  if (returnParam === 'login') {
+    // ローカルストレージから内容を復元
+    await restoreFromLocalStorage();
+    // URLからパラメータを削除（歴史を置き換え）
+    const cleanUrl = window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+  }
+});
+
+// onBeforeUnmountを追加
+onBeforeUnmount(() => {
+  // インターバルをクリア
+  if (sessionCheckInterval.value) {
+    clearInterval(sessionCheckInterval.value);
   }
 });
 
@@ -459,6 +508,78 @@ function handlePendingImagesUpdated(images: {file: File, id: string}[]) {
   pendingImages.value = images;
 }
 
+// 新しい関数を追加
+async function checkSessionStatus() {
+  try {
+    // セッション更新を試みる
+    const refreshResult = await authStore.refreshSession();
+    
+    // 更新に失敗した場合
+    if (!refreshResult) {
+      // 現在のセッション状態を確認
+      const { data } = await supabase.auth.getSession();
+      if (!data.session) {
+        // セッションが無効なら、フラグを設定してモーダルを表示
+        isSessionValid.value = false;
+        sessionExpiredModalOpen.value = true;
+        
+        // エディタ内容を一時保存
+        saveToLocalStorage();
+      }
+    }
+  } catch (error) {
+    console.error('セッションチェックエラー:', error);
+  }
+}
+
+// ローカルストレージに保存する関数
+function saveToLocalStorage() {
+  try {
+    const tempData = {
+      title: formData.title,
+      excerpt: formData.excerpt,
+      content: formData.content,
+      categories: formData.categories,
+      published: formData.published,
+      timestamp: new Date().getTime(),
+      postId: props.id || null
+    };
+    
+    localStorage.setItem('temp_post_data', JSON.stringify(tempData));
+  } catch (error) {
+    console.error('一時保存エラー:', error);
+  }
+}
+
+// ローカルストレージから復元する関数
+function restoreFromLocalStorage() {
+  try {
+    const savedData = localStorage.getItem('temp_post_data');
+    if (savedData) {
+      const tempData = JSON.parse(savedData);
+      
+      // 現在編集中の投稿IDと一致することを確認（編集モードの場合）
+      if (!props.id || (props.id && tempData.postId === props.id)) {
+        // 1時間以内の保存データであれば復元
+        const oneHour = 60 * 60 * 1000;
+        if (new Date().getTime() - tempData.timestamp < oneHour) {
+          formData.title = tempData.title;
+          formData.excerpt = tempData.excerpt;
+          formData.content = tempData.content;
+          formData.categories = tempData.categories;
+          formData.published = tempData.published;
+          
+          return true;
+        }
+      }
+    }
+    return false;
+  } catch (error) {
+    console.error('データ復元エラー:', error);
+    return false;
+  }
+}
+
 // フォーム送信処理を修正
 async function handleSubmit() {
   submitting.value = true;
@@ -475,13 +596,8 @@ async function handleSubmit() {
     // 現在のセッション情報を取得
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     
-    if (sessionError) {
-      console.error('セッションエラー:', sessionError);
-      throw new Error('認証セッションの取得に失敗しました。再ログインしてください。');
-    }
-    
-    if (!session) {
-      // セッションがない場合は認証ページにリダイレクト
+    if (sessionError || !session) {
+      // エラー処理とリダイレクト
       router.push('/login?redirect=' + encodeURIComponent(router.currentRoute.value.fullPath));
       throw new Error('認証セッションが見つかりません。再ログインしてください。');
     }
@@ -549,6 +665,9 @@ async function handleSubmit() {
       const newPost = await createPost({...formData, content: finalContent});
       router.push(`/posts/${newPost.id}`);
     }
+    
+    // 成功したら一時保存データを削除
+    localStorage.removeItem('temp_post_data');
   } catch (err: any) {
     console.error('投稿保存エラー:', err);
     formError.value = err.message || '投稿の保存に失敗しました';
@@ -843,4 +962,51 @@ function resetUploadState() {
 defineExpose({
   featuredImageInput
 });
+
+// ログイン後の復帰処理を追加
+function handleLoginRedirect() {
+  // エディタ内容を一時保存してからリダイレクト
+  saveToLocalStorage();
+  router.push('/login?redirect=' + encodeURIComponent(router.currentRoute.value.fullPath));
+}
+
+// 定期的な自動保存機能（オプション）
+const autoSaveInterval = ref<number | null>(null);
+const lastAutoSaveTime = ref<Date | null>(null);
+
+// onMounted関数内に自動保存タイマーを追加
+onMounted(async () => {
+  // 既存のコード...
+  
+  // 1分ごとの自動保存を設定
+  autoSaveInterval.value = window.setInterval(() => {
+    if (isFormValid.value && !submitting.value) {
+      saveToLocalStorage();
+      lastAutoSaveTime.value = new Date();
+    }
+  }, 60 * 1000);
+  
+  // 保存されたデータがあれば復元するか確認
+  checkForSavedData();
+});
+
+// onBeforeUnmount内に自動保存タイマーのクリーンアップを追加
+onBeforeUnmount(() => {
+  if (sessionCheckInterval.value) {
+    clearInterval(sessionCheckInterval.value);
+  }
+  
+  if (autoSaveInterval.value) {
+    clearInterval(autoSaveInterval.value);
+  }
+});
+
+// 保存データのチェックと復元確認
+async function checkForSavedData() {
+  const hasData = await restoreFromLocalStorage();
+  if (hasData) {
+    // 通知またはトースト表示で復元を通知
+    // ここではUI実装は省略
+  }
+}
 </script> 
