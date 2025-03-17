@@ -73,7 +73,7 @@
   </div>
   
   <!-- キーボードが表示されていて、かつエディタがフォーカスされている場合のみツールバーをTeleportで移動 -->
-  <Teleport to="body" v-if="isKeyboardVisible">
+  <Teleport to="body" v-if="isKeyboardVisible && isFocused">
     <!-- キーボード表示時のエディターメニュー -->
     <div 
       ref="floatingToolbar"
@@ -803,8 +803,8 @@ function updateToolbarPosition() {
   // キーボードの表示状態を更新
   isKeyboardVisible.value = keyboardHeight > 100; // 100px以上の差があれば確実にキーボード表示と判断
   
-  // ツールバーの位置を更新
-  if (isKeyboardVisible.value && floatingToolbar.value) {
+  // ツールバーの位置を更新 - isFocusedの条件を追加
+  if (isKeyboardVisible.value && isFocused.value && floatingToolbar.value) {
     // フローティングツールバーのスタイルを設定
     floatingToolbar.value.style.position = 'fixed';
     floatingToolbar.value.style.bottom = `${keyboardHeight}px`;
@@ -949,13 +949,16 @@ function handleEnterKey(e: KeyboardEvent) {
   }
 }
 
-// watch関数でもキーボードの状態を監視
+// watch関数でもキーボードの状態を監視 - 修正
 watch(() => isFocused.value, (newValue) => {
   if (newValue) {
     // フォーカスされたときに位置を更新
     updateToolbarPosition();
     // 少し遅れて再度更新（iOSの遅延対策）
     setTimeout(updateToolbarPosition, 300);
+  } else {
+    // フォーカスが外れたときはキーボード表示状態をリセット
+    isKeyboardVisible.value = false;
   }
 });
 
