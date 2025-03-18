@@ -1,0 +1,47 @@
+project/.env:
+  依存しているファイル: []
+  依存されているファイル: [project/src/lib/storage.ts, project/src/lib/supabase.ts, project/src/stores/auth.ts]
+
+project/src/lib/storage.ts:
+  依存しているファイル: [project/.env]
+  依存されているファイル: [project/src/stores/auth.ts]
+
+project/src/lib/supabase.ts:
+  依存しているファイル: [project/.env]
+  依存されているファイル: [project/src/stores/auth.ts]
+
+project/src/router/index.ts:
+  依存しているファイル: [project/src/stores/auth.ts, project/src/pages/HomePage.vue]
+  依存されているファイル: [project/src/main.ts]
+
+project/src/stores/auth.ts:
+  依存しているファイル: [project/src/lib/supabase.ts, project/src/lib/storage.ts, project/.env]
+  依存されているファイル: [project/src/router/index.ts, project/src/App.vue, project/src/components/App/Navbar.vue]
+
+project/src/assets/main.css:
+  依存しているファイル: []
+  依存されているファイル: [project/src/main.ts]
+
+project/src/components/App/Footer.vue:
+  依存しているファイル: []
+  依存されているファイル: [project/src/App.vue]
+
+project/src/components/App/Navbar.vue:
+  依存しているファイル: [project/src/stores/auth.ts]
+  依存されているファイル: [project/src/App.vue]
+
+project/src/components/App/Notifications.vue:
+  依存しているファイル: []
+  依存されているファイル: [project/src/App.vue]
+
+project/src/App.vue:
+  依存しているファイル: [project/src/stores/auth.ts, project/src/components/App/Navbar.vue, project/src/components/App/Footer.vue, project/src/components/App/Notifications.vue]
+  依存されているファイル: [project/src/main.ts]
+
+project/src/main.ts:
+  依存しているファイル: [project/src/App.vue, project/src/router/index.ts, project/src/assets/main.css]
+  依存されているファイル: []
+
+project/index.html:
+  依存しているファイル: [project/src/main.ts]
+  依存されているファイル: [] 

@@ -1,0 +1,47 @@
+project/src/pages/PostsPage.vue:
+  依存しているファイル: 
+    - project/src/lib/supabase.ts
+    - project/src/components/common/PostCard.vue
+  依存されているファイル: 
+    - project/src/router/index.ts
+
+project/src/components/common/PostCard.vue:
+  依存しているファイル: 
+    - project/src/lib/storage.ts
+  依存されているファイル: 
+    - project/src/pages/PostsPage.vue
+
+project/src/lib/storage.ts:
+  依存しているファイル: 
+    - project/.env  # VITE_SUPABASE_URL環境変数を使用
+  依存されているファイル: 
+    - project/src/components/common/PostCard.vue
+    - project/src/stores/auth.ts
+
+project/src/lib/supabase.ts:
+  依存しているファイル: 
+    - project/.env  # VITE_SUPABASE_URL、VITE_SUPABASE_ANON_KEY環境変数を使用
+  依存されているファイル: 
+    - project/src/pages/PostsPage.vue
+    - project/src/stores/auth.ts
+
+project/src/stores/auth.ts:
+  依存しているファイル: 
+    - project/src/lib/supabase.ts
+    - project/src/lib/storage.ts
+    - project/.env  # VITE_SUPABASE_URL、VITE_SUPABASE_ANON_KEY環境変数を使用
+  依存されているファイル: 
+    - project/src/router/index.ts
+
+project/src/router/index.ts:
+  依存しているファイル: 
+    - project/src/stores/auth.ts
+    - project/src/pages/PostsPage.vue
+  依存されているファイル: [] # 表示しているファイルの中には依存しているものがない
+
+project/.env:
+  依存しているファイル: []
+  依存されているファイル: 
+    - project/src/lib/storage.ts
+    - project/src/lib/supabase.ts
+    - project/src/stores/auth.ts 
