@@ -6,8 +6,13 @@
       ref="normalToolbar"
       class="glass-card flex flex-wrap gap-1 p-2 mb-2"
     >
-      <!-- ツールバーの内容 -->
-      <ToolbarButtons :editor="editor" @open-link-dialog="showLinkModalDialog" @open-file-dialog="openFileDialog" :uploading="uploading" />
+      <!-- ツールバーを新しいコンポーネントに置き換え -->
+      <EditorToolbar 
+        :editor="editor || undefined" 
+        :uploading="uploading" 
+        @open-link-dialog="showLinkModalDialog" 
+        @open-file-dialog="openFileDialog"
+      />
     </div>
     
     <!-- エディター本体 -->
@@ -24,21 +29,73 @@
       />
     </div>
     
+    <!-- ファイル入力フィールド -->
+    <input 
+      ref="fileInput"
+      type="file" 
+      accept="image/*" 
+      class="hidden w-px h-px opacity-0 absolute" 
+      @change="uploadImage"
+    />
+  </div>
+  
+  <!-- キーボードが表示されていて、かつエディタがフォーカスされている場合のみツールバーをTeleportで移動 -->
+  <Teleport to="body" v-if="isKeyboardVisible && (isFocused || showLinkMenu)">
+    <!-- キーボード表示時のエディターメニュー -->
+    <div 
+      ref="floatingToolbar"
+      class="sticky-toolbar toolbar-active editor-toolbar glass-card flex flex-wrap gap-1 p-2"
+      @pointerdown.stop.prevent="preventBlur"
+      @touchstart.stop.prevent="preventBlur"
+      @mousedown.stop.prevent="preventBlur"
+    >
+      <!-- ツールバーを新しいコンポーネントに置き換え -->
+      <EditorToolbar 
+        :editor="editor || undefined" 
+        :uploading="uploading" 
+        @open-link-dialog="showLinkModalDialog" 
+        @open-file-dialog="openFileDialog"
+      />
+    </div>
+  </Teleport>
+
+  <!-- リンクメニューを常にTeleportで表示する -->
+  <Teleport to="body">
     <!-- リンクメニュー -->
     <div 
       v-if="showLinkMenu" 
-      class="glass-card absolute z-20 rounded p-3 shadow-background/70"
-      :style="{ left: `${linkMenuPosition.x}px`, top: `${linkMenuPosition.y}px` }"
+      ref="linkMenu"
+      class="floating-link-menu glass-card rounded p-3 shadow-lg z-30 fixed"
+      :style="linkMenuStyle"
     >
-      <div class="flex items-center mb-2">
-        <input 
-          v-model="linkUrl"
-          type="text"
-          placeholder="URLを入力"
-          class="flex-1 rounded border border-border bg-surface px-2 py-1 text-sm text-text"
-        />
+      <div class="flex flex-col gap-2">
+        <!-- リンクURL入力フィールド -->
+        <div class="flex items-center">
+          <input 
+            ref="linkInput"
+            v-model="linkUrl"
+            type="text"
+            placeholder="URLを入力"
+            class="flex-1 rounded border border-border bg-surface px-2 py-1 text-sm text-text"
+            @keydown.enter.prevent="applyLink"
+            @keydown.esc.prevent="showLinkMenu = false"
+          />
+        </div>
+        
+        <!-- リンクテキスト入力フィールド -->
+        <div class="flex items-center">
+          <input 
+            ref="linkTextInput"
+            v-model="linkText"
+            type="text"
+            placeholder="リンクテキストを入力（省略可）"
+            class="flex-1 rounded border border-border bg-surface px-2 py-1 text-sm text-text"
+            @keydown.enter.prevent="applyLink"
+            @keydown.esc.prevent="showLinkMenu = false"
+          />
+        </div>
       </div>
-      <div class="flex justify-end space-x-2">
+      <div class="flex justify-end space-x-2 mt-3">
         <button 
           @click="showLinkMenu = false"
           class="btn btn-secondary btn-sm"
@@ -61,200 +118,25 @@
         </button>
       </div>
     </div>
-
-    <!-- ファイル入力フィールドを改善（必須） -->
-    <input 
-      ref="fileInput"
-      type="file" 
-      accept="image/*" 
-      class="hidden w-px h-px opacity-0 absolute" 
-      @change="uploadImage"
-    />
-  </div>
-  
-  <!-- キーボードが表示されていて、かつエディタがフォーカスされている場合のみツールバーをTeleportで移動 -->
-  <Teleport to="body" v-if="isKeyboardVisible && isFocused">
-    <!-- キーボード表示時のエディターメニュー -->
-    <div 
-      ref="floatingToolbar"
-      class="editor-toolbar glass-card flex flex-wrap gap-1 p-2 sticky-toolbar toolbar-active"
-      :key="toolbarUpdateTrigger"
-    >
-      <!-- ツールバーの内容 -->
-      <div class="flex flex-wrap gap-1">
-        <!-- 見出し2ボタン -->
-        <button
-          type="button"
-          class="btn-icon-info"
-          :class="{ 'bg-primary/20 text-primary': editor?.isActive('heading', { level: 2 }) }"
-          @touchend.prevent="toggleHeading2"
-          title="見出し2"
-        >
-          <PhTextHTwo class="h-5 w-5" />
-        </button>
-        
-        <!-- 見出し3ボタン -->
-        <button
-          class="btn-icon-info"
-          :class="{ 'bg-primary/20 text-primary': editor?.isActive('heading', { level: 3 }) }"
-          @touchend.prevent="toggleHeading3"
-          title="見出し3"
-        >
-          <PhTextHThree class="h-5 w-5" />
-        </button>
-
-        <!-- 太字ボタン -->
-        <button
-          class="btn-icon-accent1"
-          :class="{ 'bg-primary/20 text-primary': editor?.isActive('bold') }"
-          @touchend.prevent="toggleBold"
-          title="太字"
-        >
-          <PhTextBolder class="h-5 w-5" />
-        </button>
-
-        <!-- 斜体ボタン -->
-        <button
-          class="btn-icon-accent1"
-          :class="{ 'bg-primary/20 text-primary': editor?.isActive('italic') }"
-          @touchend.prevent="toggleItalic"
-          title="斜体"
-        >
-          <PhTextItalic class="h-5 w-5" />
-        </button>
-
-        <!-- 取り消し線ボタン -->
-        <button
-          class="btn-icon-warning"
-          :class="{ 'bg-primary/20 text-primary': editor?.isActive('strike') }"
-          @touchend.prevent="toggleStrike"
-          title="取り消し線"
-        >
-          <PhTextStrikethrough class="h-5 w-5" />
-        </button>
-
-        <!-- 箇条書きボタン -->
-        <button
-          class="btn-icon-accent2"
-          :class="{ 'bg-primary/20 text-primary': editor?.isActive('bulletList') }"
-          @touchend.prevent="toggleBulletList"
-          title="箇条書き"
-        >
-          <PhListBullets class="h-5 w-5" />
-        </button>
-
-        <!-- 番号付きリストボタン -->
-        <button
-          class="btn-icon-accent2"
-          :class="{ 'bg-primary/20 text-primary': editor?.isActive('orderedList') }"
-          @touchend.prevent="toggleOrderedList"
-          title="番号付きリスト"
-        >
-          <PhListNumbers class="h-5 w-5" />
-        </button>
-
-        <!-- 引用ボタン -->
-        <button
-          class="btn-icon-accent3"
-          :class="{ 'bg-primary/20 text-primary': editor?.isActive('blockquote') }"
-          @touchend.prevent="toggleBlockquote"
-          title="引用"
-        >
-          <PhQuotes class="h-5 w-5" />
-        </button>
-
-        <!-- 水平線ボタン -->
-        <button
-          class="btn-icon-accent3"
-          @touchend.prevent="setHorizontalRule"
-          title="水平線"
-        >
-          <PhMinus class="h-5 w-5" />
-        </button>
-
-        <!-- リンクボタン -->
-        <button
-          class="btn-icon-primary"
-          :class="{ 'bg-primary/20 text-primary': editor?.isActive('link') }"
-          @touchend.prevent="showLinkModalDialog"
-          title="リンク"
-        >
-          <PhLink class="h-5 w-5" />
-        </button>
-
-        <!-- 画像アップロードボタン -->
-        <button
-          class="btn-icon-success"
-          @touchend.prevent="openFileDialog"
-          title="画像"
-          :disabled="uploading"
-        >
-          <PhSpinner v-if="uploading" class="h-5 w-5 animate-spin" />
-          <PhImage v-else class="h-5 w-5" />
-        </button>
-
-        <!-- 元に戻すボタン -->
-        <button
-          class="btn-icon-secondary"
-          @touchend.prevent="undoEdit"
-          title="元に戻す"
-        >
-          <PhArrowCounterClockwise class="h-5 w-5" />
-        </button>
-
-        <!-- やり直しボタン -->
-        <button
-          class="btn-icon-secondary"
-          @touchend.prevent="redoEdit"
-          title="やり直し"
-        >
-          <PhArrowClockwise class="h-5 w-5" />
-        </button>
-      </div>
-    </div>
   </Teleport>
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeUnmount, onMounted, watch, h, defineComponent } from 'vue';
+import { ref, onBeforeUnmount, onMounted, watch, computed, nextTick } from 'vue';
 import { Editor, EditorContent } from '@tiptap/vue-3';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
 import Placeholder from '@tiptap/extension-placeholder';
 import { v4 as uuidv4 } from 'uuid';
-import { 
-  // 見出し用アイコン
-  PhTextHTwo,
-  PhTextHThree,
-  // 書式用アイコン
-  PhTextBolder,
-  PhTextItalic,
-  PhTextStrikethrough,
-  // リスト用アイコン
-  PhListBullets,
-  PhListNumbers,
-  // ブロック操作用アイコン
-  PhQuotes,
-  PhMinus,
-  // リンク用アイコン
-  PhLink,
-  // 画像用アイコン
-  PhImage,
-  // 履歴操作用アイコン
-  PhArrowCounterClockwise,
-  PhArrowClockwise,
-  // ローディング用アイコン
-  PhSpinner
-} from '@phosphor-icons/vue';
-import { Teleport } from 'vue';
+import EditorToolbar from './EditorToolbar.vue';
 
 // エディターの型を修正
 const editor = ref<Editor | undefined>(undefined);
 const fileInput = ref<HTMLInputElement | null>(null);
 const uploading = ref(false);
-const showLinkModal = ref(false);
 const linkUrl = ref('');
+const linkText = ref(''); // リンクテキスト用の新しい状態変数
 const showLinkMenu = ref(false);
 const linkMenuPosition = ref({ x: 0, y: 0 });
 const isFocused = ref(false);
@@ -294,183 +176,6 @@ const emit = defineEmits([
 
 // URL検出の正規表現（必要）
 const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
-
-// ToolbarButtonsコンポーネント - ツールバーの内容を共通化するためのコンポーネント
-const ToolbarButtons = defineComponent({
-  props: {
-    editor: Object,
-    uploading: Boolean
-  },
-  emits: ['open-link-dialog', 'open-file-dialog'],
-  setup(props, { emit }) {
-    return () => h('div', { class: 'flex flex-wrap gap-1' }, [
-      // 見出し2ボタン
-      h('button', {
-        type: 'button',
-        class: ['btn-icon-info', { 'bg-primary/20 text-primary': props.editor?.isActive('heading', { level: 2 }) }],
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          props.editor?.chain().focus().toggleHeading({ level: 2 }).run();
-        },
-        title: '見出し2'
-      }, [h(PhTextHTwo, { class: 'h-5 w-5' })]),
-      
-      // 見出し3ボタン
-      h('button', {
-        type: 'button',
-        class: ['btn-icon-info', { 'bg-primary/20 text-primary': props.editor?.isActive('heading', { level: 3 }) }],
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          props.editor?.chain().focus().toggleHeading({ level: 3 }).run();
-        },
-        title: '見出し3'
-      }, [h(PhTextHThree, { class: 'h-5 w-5' })]),
-
-      // 太字ボタン
-      h('button', {
-        type: 'button',
-        class: ['btn-icon-accent1', { 'bg-primary/20 text-primary': props.editor?.isActive('bold') }],
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          props.editor?.chain().focus().toggleBold().run();
-        },
-        title: '太字'
-      }, [h(PhTextBolder, { class: 'h-5 w-5' })]),
-
-      // 斜体ボタン
-      h('button', {
-        type: 'button',
-        class: ['btn-icon-accent1', { 'bg-primary/20 text-primary': props.editor?.isActive('italic') }],
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          props.editor?.chain().focus().toggleItalic().run();
-        },
-        title: '斜体'
-      }, [h(PhTextItalic, { class: 'h-5 w-5' })]),
-
-      // 取り消し線ボタン
-      h('button', {
-        type: 'button',
-        class: ['btn-icon-warning', { 'bg-primary/20 text-primary': props.editor?.isActive('strike') }],
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          props.editor?.chain().focus().toggleStrike().run();
-        },
-        title: '取り消し線'
-      }, [h(PhTextStrikethrough, { class: 'h-5 w-5' })]),
-
-      // 箇条書きボタン
-      h('button', {
-        type: 'button',
-        class: ['btn-icon-accent2', { 'bg-primary/20 text-primary': props.editor?.isActive('bulletList') }],
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          props.editor?.chain().focus().toggleBulletList().run();
-        },
-        title: '箇条書き'
-      }, [h(PhListBullets, { class: 'h-5 w-5' })]),
-
-      // 番号付きリストボタン
-      h('button', {
-        type: 'button',
-        class: ['btn-icon-accent2', { 'bg-primary/20 text-primary': props.editor?.isActive('orderedList') }],
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          props.editor?.chain().focus().toggleOrderedList().run();
-        },
-        title: '番号付きリスト'
-      }, [h(PhListNumbers, { class: 'h-5 w-5' })]),
-
-      // 引用ボタン
-      h('button', {
-        type: 'button',
-        class: ['btn-icon-accent3', { 'bg-primary/20 text-primary': props.editor?.isActive('blockquote') }],
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          props.editor?.chain().focus().toggleBlockquote().run();
-        },
-        title: '引用'
-      }, [h(PhQuotes, { class: 'h-5 w-5' })]),
-
-      // 水平線ボタン
-      h('button', {
-        type: 'button',
-        class: ['btn-icon-accent3'],
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          props.editor?.chain().focus().setHorizontalRule().run();
-        },
-        title: '水平線'
-      }, [h(PhMinus, { class: 'h-5 w-5' })]),
-
-      // リンクボタン
-      h('button', {
-        type: 'button',
-        class: ['btn-icon-primary', { 'bg-primary/20 text-primary': props.editor?.isActive('link') }],
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          emit('open-link-dialog');
-        },
-        title: 'リンク'
-      }, [h(PhLink, { class: 'h-5 w-5' })]),
-
-      // 画像アップロードボタン（修正後）
-      h('button', {
-        type: 'button',
-        class: ['btn-icon-success'],
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          emit('open-file-dialog');
-        },
-        title: '画像',
-        disabled: props.uploading
-      }, [
-        // v-ifとv-elseの代わりに条件演算子を使用
-        props.uploading 
-          ? h(PhSpinner, { class: 'h-5 w-5 animate-spin' })
-          : h(PhImage, { class: 'h-5 w-5' })
-      ]),
-
-      // 元に戻すボタン
-      h('button', {
-        type: 'button',
-        class: ['btn-icon-secondary'],
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          props.editor?.chain().focus().undo().run();
-        },
-        title: '元に戻す'
-      }, [h(PhArrowCounterClockwise, { class: 'h-5 w-5' })]),
-
-      // やり直しボタン
-      h('button', {
-        type: 'button',
-        class: ['btn-icon-secondary'],
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          props.editor?.chain().focus().redo().run();
-        },
-        title: 'やり直し'
-      }, [h(PhArrowClockwise, { class: 'h-5 w-5' })]),
-    ]);
-  }
-});
-
-// 既存のコードの下に追加
-const toolbarUpdateTrigger = ref(0);
 
 // エディター初期化を修正
 onMounted(() => {
@@ -547,6 +252,33 @@ onMounted(() => {
         if (editor.value) {
           const html = editor.value.getHTML();
           emit('update:modelValue', html);
+          
+          // リンクマークの不適切な残存を確認・修正
+          if (editor.value.isActive('link')) {
+            const { state } = editor.value;
+            const { from, to } = state.selection;
+            
+            // 選択範囲が空（カーソル位置）かリンクの中身が空かを確認
+            if (from === to) {
+              const node = state.doc.nodeAt(from);
+              // リンクの内容が空（またはリンク内のテキストなし）の場合
+              const isEmpty = node?.isText && node.text === '';
+              
+              // カーソル位置の前後のノードを確認して空リンクを検出
+              const prevPos = Math.max(0, from - 1);
+              const prevNode = state.doc.nodeAt(prevPos);
+              const prevMarks = prevNode ? prevNode.marks.filter(mark => mark.type.name === 'link') : [];
+              
+              const nextPos = Math.min(state.doc.content.size, to + 1);
+              const nextNode = state.doc.nodeAt(nextPos);
+              const nextMarks = nextNode ? nextNode.marks.filter(mark => mark.type.name === 'link') : [];
+              
+              // 空のリンクやリンクの境界にいる場合はリンクマークを解除
+              if (isEmpty || (prevMarks.length === 0 && nextMarks.length === 0)) {
+                editor.value.chain().focus().unsetMark('link').run();
+              }
+            }
+          }
         }
       },
       onFocus: () => {
@@ -635,7 +367,38 @@ defineExpose({
   }
 });
 
-// リンク挿入モーダルを表示
+// リンクメニュー関連を追加
+const linkMenu = ref<HTMLElement | null>(null);
+const linkInput = ref<HTMLInputElement | null>(null);
+const linkTextInput = ref<HTMLInputElement | null>(null);
+
+// リンクメニューのスタイルを動的に計算
+const linkMenuStyle = computed(() => {
+  if (!linkMenuPosition.value) return {};
+
+  const { x, y } = linkMenuPosition.value;
+  
+  // モバイル向け（キーボード表示時）
+  if (isKeyboardVisible.value) {
+    return {
+      left: '50%',
+      top: '50%',
+      transform: 'translate(-50%, -50%)',
+      maxWidth: '90vw',
+      width: '320px'
+    };
+  }
+  
+  // デスクトップまたはキーボード非表示モバイル向け
+  return {
+    left: `${x}px`,
+    top: `${y}px`,
+    maxWidth: '320px',
+    width: 'auto'
+  };
+});
+
+// リンク挿入モーダルを表示（更新）
 function showLinkModalDialog() {
   if (!editor.value) return;
   
@@ -648,8 +411,36 @@ function showLinkModalDialog() {
   
   if (selectedText.match(urlRegex)) {
     linkUrl.value = selectedText;
+    linkText.value = ''; // URLが選択されている場合はテキスト欄をクリア
+  } else if (editor.value.isActive('link')) {
+    // 既存のリンクがある場合はその値を取得
+    const attrs = editor.value.getAttributes('link');
+    linkUrl.value = attrs.href || '';
+    
+    // リンクマークの範囲を最も正確に取得するためにProseMirror APIのみを使用
+    console.log('リンクテキスト検出開始:', { pos: from });
+    
+    // リンク範囲を取得
+    const linkRange = findLinkRange(state, from);
+    if (linkRange) {
+      // 範囲が見つかった場合は、その範囲のテキストを取得
+      const linkTextContent = state.doc.textBetween(linkRange.from, linkRange.to);
+      console.log('リンク範囲から検出:', { 
+        text: linkTextContent, 
+        from: linkRange.from, 
+        to: linkRange.to,
+        range: linkRange.to - linkRange.from
+      });
+      
+      linkText.value = linkTextContent;
+    } else {
+      // リンク範囲が見つからない場合は選択テキストを使用
+      linkText.value = selectedText;
+    }
   } else {
     linkUrl.value = '';
+    // リンクテキストは選択されたテキストを保持
+    linkText.value = selectedText;
   }
   
   // リンクメニューを表示
@@ -657,13 +448,162 @@ function showLinkModalDialog() {
   
   // メニュー位置をカーソル位置に設定
   const coords = view.coordsAtPos(from);
-  linkMenuPosition.value = { x: coords.right, y: coords.bottom + 10 };
+  
+  // 画面の端に近い場合の調整
+  let x = coords.right;
+  let y = coords.bottom + 10;
+  
+  // キーボードが表示されている場合は中央に表示
+  if (isKeyboardVisible.value) {
+    x = window.innerWidth / 2;
+    y = window.innerHeight / 2 - 100; // キーボードの上に表示
+  } else {
+    // 右端に近い場合は左側に表示
+    if (x + 320 > window.innerWidth) {
+      x = Math.max(10, coords.left - 320);
+    }
+    
+    // 下端に近い場合は上に表示
+    if (y + 150 > window.innerHeight) {
+      y = coords.top - 150;
+    }
+  }
+  
+  linkMenuPosition.value = { x, y };
+  
+  // 次のティックでフォーカス
+  nextTick(() => {
+    linkInput.value?.focus();
+  });
+}
+
+// リンクマークの範囲を特定する関数 - シンプル化
+function findLinkRange(state: any, pos: number) {
+  try {
+    // リンクマークのタイプを取得
+    const linkType = state.schema.marks.link;
+    
+    // リンクマークがなければnullを返す
+    if (!linkType) return null;
+    
+    // まず前の位置を確認（カーソルがリンクテキストの末尾の場合）
+    // これを最優先する
+    let linkMark = null;
+    if (pos > 0) {
+      const prevNode = state.doc.nodeAt(pos - 1);
+      if (prevNode && prevNode.marks && prevNode.marks.length) {
+        linkMark = prevNode.marks.find((m: any) => m.type.name === 'link');
+        if (linkMark) {
+          pos = pos - 1;
+          console.log('リンクの末尾カーソルを検出:', { pos });
+        }
+      }
+    }
+    
+    // 前の位置にリンクマークがない場合は現在位置を確認
+    if (!linkMark) {
+      // ドキュメント内のカーソル位置にあるノードを直接取得
+      const node = state.doc.nodeAt(pos);
+      if (node && node.marks) {
+        linkMark = node.marks.find((m: any) => m.type.name === 'link');
+      }
+      
+      // 現在位置にリンクマークがなければ、次の位置を確認
+      if (!linkMark && pos < state.doc.content.size - 1) {
+        const nextNode = state.doc.nodeAt(pos + 1);
+        if (nextNode && nextNode.marks) {
+          linkMark = nextNode.marks.find((m: any) => m.type.name === 'link');
+          if (linkMark) pos = pos + 1;
+        }
+      }
+    }
+    
+    if (!linkMark) {
+      console.warn('リンクマークが見つかりませんでした:', { pos });
+      return null;
+    }
+    
+    // リンクのhref属性を記録
+    const href = linkMark.attrs.href;
+
+    // ドキュメント内のすべてのテキストノードと位置をチェックして、リンク範囲を検出
+    let startPos = pos;
+    let endPos = pos;
+    
+    // 前方検索: カーソル位置から左側にリンクの始点を探す
+    let i = pos;
+    while (i >= 0) {
+      const nodeAtPos = state.doc.nodeAt(i);
+      if (!nodeAtPos || !nodeAtPos.isText) {
+        // テキストノードでない場合はスキップして前に進む
+        i--;
+        continue;
+      }
+      
+      const marksAtPos = nodeAtPos.marks || [];
+      const hasLinkMark = marksAtPos.some(
+        (m: any) => m.type.name === 'link' && m.attrs.href === href
+      );
+      
+      if (hasLinkMark) {
+        startPos = i;
+        i--;
+      } else {
+        break;
+      }
+    }
+    
+    // 後方検索: カーソル位置から右側にリンクの終点を探す
+    i = pos;
+    while (i < state.doc.content.size) {
+      const nodeAtPos = state.doc.nodeAt(i);
+      if (!nodeAtPos || !nodeAtPos.isText) {
+        // テキストノードでない場合はスキップして次に進む
+        i++;
+        continue;
+      }
+      
+      const marksAtPos = nodeAtPos.marks || [];
+      const hasLinkMark = marksAtPos.some(
+        (m: any) => m.type.name === 'link' && m.attrs.href === href
+      );
+      
+      if (hasLinkMark) {
+        endPos = i + 1; // 位置は文字の後なので+1
+        i++;
+      } else {
+        break;
+      }
+    }
+    
+    // 範囲が正しいか確認
+    if (endPos <= startPos) {
+      console.warn('無効なリンク範囲を検出:', {startPos, endPos});
+      return null;
+    }
+    
+    // リンクの範囲を返す
+    const text = state.doc.textBetween(startPos, endPos);
+    console.log('リンク範囲検出成功:', {
+      from: startPos,
+      to: endPos,
+      text: text
+    });
+    
+    return {
+      from: startPos,
+      to: endPos
+    };
+  } catch (error) {
+    console.error('リンク範囲の検出中にエラーが発生しました:', error);
+    return null;
+  }
 }
 
 // リンク挿入
 function insertLink() {
   if (!editor.value || !linkUrl.value.trim()) {
-    showLinkModal.value = false;
+    showLinkMenu.value = false;
     return;
   }
   
@@ -673,9 +613,153 @@ function insertLink() {
     url = 'https://' + url;
   }
   
-  editor.value.chain().focus().setLink({ href: url }).run();
-  showLinkModal.value = false;
+  // リンクテキストが空の場合、URLをテキストとして使用
+  const effectiveLinkText = linkText.value.trim() || url;
+  
+  // 既存のリンクを編集中かどうか確認
+  const isEditingExistingLink = editor.value.isActive('link');
+  
+  if (isEditingExistingLink) {
+    // 既存リンクを編集する場合
+    const { state } = editor.value;
+    const { from } = state.selection;
+    
+    // リンク範囲を取得
+    const linkRange = findLinkRange(state, from);
+    
+    console.log('リンク編集:', { 
+      linkRange: linkRange ? { 
+        from: linkRange.from, 
+        to: linkRange.to, 
+        text: state.doc.textBetween(linkRange.from, linkRange.to)
+      } : null 
+    });
+    
+    if (linkRange) {
+      try {
+        // ステップ1: 正確なリンク範囲を選択してリンクマークを解除
+        editor.value
+          .chain()
+          .focus()
+          .setTextSelection({ from: linkRange.from, to: linkRange.to })
+          .unsetMark('link')
+          .run();
+        
+        // ステップ2: リンクテキストだけを置換
+        editor.value
+          .chain()
+          .focus()
+          .deleteRange({ from: linkRange.from, to: linkRange.to })
+          .insertContent(effectiveLinkText)
+          .run();
+        
+        // ステップ3: 新しく挿入したテキスト範囲を選択してリンクを設定
+        editor.value
+          .chain()
+          .focus()
+          .setTextSelection({ from: linkRange.from, to: linkRange.from + effectiveLinkText.length })
+          .setLink({ href: url })
+          .run();
+        
+        // ステップ4: カーソルをリンクの後ろに移動
+        const newPos = linkRange.from + effectiveLinkText.length;
+        setTimeout(() => {
+          moveCaretAfterLink(newPos);
+        }, 10);
+      } catch (error) {
+        console.error('リンク編集中にエラーが発生しました:', error);
+        insertNormalLink(url);
+      }
+    } else {
+      // リンク範囲が見つからない場合は通常挿入
+      console.log('リンク範囲が見つからないため、通常挿入を実行します');
+      insertNormalLink(url);
+    }
+  } else {
+    // 新規リンク挿入の場合
+    insertNormalLink(url, effectiveLinkText);
+  }
+  
+  showLinkMenu.value = false;
   linkUrl.value = '';
+  linkText.value = '';
+}
+
+// カーソルをリンクの後ろに移動し、リンクマークの影響を解除する
+function moveCaretAfterLink(pos: number) {
+  if (!editor.value) return;
+  
+  editor.value
+    .chain()
+    .focus()
+    .setTextSelection(pos)
+    // 空白スペースを挿入してリンクから確実に脱出
+    .insertContent(' ')
+    .deleteRange({ from: pos, to: pos + 1 })
+    // 明示的にリンクマークの影響を無効化
+    .unsetMark('link')
+    .run();
+}
+
+// 通常のリンク挿入処理（新規作成時）
+function insertNormalLink(url: string, effectiveLinkText?: string) {
+  if (!editor.value) return;
+  
+  const { state } = editor.value;
+  const { from, to } = state.selection;
+  const selectedText = state.doc.textBetween(from, to);
+  const linkDisplayText = effectiveLinkText || linkText.value.trim() || url;
+  
+  // リンクテキストが指定されていて、かつ選択範囲がある場合
+  if (linkDisplayText && selectedText) {
+    // 選択テキストをリンクテキストで置き換えてからリンクを適用
+    editor.value
+      .chain()
+      .focus()
+      .deleteRange({ from, to })
+      .insertContent(linkDisplayText)
+      .setTextSelection({ from, to: from + linkDisplayText.length })
+      .setLink({ href: url })
+      .run();
+      
+    // リンク適用後、カーソルをリンクの後ろに移動
+    const newPos = from + linkDisplayText.length;
+    setTimeout(() => {
+      moveCaretAfterLink(newPos);
+    }, 10);
+  } 
+  // リンクテキストが指定されていないが選択範囲がある場合
+  else if (selectedText) {
+    // 選択範囲にリンクを適用
+    editor.value.chain().focus().setLink({ href: url }).run();
+    
+    // リンク適用後、カーソルをリンクの後ろに移動
+    setTimeout(() => {
+      moveCaretAfterLink(to);
+    }, 10);
+  } 
+  // 選択範囲がない場合はURLをテキストとして挿入してリンク化
+  else {
+    const displayText = linkDisplayText;
+    const currentPos = editor.value.state.selection.from;
+    
+    editor.value.chain().focus().insertContent({
+      type: 'text',
+      text: displayText,
+      marks: [
+        {
+          type: 'link',
+          attrs: { href: url }
+        }
+      ]
+    }).run();
+    
+    // リンク適用後、カーソルをリンクの後ろに移動
+    const newPos = currentPos + displayText.length;
+    setTimeout(() => {
+      moveCaretAfterLink(newPos);
+    }, 10);
+  }
 }
 
 // 画像アップロード処理を修正（即時アップロードせず一時保存）
@@ -800,11 +884,16 @@ function updateToolbarPosition() {
   // iOS/Androidのスクロール位置を考慮
   const viewportOffsetTop = window.visualViewport.offsetTop || 0;
   
-  // キーボードの表示状態を更新
+  // キーボードの表示状態を更新（前の値と比較）
+  const wasKeyboardVisible = isKeyboardVisible.value;
   isKeyboardVisible.value = keyboardHeight > 100; // 100px以上の差があれば確実にキーボード表示と判断
   
-  // ツールバーの位置を更新 - isFocusedの条件を追加
-  if (isKeyboardVisible.value && isFocused.value && floatingToolbar.value) {
+  // キーボード表示状態が変わったときのみ再レンダリング
+  if (wasKeyboardVisible !== isKeyboardVisible.value) {
+  }
+  
+  // ツールバーの位置を更新
+  if (isKeyboardVisible.value && floatingToolbar.value) {
     // フローティングツールバーのスタイルを設定
     floatingToolbar.value.style.position = 'fixed';
     floatingToolbar.value.style.bottom = `${keyboardHeight}px`;
@@ -814,9 +903,21 @@ function updateToolbarPosition() {
     floatingToolbar.value.style.transform = `translateY(${viewportOffsetTop}px)`;
     floatingToolbar.value.style.padding = '8px';
     floatingToolbar.value.style.borderRadius = '0';
-    
-    // アニメーションを滑らかにするためにtransitionを調整
-    floatingToolbar.value.style.transition = 'bottom 0.15s ease-out, transform 0.15s ease-out';
+    floatingToolbar.value.style.userSelect = 'none';
+  }
+}
+
+// フォーカス喪失を防止する関数
+function preventBlur(e: Event) {
+  // デフォルトのフォーカス喪失を防止
+  e.preventDefault();
+  
+  // タップ後、エディタに再フォーカスする
+  if (editor.value) {
+    // 即時フォーカスすると他のイベントが干渉するため、少し遅延させる
+    setTimeout(() => {
+      editor.value?.commands.focus();
+    }, 10);
   }
 }
 
@@ -846,92 +947,6 @@ function removeLink() {
   showLinkMenu.value = false;
 }
 
-// 各ツールバーボタンの関数を修正
-function toggleHeading2() {
-  if (editor.value) {
-    editor.value.chain().focus().toggleHeading({ level: 2 }).run();
-    forceToolbarUpdate();
-  }
-}
-
-function toggleHeading3() {
-  if (editor.value) {
-    editor.value.chain().focus().toggleHeading({ level: 3 }).run();
-    forceToolbarUpdate();
-  }
-}
-
-function toggleBold() {
-  if (editor.value) {
-    editor.value.chain().focus().toggleBold().run();
-    forceToolbarUpdate();
-  }
-}
-
-function toggleItalic() {
-  if (editor.value) {
-    editor.value.chain().focus().toggleItalic().run();
-    forceToolbarUpdate();
-  }
-}
-
-function toggleStrike() {
-  if (editor.value) {
-    editor.value.chain().focus().toggleStrike().run();
-    forceToolbarUpdate();
-  }
-}
-
-function toggleBulletList() {
-  if (editor.value) {
-    editor.value.chain().focus().toggleBulletList().run();
-    forceToolbarUpdate();
-  }
-}
-
-function toggleOrderedList() {
-  if (editor.value) {
-    editor.value.chain().focus().toggleOrderedList().run();
-    forceToolbarUpdate();
-  }
-}
-
-function toggleBlockquote() {
-  if (editor.value) {
-    editor.value.chain().focus().toggleBlockquote().run();
-    forceToolbarUpdate();
-  }
-}
-
-function setHorizontalRule() {
-  if (editor.value) {
-    editor.value.chain().focus().setHorizontalRule().run();
-  }
-}
-
-function undoEdit() {
-  if (editor.value) {
-    editor.value.chain().focus().undo().run();
-  }
-}
-
-function redoEdit() {
-  if (editor.value) {
-    editor.value.chain().focus().redo().run();
-  }
-}
-
-// ツールバーの強制更新関数を追加
-function forceToolbarUpdate() {
-  // Vue の反応性システムを利用して、ツールバーを再レンダリング
-  toolbarUpdateTrigger.value += 1;
-  
-  // 100ms後にもう一度更新（状態の変更が非同期の場合のため）
-  setTimeout(() => {
-    toolbarUpdateTrigger.value += 1;
-  }, 100);
-}
-
 // エディター本体の修正部分
 function handleEnterKey(e: KeyboardEvent) {
   if (!editor.value) return;
@@ -949,7 +964,37 @@ function handleEnterKey(e: KeyboardEvent) {
   }
 }
 
-// watch関数でもキーボードの状態を監視 - 修正
+// ツールバーの強制更新関数
+function forceToolbarUpdate() {
+  // 実行中の場合はスキップ
+  if (updatingToolbar) return;
+  
+  // 更新中フラグをセット
+  updatingToolbar = true;
+  
+  try {
+    // エディタにフォーカスを戻す
+    if (editor.value) {
+      setTimeout(() => {
+        try {
+          editor.value?.commands.focus();
+        } catch (e) {
+          console.error('エディタフォーカス時エラー:', e);
+        }
+      }, 10);
+    }
+  } finally {
+    // 更新フラグをリセット（少し遅延させる）
+    setTimeout(() => {
+      updatingToolbar = false;
+    }, 100);
+  }
+}
+
+// ツールバー更新中フラグ
+let updatingToolbar = false;
+
+// watch関数でもキーボードの状態を監視
 watch(() => isFocused.value, (newValue) => {
   if (newValue) {
     // フォーカスされたときに位置を更新
@@ -957,8 +1002,13 @@ watch(() => isFocused.value, (newValue) => {
     // 少し遅れて再度更新（iOSの遅延対策）
     setTimeout(updateToolbarPosition, 300);
   } else {
-    // フォーカスが外れたときはキーボード表示状態をリセット
-    isKeyboardVisible.value = false;
+    // フォーカスが外れた後、少し待ってからキーボード表示状態をリセット
+    // ツールバーボタンタップでのフォーカス喪失後にも十分な時間を確保
+    setTimeout(() => {
+      if (!isFocused.value) {
+        isKeyboardVisible.value = false;
+      }
+    }, 250);
   }
 });
 
@@ -989,6 +1039,8 @@ watch(() => editor.value?.getHTML(), () => {
   width: 100%;
   /* iOSのノッチ対応 */
   padding-bottom: env(safe-area-inset-bottom, 0);
+  /* タッチイベントをキャプチャ */
+  touch-action: none;
 }
 
 .toolbar-active {
@@ -998,22 +1050,14 @@ watch(() => editor.value?.getHTML(), () => {
 }
 
 .editor-toolbar {
-  transition: all 0.2s ease-out;
+  transition: none; /* アニメーション無効化 */
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(8px);
 }
 
-/* タップ領域を広げる */
-.editor-toolbar button {
-  min-width: 40px;
-  min-height: 40px;
-  touch-action: manipulation;
-  position: relative;
-}
-
-/* iOSでのハプティックフィードバック防止 */
-.editor-toolbar button {
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
+.floating-link-menu {
+  transition: all 0.2s ease-out;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(8px);
 }
 </style> 
