@@ -1,8 +1,13 @@
 {
-  "name": "accessible-blog-app",
+  "name": "juna-supabase",
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imuradevelopment/Juna_supabase.git"
+  },
+  "homepage": "https://juna-supabase.netlify.app",
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
@@ -47,7 +52,7 @@
     "rollup-plugin-visualizer": "^5.14.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.5.3",
-    "vite": "^5.4.2",
+    "vite": "^6.2.2",
     "vue-tsc": "^2.1.4"
   }
 }
