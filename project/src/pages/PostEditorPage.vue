@@ -88,7 +88,7 @@
           </div>
           
           <div class="flex justify-between pt-4">
-            <router-link to="/" class="btn btn-outline-secondary" type="button">キャンセル</router-link>
+            <router-link to="/" class="btn btn-outline-secondary" type="button" @click="handleCancel">キャンセル</router-link>
             <button 
               type="submit" 
               class="btn btn-primary"
@@ -124,8 +124,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted, computed, onBeforeUnmount } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, reactive, onMounted, computed, onBeforeUnmount, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
@@ -151,6 +151,7 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const route = useRoute();
 const authStore = useAuthStore();
 
 const formData = reactive<FormData>({
@@ -194,8 +195,27 @@ const sessionCheckInterval = ref<number | null>(null);
 const sessionExpiredModalOpen = ref(false);
 const isSessionValid = ref(true);
 
-onMounted(async () => {
+// 自動保存のインターバルと最終保存時間
+const autoSaveInterval = ref<number | null>(null);
+const lastAutoSaveTime = ref<Date | null>(null);
+
+// propsのidの変更を監視して、画面遷移時にデータをリセット
+watch(() => route.path, async () => {
+  // パスが変わったらデータをリセット
+  resetFormData();
   resetUploadState();
+  
+  // 編集モードの場合は新しいデータを取得
+  if (props.id) {
+    await fetchPost(props.id);
+  }
+  
+  // 24時間以内のデータを復元
+  await checkForSavedData();
+}, { immediate: true });
+
+onMounted(async () => {
+  resetFormData();
   
   if (props.id) {
     await fetchPost(props.id);
@@ -211,13 +231,76 @@ onMounted(async () => {
     const cleanUrl = window.location.pathname;
     window.history.replaceState({}, document.title, cleanUrl);
   }
+
+  // 既存の自動保存インターバル設定
+  autoSaveInterval.value = window.setInterval(() => {
+    if (isFormValid.value && !submitting.value) {
+      saveToLocalStorage();
+      lastAutoSaveTime.value = new Date();
+    } else if (!submitting.value && (
+      formData.title.trim() !== '' || 
+      formData.excerpt || 
+      formData.content || 
+      formData.cover_image_path || 
+      formData.categories.length > 0
+    )) {
+      // フォームが完全に有効でなくても、何か入力があれば部分的に保存
+      saveToLocalStorage(true);
+      lastAutoSaveTime.value = new Date();
+    } else {
+      // 何も入力がない場合でも時間だけは更新
+      lastAutoSaveTime.value = new Date();
+    }
+  }, 60 * 1000);
+  
+  // 保存データのチェックと復元
+  checkForSavedData();
+  
+  // 期限切れデータの削除処理
+  checkExpiredData();
 });
 
 onBeforeUnmount(() => {
   if (sessionCheckInterval.value) {
     clearInterval(sessionCheckInterval.value);
   }
+  
+  if (autoSaveInterval.value) {
+    clearInterval(autoSaveInterval.value);
+  }
 });
+
+function resetFormData() {
+  formData.title = '';
+  formData.excerpt = null;
+  formData.content = '';
+  formData.cover_image_path = null;
+  formData.published = false;
+  formData.categories = [];
+  
+  // アイキャッチ画像もリセット
+  if (eyecatchUploaderRef.value) {
+    eyecatchUploaderRef.value.preview = null;
+    eyecatchUploaderRef.value.imageFile = null;
+    if (formData.cover_image_path) {
+      formData.cover_image_path = null;
+    }
+  }
+  
+  // エディタの内容をリセット
+  if (richTextEditorRef.value) {
+    richTextEditorRef.value.setContent('');
+  }
+  
+  // アップロード状態もリセット
+  pendingImages.value = [];
+  uploadedImages.value = [];
+  featuredImageFile.value = null;
+}
+
+function resetUploadState() {
+  isUploading.value = false;
+}
 
 async function fetchPost(postId: string) {
   try {
@@ -303,8 +386,21 @@ async function checkSessionStatus() {
   }
 }
 
-function saveToLocalStorage() {
+function saveToLocalStorage(isPartial = false) {
   try {
+    // 保存用キーの生成
+    const storageKey = props.id ? `temp_edit_post_data_${props.id}` : 'temp_new_post_data';
+    
+    // ファイルデータのBase64エンコード
+    let fileDataBase64 = null;
+    if (eyecatchUploaderRef.value?.imageFile) {
+      if (eyecatchUploaderRef.value.fileDataBase64) {
+        fileDataBase64 = eyecatchUploaderRef.value.fileDataBase64;
+      } else if (eyecatchUploaderRef.value.preview) {
+        fileDataBase64 = eyecatchUploaderRef.value.preview;
+      }
+    }
+    
     const tempData = {
       title: formData.title,
       excerpt: formData.excerpt,
@@ -312,10 +408,16 @@ function saveToLocalStorage() {
       categories: formData.categories,
       published: formData.published,
       timestamp: new Date().getTime(),
-      postId: props.id || null
+      postId: props.id || null,
+      cover_image_path: formData.cover_image_path,
+      eyecatch_preview: eyecatchUploaderRef.value?.preview || null,
+      eyecatch_file_data: fileDataBase64,
+      eyecatch_file_name: eyecatchUploaderRef.value?.imageFile?.name || null,
+      eyecatch_file_type: eyecatchUploaderRef.value?.imageFile?.type || null,
+      isPartialSave: isPartial
     };
     
-    localStorage.setItem('temp_post_data', JSON.stringify(tempData));
+    localStorage.setItem(storageKey, JSON.stringify(tempData));
   } catch (error) {
     console.error('一時保存エラー:', error);
   }
@@ -323,21 +425,53 @@ function saveToLocalStorage() {
 
 function restoreFromLocalStorage() {
   try {
-    const savedData = localStorage.getItem('temp_post_data');
+    // 復元用キーの生成
+    const storageKey = props.id ? `temp_edit_post_data_${props.id}` : 'temp_new_post_data';
+    const savedData = localStorage.getItem(storageKey);
+    
     if (savedData) {
       const tempData = JSON.parse(savedData);
       
-      if (!props.id || (props.id && tempData.postId === props.id)) {
-        const oneHour = 60 * 60 * 1000;
-        if (new Date().getTime() - tempData.timestamp < oneHour) {
-          formData.title = tempData.title;
-          formData.excerpt = tempData.excerpt;
+      // 編集モードでは該当IDの投稿データのみ復元
+      if (props.id && tempData.postId !== props.id) {
+        return false;
+      }
+      
+      // 24時間以内のデータのみ復元
+      const oneDayInMs = 24 * 60 * 60 * 1000;
+      if (new Date().getTime() - tempData.timestamp < oneDayInMs) {
+        formData.title = tempData.title;
+        formData.excerpt = tempData.excerpt;
+        formData.categories = tempData.categories;
+        formData.published = tempData.published;
+        formData.cover_image_path = tempData.cover_image_path;
+        
+        // エディタのコンテンツを復元
+        if (richTextEditorRef.value && tempData.content) {
+          richTextEditorRef.value.setContent(tempData.content);
           formData.content = tempData.content;
-          formData.categories = tempData.categories;
-          formData.published = tempData.published;
-          
-          return true;
         }
+        
+        // アイキャッチプレビューの復元
+        if (eyecatchUploaderRef.value) {
+          if (tempData.eyecatch_preview) {
+            eyecatchUploaderRef.value.setPreview(tempData.eyecatch_preview);
+          }
+          
+          // ファイルデータの復元
+          if (tempData.eyecatch_file_data && tempData.eyecatch_file_name && tempData.eyecatch_file_type) {
+            eyecatchUploaderRef.value.restoreFileFromBase64(
+              tempData.eyecatch_file_data,
+              tempData.eyecatch_file_name,
+              tempData.eyecatch_file_type
+            );
+          }
+        }
+        
+        return true;
+      } else {
+        // 24時間を超えたデータは削除
+        localStorage.removeItem(storageKey);
       }
     }
     return false;
@@ -409,13 +543,16 @@ async function handleSubmit() {
     
     if (props.id) {
       await updatePost({...formData, content: finalContent});
+      // 保存成功時に編集用データを削除
+      localStorage.removeItem(`temp_edit_post_data_${props.id}`);
       router.push(`/posts/${props.id}`);
     } else {
       const newPost = await createPost({...formData, content: finalContent});
+      // 保存成功時に新規作成用データを削除
+      localStorage.removeItem('temp_new_post_data');
       router.push(`/posts/${newPost.id}`);
     }
     
-    localStorage.removeItem('temp_post_data');
   } catch (err: any) {
     console.error('投稿保存エラー:', err);
     formError.value = err.message || '投稿の保存に失敗しました';
@@ -592,38 +729,46 @@ async function updatePost(postData: any) {
   }
 }
 
-function resetUploadState() {
-  isUploading.value = false;
-}
-
 function handleLoginRedirect() {
   saveToLocalStorage();
   router.push('/login?redirect=' + encodeURIComponent(router.currentRoute.value.fullPath));
 }
 
-const autoSaveInterval = ref<number | null>(null);
-const lastAutoSaveTime = ref<Date | null>(null);
+// キャンセル処理を修正
+function handleCancel() {
+  // キャンセル時に自動保存データを削除
+  if (props.id) {
+    localStorage.removeItem(`temp_edit_post_data_${props.id}`);
+  } else {
+    localStorage.removeItem('temp_new_post_data');
+  }
+  router.push('/');
+}
 
-onMounted(async () => {
-  autoSaveInterval.value = window.setInterval(() => {
-    if (isFormValid.value && !submitting.value) {
-      saveToLocalStorage();
-      lastAutoSaveTime.value = new Date();
+// 期限切れデータのチェックと削除
+function checkExpiredData() {
+  const oneDayInMs = 24 * 60 * 60 * 1000;
+  const now = new Date().getTime();
+  
+  // LocalStorageのすべてのキーを確認
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    
+    if (key && (key === 'temp_new_post_data' || key.startsWith('temp_edit_post_data_'))) {
+      try {
+        const data = JSON.parse(localStorage.getItem(key) || '');
+        
+        // 24時間を超えたデータは削除
+        if (data.timestamp && (now - data.timestamp > oneDayInMs)) {
+          localStorage.removeItem(key);
+        }
+      } catch (e) {
+        // 不正なJSONの場合も削除
+        localStorage.removeItem(key);
+      }
     }
-  }, 60 * 1000);
-  
-  checkForSavedData();
-});
-
-onBeforeUnmount(() => {
-  if (sessionCheckInterval.value) {
-    clearInterval(sessionCheckInterval.value);
   }
-  
-  if (autoSaveInterval.value) {
-    clearInterval(autoSaveInterval.value);
-  }
-});
+}
 
 // 保存データのチェックと復元確認
 async function checkForSavedData() {

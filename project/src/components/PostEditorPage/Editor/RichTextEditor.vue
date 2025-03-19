@@ -209,13 +209,36 @@ const editor = useEditor({
     }),
     Link.configure({
       openOnClick: false,
+      HTMLAttributes: {
+        class: 'editor-link',
+      },
     }),
   ],
   editorProps: {
-    handleKeyDown: (_view, event) => {
+    handleKeyDown: (_, event) => {
+      // Enterキーとカスタムキーボードショートカットのハンドリングはそのまま継続
       if (event.key === 'Enter' && isKeyboardVisible.value) {
         return false;
       }
+      
+      // ブラウザのデフォルトショートカットを無効化
+      const isCtrlOrCmd = event.ctrlKey || event.metaKey;
+      const isAlt = event.altKey;
+      
+      // 2キー組み合わせのショートカットを無効化（編集用のショートカット）
+      if ((isCtrlOrCmd && ['b', 'i', 'z', 'y', 'k'].includes(event.key.toLowerCase())) || 
+          (isAlt && ['2', '3', '7', '8', 'q', 'h', 'i', 's'].includes(event.key.toLowerCase()))) {
+        event.preventDefault();
+        return true; // イベントを処理済みとしてマーク
+      }
+      
+      // リンク関連のショートカット (Ctrl+K)
+      if ((event.ctrlKey || event.metaKey) && event.key === 'k') {
+        event.preventDefault();
+        showLinkModalDialog();
+        return true;
+      }
+      
       return false;
     }
   },
@@ -252,7 +275,9 @@ const editor = useEditor({
   },
   onBlur: () => {
     isFocused.value = false;
-  }
+  },
+  enableInputRules: true,
+  enablePasteRules: true
 });
 
 // props.modelValueの変更を監視して、エディタ内容を更新
@@ -494,6 +519,12 @@ defineExpose({
     }
     
     editor.value.chain().focus().setImage(imageOptions).run();
+  },
+
+  // エディタのコンテンツを設定
+  setContent(content: string | object) {
+    if (!editor.value) return;
+    editor.value.commands.setContent(content);
   },
 
   // エディタにフォーカスを確保

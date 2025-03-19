@@ -66,6 +66,7 @@ const preview = ref<string | null>(null);
 const featuredImageInput = ref<HTMLInputElement | null>(null);
 const imageFile = ref<File | null>(null);
 const isUploading = ref(false);
+const fileDataBase64 = ref<string | null>(null);
 
 async function handleImageUpload(event: Event) {
   event.preventDefault();
@@ -84,10 +85,19 @@ async function handleImageUpload(event: Event) {
     
     if (props.richTextEditorRef) {
       preview.value = await props.richTextEditorRef.encodeImageToBase64(file);
+      fileDataBase64.value = preview.value;
       imageFile.value = file;
     } else {
       imageFile.value = file;
-      preview.value = URL.createObjectURL(file);
+      // Base64データを生成
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        if (e.target?.result) {
+          fileDataBase64.value = e.target.result as string;
+          preview.value = URL.createObjectURL(file);
+        }
+      };
+      reader.readAsDataURL(file);
     }
     
     emit('file-selected', file);
@@ -97,6 +107,34 @@ async function handleImageUpload(event: Event) {
   } finally {
     const input = event.target as HTMLInputElement;
     if (input) input.value = '';
+  }
+}
+
+// Base64データからファイルを復元するメソッド
+async function restoreFileFromBase64(base64Data: string, fileName: string, fileType: string) {
+  try {
+    // Base64文字列をBlobに変換
+    const byteString = atob(base64Data.split(',')[1]);
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    
+    for (let i = 0; i < byteString.length; i++) {
+      ia[i] = byteString.charCodeAt(i);
+    }
+    
+    const blob = new Blob([ab], { type: fileType });
+    const file = new File([blob], fileName, { type: fileType });
+    
+    // ファイルとプレビューをセット
+    imageFile.value = file;
+    preview.value = base64Data;
+    fileDataBase64.value = base64Data;
+    
+    emit('file-selected', file);
+    return true;
+  } catch (error) {
+    console.error('ファイル復元エラー:', error);
+    return false;
   }
 }
 
@@ -143,6 +181,12 @@ function clearImage() {
 defineExpose({
   featuredImageInput,
   uploadImage,
-  imageFile
+  imageFile,
+  preview,
+  fileDataBase64,
+  setPreview(previewData: string | null) {
+    preview.value = previewData;
+  },
+  restoreFileFromBase64
 });
 </script> 

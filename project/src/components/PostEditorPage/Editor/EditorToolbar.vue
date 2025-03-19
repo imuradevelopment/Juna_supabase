@@ -10,116 +10,126 @@
     <!-- 見出し2ボタン -->
     <button
       type="button"
-      class="btn-icon-info"
+      class="btn-icon-info tooltip-container"
       :class="{ 'bg-primary/20 text-primary': editor?.isActive('heading', { level: 2 }) }"
       @click.prevent="toggleHeading(2)"
       @touchend.prevent="toggleHeading(2)"
       title="見出し2"
     >
       <PhTextHTwo class="h-5 w-5" />
+      <div class="tooltip">見出し2 <kbd>{{ isMac ? 'Option' : 'Alt' }}+2</kbd></div>
     </button>
     
     <!-- 見出し3ボタン -->
     <button
-      class="btn-icon-info"
+      class="btn-icon-info tooltip-container"
       :class="{ 'bg-primary/20 text-primary': editor?.isActive('heading', { level: 3 }) }"
       @click.prevent="toggleHeading(3)"
       @touchend.prevent="toggleHeading(3)"
       title="見出し3"
     >
       <PhTextHThree class="h-5 w-5" />
+      <div class="tooltip">見出し3 <kbd>{{ isMac ? 'Option' : 'Alt' }}+3</kbd></div>
     </button>
 
     <!-- 太字ボタン -->
     <button
-      class="btn-icon-accent1"
+      class="btn-icon-accent1 tooltip-container"
       :class="{ 'bg-primary/20 text-primary': editor?.isActive('bold') }"
       @click.prevent="toggleBold"
       @touchend.prevent="toggleBold"
       title="太字"
     >
       <PhTextBolder class="h-5 w-5" />
+      <div class="tooltip">太字 <kbd>{{ isMac ? '⌘' : 'Ctrl' }}+B</kbd></div>
     </button>
 
     <!-- 斜体ボタン -->
     <button
-      class="btn-icon-accent1"
+      class="btn-icon-accent1 tooltip-container"
       :class="{ 'bg-primary/20 text-primary': editor?.isActive('italic') }"
       @click.prevent="toggleItalic"
       @touchend.prevent="toggleItalic"
       title="斜体"
     >
       <PhTextItalic class="h-5 w-5" />
+      <div class="tooltip">斜体 <kbd>{{ isMac ? '⌘' : 'Ctrl' }}+I</kbd></div>
     </button>
 
     <!-- 取り消し線ボタン -->
     <button
-      class="btn-icon-accent1"
+      class="btn-icon-accent1 tooltip-container"
       :class="{ 'bg-primary/20 text-primary': editor?.isActive('strike') }"
       @click.prevent="toggleStrike"
       @touchend.prevent="toggleStrike"
       title="取り消し線"
     >
       <PhTextStrikethrough class="h-5 w-5" />
+      <div class="tooltip">取り消し線 <kbd>{{ isMac ? 'Option' : 'Alt' }}+S</kbd></div>
     </button>
 
     <!-- 箇条書きリストボタン -->
     <button
-      class="btn-icon-accent2"
+      class="btn-icon-accent2 tooltip-container"
       :class="{ 'bg-primary/20 text-primary': editor?.isActive('bulletList') }"
       @click.prevent="toggleBulletList"
       @touchend.prevent="toggleBulletList"
       title="箇条書き"
     >
       <PhListBullets class="h-5 w-5" />
+      <div class="tooltip">箇条書き <kbd>{{ isMac ? 'Option' : 'Alt' }}+8</kbd></div>
     </button>
 
     <!-- 番号付きリストボタン -->
     <button
-      class="btn-icon-accent2"
+      class="btn-icon-accent2 tooltip-container"
       :class="{ 'bg-primary/20 text-primary': editor?.isActive('orderedList') }"
       @click.prevent="toggleOrderedList"
       @touchend.prevent="toggleOrderedList"
       title="番号付きリスト"
     >
       <PhListNumbers class="h-5 w-5" />
+      <div class="tooltip">番号付きリスト <kbd>{{ isMac ? 'Option' : 'Alt' }}+7</kbd></div>
     </button>
 
     <!-- 引用ボタン -->
     <button
-      class="btn-icon-accent3"
+      class="btn-icon-accent3 tooltip-container"
       :class="{ 'bg-primary/20 text-primary': editor?.isActive('blockquote') }"
       @click.prevent="toggleBlockquote"
       @touchend.prevent="toggleBlockquote"
       title="引用"
     >
       <PhQuotes class="h-5 w-5" />
+      <div class="tooltip">引用 <kbd>{{ isMac ? 'Option' : 'Alt' }}+Q</kbd></div>
     </button>
 
     <!-- 水平線ボタン -->
     <button
-      class="btn-icon-accent3"
+      class="btn-icon-accent3 tooltip-container"
       @click.prevent="setHorizontalRule"
       @touchend.prevent="setHorizontalRule"
       title="水平線"
     >
       <PhMinus class="h-5 w-5" />
+      <div class="tooltip">水平線 <kbd>{{ isMac ? 'Option' : 'Alt' }}+H</kbd></div>
     </button>
 
     <!-- リンクボタン -->
     <button
-      class="btn-icon-primary"
+      class="btn-icon-primary tooltip-container"
       :class="{ 'bg-primary/20 text-primary': editor?.isActive('link') }"
       @click.prevent="$emit('open-link-dialog')"
       @touchend.prevent="$emit('open-link-dialog')"
       title="リンク"
     >
       <PhLink class="h-5 w-5" />
+      <div class="tooltip">リンク <kbd>{{ isMac ? '⌘' : 'Ctrl' }}+K</kbd></div>
     </button>
 
     <!-- 画像アップロードボタン -->
     <button
-      class="btn-icon-success"
+      class="btn-icon-success tooltip-container"
       @click.prevent="$emit('open-file-dialog')"
       @touchend.prevent="$emit('open-file-dialog')"
       title="画像"
@@ -127,32 +137,35 @@
     >
       <PhSpinner v-if="uploading" class="h-5 w-5 animate-spin" />
       <PhImage v-else class="h-5 w-5" />
+      <div class="tooltip">画像 <kbd>{{ isMac ? 'Option' : 'Alt' }}+I</kbd></div>
     </button>
 
     <!-- 元に戻すボタン -->
     <button
-      class="btn-icon-secondary"
+      class="btn-icon-secondary tooltip-container"
       @click.prevent="undoEdit"
       @touchend.prevent="undoEdit"
       title="元に戻す"
     >
       <PhArrowCounterClockwise class="h-5 w-5" />
+      <div class="tooltip">前の状態に戻す <kbd>{{ isMac ? '⌘' : 'Ctrl' }}+Z</kbd></div>
     </button>
 
     <!-- やり直しボタン -->
     <button
-      class="btn-icon-secondary"
+      class="btn-icon-secondary tooltip-container"
       @click.prevent="redoEdit"
       @touchend.prevent="redoEdit"
       title="やり直し"
     >
       <PhArrowClockwise class="h-5 w-5" />
+      <div class="tooltip">次の状態に進む <kbd>{{ isMac ? '⌘' : 'Ctrl' }}+Y</kbd></div>
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue';
 import { 
   PhTextHTwo,
   PhTextHThree,
@@ -169,6 +182,14 @@ import {
   PhArrowClockwise,
   PhSpinner
 } from '@phosphor-icons/vue';
+
+// OS判定変数
+const isMac = computed(() => {
+  if (typeof navigator !== 'undefined') {
+    return /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+  }
+  return false;
+});
 
 // コンポーネントのプロパティ定義
 const props = defineProps({
@@ -340,13 +361,110 @@ onMounted(() => {
   try {
     const cleanupKeyboardWatchers = setupKeyboardWatchers();
     
-    onBeforeUnmount(cleanupKeyboardWatchers);
+    // キーボードショートカットのイベントリスナーを設定
+    window.addEventListener('keydown', handleKeyboardShortcuts);
+    
+    onBeforeUnmount(() => {
+      cleanupKeyboardWatchers();
+      window.removeEventListener('keydown', handleKeyboardShortcuts);
+    });
     
     updateToolbarPosition();
   } catch (error) {
     console.error('ツールバーの初期化に失敗しました:', error);
   }
 });
+
+/**
+ * キーボードショートカットハンドラー
+ */
+function handleKeyboardShortcuts(event: KeyboardEvent) {
+  if (!props.editor || !props.isFocused) return;
+  
+  // エディタがフォーカスされている場合は常にブラウザのデフォルトショートカットを無効化
+  const isCtrlOrCmd = event.ctrlKey || event.metaKey;
+  const isAlt = event.altKey;
+  
+  // 2キー組み合わせの基本的なショートカットを無効化（編集用のものは常に捕捉）
+  if ((isCtrlOrCmd && ['b', 'i', 'z', 'y', 'k'].includes(event.key.toLowerCase())) || 
+      (isAlt && ['2', '3', '7', '8', 'q', 'h', 'i', 's'].includes(event.key.toLowerCase()))) {
+    event.preventDefault();
+  }
+  
+  // ショートカットのハンドリング
+  if (isCtrlOrCmd) {
+    switch (event.key.toLowerCase()) {
+      // 太字
+      case 'b':
+        toggleBold();
+        break;
+      
+      // 斜体
+      case 'i':
+        toggleItalic();
+        break;
+      
+      // リンク
+      case 'k':
+        emit('open-link-dialog');
+        break;
+      
+      // 元に戻す
+      case 'z':
+        if (!event.shiftKey) {
+          undoEdit();
+        }
+        break;
+        
+      // やり直し
+      case 'y':
+        redoEdit();
+        break;
+    }
+  } else if (isAlt) {
+    switch (event.key) {
+      // 見出し
+      case '2':
+        toggleHeading(2);
+        break;
+      case '3':
+        toggleHeading(3);
+        break;
+      
+      // リスト
+      case '8':
+        toggleBulletList();
+        break;
+      case '7':
+        toggleOrderedList();
+        break;
+      
+      // 引用
+      case 'q':
+      case 'Q':
+        toggleBlockquote();
+        break;
+      
+      // 水平線
+      case 'h':
+      case 'H':
+        setHorizontalRule();
+        break;
+      
+      // 画像
+      case 'i':
+      case 'I':
+        emit('open-file-dialog');
+        break;
+        
+      // 取り消し線
+      case 's':
+      case 'S':
+        toggleStrike();
+        break;
+    }
+  }
+}
 
 // ツールバー要素の変更を監視
 watch(() => props.toolbarElement, (newElement) => {
@@ -510,6 +628,48 @@ button {
   user-select: none;
 }
 
+/* ツールチップのスタイル */
+.tooltip-container {
+  position: relative;
+}
+
+.tooltip {
+  visibility: hidden;
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(30, 30, 30, 0.9);
+  color: theme('colors.text', white);
+  text-align: center;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.tooltip kbd {
+  background-color: rgba(50, 50, 50, 0.8);
+  color: white;
+  border-radius: 3px;
+  padding: 1px 4px;
+  margin: 0 2px;
+  font-size: 0.7rem;
+  font-family: monospace;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  border: 1px solid theme('colors.border', #555);
+}
+
+.tooltip-container:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
 /* フローティングツールバーのスタイル */
 .floating-toolbar {
   position: fixed;
@@ -523,5 +683,12 @@ button {
   will-change: transform;
   backface-visibility: hidden;
   width: 100%;
+}
+
+/* モバイル環境でのツールチップ表示を制御 */
+@media (max-width: 640px) {
+  .tooltip {
+    display: none;
+  }
 }
 </style>

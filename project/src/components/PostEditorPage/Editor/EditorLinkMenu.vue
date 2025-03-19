@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted, watch } from 'vue';
+import { ref, computed, nextTick, onMounted, watch, onBeforeUnmount } from 'vue';
 import type { Editor } from '@tiptap/vue-3';
 
 // コンポーネントのプロパティ定義
@@ -227,6 +227,28 @@ function moveCaretAfterLink(pos: number) {
   }
 }
 
+/**
+ * キーボードショートカットハンドラー
+ * リンクメニュー表示時のショートカット処理
+ */
+function handleKeyboardShortcuts(event: KeyboardEvent) {
+  if (!props.visible) return;
+  
+  // エスケープキーでメニューをキャンセル
+  if (event.key === 'Escape') {
+    event.preventDefault();
+    cancel();
+    return;
+  }
+  
+  // Enter キーでリンクを適用
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    applyLink();
+    return;
+  }
+}
+
 // コンポーネントマウント時の初期化
 onMounted(() => {
   url.value = props.initialUrl;
@@ -237,6 +259,14 @@ onMounted(() => {
       linkInput.value.focus();
     }
   });
+  
+  // キーボードショートカットのイベントリスナーを設定
+  window.addEventListener('keydown', handleKeyboardShortcuts);
+});
+
+// コンポーネント破棄時の後処理
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleKeyboardShortcuts);
 });
 
 // 表示状態の変更を監視
