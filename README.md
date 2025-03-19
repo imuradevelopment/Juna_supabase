@@ -78,7 +78,7 @@ npm run dev
 @PostDetailPage.vue @supabase.ts @auth.ts @RichTextContent.vue @CommentSystem.vue @CommentItem.vue @storage.ts @index.ts @tailwind.config.js これは投稿詳細ページです。どのようになっていますか？説明してください。
 
 #### 投稿作成、編集ページ
-@PostEditorPage.vue @supabase.ts @auth.ts @RichTextEditor.vue @EditorToolbar.vue @storage.ts @index.ts @tailwind.config.js @storage.ts これは投稿作成、編集ページです。どのようになっていますか？説明してください。
+@PostEditorPage.vue @supabase.ts @auth.ts @RichTextEditor.vue @EditorToolbar.vue @EditorLinkMenu.vue @storage.ts @index.ts @tailwind.config.js @storage.ts これは投稿作成、編集ページです。どのようになっていますか？説明してください。
 
 #### 投稿一覧ページ
 @PostsPage.vue @supabase.ts @PostCard.vue @index.ts @tailwind.config.js @storage.ts @auth.ts これは投稿一覧ページです。どのようになっていますか？説明してください。

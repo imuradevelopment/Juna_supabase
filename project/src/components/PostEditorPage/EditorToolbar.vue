@@ -173,7 +173,7 @@ import {
 // プロパティの定義
 const props = defineProps({
   editor: {
-    type: Object as () => any,
+    type: Object as () => import('@tiptap/vue-3').Editor | null | undefined,
     required: true
   },
   uploading: {
