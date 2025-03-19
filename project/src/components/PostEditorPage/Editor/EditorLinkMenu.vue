@@ -1,3 +1,4 @@
+<!-- リンク編集用のフローティングメニューコンポーネント -->
 <template>
   <div 
     v-if="visible" 
@@ -6,7 +7,7 @@
     :style="menuStyle"
   >
     <div class="flex flex-col gap-2">
-      <!-- リンクURL入力フィールド -->
+      <!-- URLの入力フィールド -->
       <div class="flex items-center">
         <input 
           ref="linkInput"
@@ -19,7 +20,7 @@
         />
       </div>
       
-      <!-- リンクテキスト入力フィールド -->
+      <!-- リンクテキストの入力フィールド -->
       <div class="flex items-center">
         <input 
           ref="linkTextInput"
@@ -32,22 +33,16 @@
         />
       </div>
     </div>
+    <!-- アクションボタン -->
     <div class="flex justify-end space-x-2 mt-3">
       <button 
-        @click="cancel"
+        @click.stop.prevent="cancel"
         class="btn btn-secondary btn-sm"
       >
         キャンセル
       </button>
       <button 
-        @click="removeLink"
-        class="btn btn-error btn-sm"
-        :disabled="!isLinkActive"
-      >
-        リンク解除
-      </button>
-      <button 
-        @click="applyLink"
+        @click.stop.prevent="applyLink"
         class="btn btn-primary btn-sm"
         :disabled="!url"
       >
@@ -61,11 +56,11 @@
 import { ref, computed, nextTick, onMounted, watch } from 'vue';
 import type { Editor } from '@tiptap/vue-3';
 
-// Props
+// コンポーネントのプロパティ定義
 const props = defineProps({
   editor: {
     type: Object as () => Editor | null | undefined,
-    required: true
+    default: undefined
   },
   visible: {
     type: Boolean,
@@ -93,38 +88,36 @@ const props = defineProps({
   }
 });
 
-// Emits
-const emit = defineEmits(['close', 'apply', 'remove', 'open']);
+// イベント定義
+const emit = defineEmits(['close', 'apply', 'open']);
 
-// ローカル状態
+// メニューに関する状態
 const linkMenu = ref<HTMLElement | null>(null);
 const linkInput = ref<HTMLInputElement | null>(null);
 const linkTextInput = ref<HTMLInputElement | null>(null);
 const url = ref('');
 const text = ref('');
 
-// URL検出の正規表現
+// URLの正規表現パターン
 const urlRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/gi;
 
-// リンクが現在アクティブかどうか
-const isLinkActive = computed(() => props.editor?.isActive('link') ?? false);
-
-// リンクメニューのスタイルを計算
+/**
+ * メニューのスタイルを計算
+ * キーボードが表示されているか否かで位置を調整
+ */
 const menuStyle = computed(() => {
   const { x, y } = props.position;
   
-  // モバイル向け（キーボード表示時）
   if (props.isKeyboardVisible) {
     return {
       left: '50%',
-      top: '50%',
+      top: '40%',
       transform: 'translate(-50%, -50%)',
       maxWidth: '90vw',
       width: '320px'
     };
   }
   
-  // デスクトップまたはキーボード非表示モバイル向け
   return {
     left: `${x}px`,
     top: `${y}px`,
@@ -133,18 +126,18 @@ const menuStyle = computed(() => {
   };
 });
 
-// エディターからリンク範囲を検出する関数
+/**
+ * リンクの範囲を検出する
+ * 指定された位置のノードがリンクマークを持っているか確認し、リンクの開始・終了位置を特定
+ */
 function findLinkRange(state: any, pos: number) {
   try {
-    // リンクマークのタイプを取得
     const linkType = state.schema.marks.link;
     if (!linkType) return null;
     
-    // カーソル位置のノードを取得
     const node = state.doc.nodeAt(pos);
     const prevNode = pos > 0 ? state.doc.nodeAt(pos - 1) : null;
     
-    // リンクマークを見つける
     let linkMark = null;
     if (node && node.marks) {
       linkMark = node.marks.find((m: any) => m.type.name === 'link');
@@ -156,14 +149,12 @@ function findLinkRange(state: any, pos: number) {
     
     if (!linkMark) return null;
     
-    // リンクのhref属性を記録
     const href = linkMark.attrs.href;
     
-    // 前方と後方に検索してリンク範囲を特定
     let start = pos;
     let end = pos;
     
-    // 前方検索
+    // リンク開始位置を検索
     let i = pos;
     while (i >= 0) {
       const nodeAtPos = state.doc.nodeAt(i);
@@ -184,7 +175,7 @@ function findLinkRange(state: any, pos: number) {
       }
     }
     
-    // 後方検索
+    // リンク終了位置を検索
     i = pos;
     while (i < state.doc.content.size) {
       const nodeAtPos = state.doc.nodeAt(i);
@@ -215,79 +206,82 @@ function findLinkRange(state: any, pos: number) {
   }
 }
 
-// カーソルをリンクの後ろに移動し、リンクマークの影響を解除する
+/**
+ * リンク追加後にカーソル位置を調整
+ * リンク後ろにカーソルを移動させる
+ */
 function moveCaretAfterLink(pos: number) {
   if (!props.editor) return;
   
-  props.editor
-    .chain()
-    .focus()
-    .setTextSelection(pos)
-    // 空白スペースを挿入してリンクから確実に脱出
-    .insertContent(' ')
-    .deleteRange({ from: pos, to: pos + 1 })
-    // 明示的にリンクマークの影響を無効化
-    .unsetMark('link')
-    .run();
+  try {
+    props.editor
+      .chain()
+      .focus()
+      .setTextSelection(pos)
+      .insertContent(' ')
+      .deleteRange({ from: pos, to: pos + 1 })
+      .unsetMark('link')
+      .run();
+  } catch (error) {
+    console.error('カーソル移動エラー:', error);
+  }
 }
 
-// 初期値設定
+// コンポーネントマウント時の初期化
 onMounted(() => {
-  // 表示と同時に値をセット
   url.value = props.initialUrl;
   text.value = props.initialText || props.selectedText;
   
-  // 入力フィールドにフォーカス
   nextTick(() => {
-    linkInput.value?.focus();
+    if (linkInput.value) {
+      linkInput.value.focus();
+    }
   });
 });
 
-// 可視性変更時に値を更新
+// 表示状態の変更を監視
 watch(() => props.visible, (newValue) => {
   if (newValue) {
-    // メニューが表示されたときにpropsの値を反映
     url.value = props.initialUrl;
     text.value = props.initialText || props.selectedText;
     
-    // 表示後にフォーカス
     nextTick(() => {
-      linkInput.value?.focus();
+      if (linkInput.value) {
+        linkInput.value.focus();
+      }
     });
   }
 });
 
-// リンクメニューを表示する関数
+/**
+ * リンクメニューを表示する
+ * 現在の選択テキストやカーソル位置に基づいてリンクメニューを開く
+ */
 function showLinkMenu() {
   if (!props.editor) return;
   
-  // カーソル位置を取得
   const { state, view } = props.editor;
   const { from, to } = state.selection;
   
-  // 選択テキスト
   const selectedText = state.doc.textBetween(from, to);
   
-  // リンクURLとテキストの初期値
   let linkUrl = '';
   let linkText = '';
   
+  // 選択テキストがURLの場合、URLとして使用
   if (selectedText.match(urlRegex)) {
-    // 選択テキストがURLの場合
     linkUrl = selectedText;
   } else if (props.editor.isActive('link')) {
-    // 既存のリンクがある場合はそのURLを取得
+    // 既存リンクが選択されている場合
     const attrs = props.editor.getAttributes('link');
     linkUrl = attrs.href || '';
     
-    // 選択範囲が空の場合、リンクテキストを取得
     if (from === to) {
       try {
         const linkRange = findLinkRange(state, from);
         if (linkRange) {
           linkText = state.doc.textBetween(linkRange.from, linkRange.to);
         } else {
-          // リンク範囲が見つからない場合は選択テキストを使用
           linkText = selectedText;
         }
       } catch (error) {
@@ -295,38 +289,33 @@ function showLinkMenu() {
         linkText = selectedText;
       }
     } else {
-      // 選択範囲がある場合はその範囲のテキストを使用
       linkText = selectedText;
     }
   } else {
-    // 新規リンク作成の場合
     linkText = selectedText;
   }
   
-  // メニュー位置をカーソル位置に設定
+  // メニュー表示位置を計算
   const coords = view.coordsAtPos(from);
   
-  // 画面の端に近い場合の調整
   let x = coords.right;
   let y = coords.bottom + 10;
   
-  // キーボードが表示されている場合は中央に表示
+  // キーボードが表示されている場合は画面中央に配置
   if (props.isKeyboardVisible) {
     x = window.innerWidth / 2;
-    y = window.innerHeight / 2 - 100; // キーボードの上に表示
+    y = window.innerHeight * 0.4;
   } else {
-    // 右端に近い場合は左側に表示
+    // 画面端に近い場合の位置調整
     if (x + 320 > window.innerWidth) {
       x = Math.max(10, coords.left - 320);
     }
     
-    // 下端に近い場合は上に表示
     if (y + 150 > window.innerHeight) {
       y = coords.top - 150;
     }
   }
   
-  // 親コンポーネントにメニュー表示イベントを発行
   emit('open', {
     position: { x, y },
     initialUrl: linkUrl,
@@ -335,33 +324,36 @@ function showLinkMenu() {
   });
 }
 
-// リンク適用
+/**
+ * リンクを適用する
+ * 入力されたURLとテキストを使ってリンクを作成
+ */
 function applyLink() {
   if (!props.editor || !url.value.trim()) {
     cancel();
     return;
   }
   
-  // URLの形式を確認し、必要なら修正
+  // URLの形式を調整（http/httpsプレフィックスがなければ追加）
   let finalUrl = url.value.trim();
   if (!/^https?:\/\//i.test(finalUrl)) {
     finalUrl = 'https://' + finalUrl;
   }
   
-  // リンクテキストが空の場合、URLをテキストとして使用
   const finalText = text.value.trim() || finalUrl;
   
-  // 親コンポーネントにデータを渡す
   emit('apply', {
     url: finalUrl,
     text: finalText
   });
   
-  // 状態をリセットしてメニューを閉じる
   cancel();
 }
 
-// 単純なリンク挿入処理（新規作成/フォールバック用）
+/**
+ * シンプルなリンクを挿入
+ * 新規リンク作成のためのヘルパー関数
+ */
 function insertSimpleLink(url: string, text: string) {
   if (!props.editor) return;
   
@@ -369,46 +361,45 @@ function insertSimpleLink(url: string, text: string) {
   const { from, to } = state.selection;
   const hasSelection = from !== to;
   
-  if (hasSelection) {
-    // 選択範囲がある場合: テキスト置換してリンク化
-    props.editor
-      .chain()
-      .focus()
-      .deleteRange({ from, to })
-      .insertContent(text)
-      .setTextSelection({ from, to: from + text.length })
-      .setLink({ href: url })
-      .run();
+  try {
+    if (hasSelection) {
+      // 選択範囲がある場合は選択テキストを置き換え
+      props.editor
+        .chain()
+        .focus()
+        .deleteRange({ from, to })
+        .insertContent(text)
+        .setTextSelection({ from, to: from + text.length })
+        .setLink({ href: url })
+        .run();
+        
+      moveCaretAfterLink(from + text.length);
+    } else {
+      // カーソル位置にリンクを挿入
+      const currentPos = props.editor.state.selection.from;
       
-    // カーソルをリンクの後ろに移動
-    const newPos = from + text.length;
-    setTimeout(() => {
-      moveCaretAfterLink(newPos);
-    }, 10);
-  } else {
-    // 選択範囲がない場合: テキスト挿入してリンク化
-    const currentPos = props.editor.state.selection.from;
-    
-    props.editor.chain().focus().insertContent({
-      type: 'text',
-      text: text,
-      marks: [
-        {
-          type: 'link',
-          attrs: { href: url }
-        }
-      ]
-    }).run();
-    
-    // カーソルをリンクの後ろに移動
-    const newPos = currentPos + text.length;
-    setTimeout(() => {
-      moveCaretAfterLink(newPos);
-    }, 10);
+      props.editor.chain().focus().insertContent({
+        type: 'text',
+        text: text,
+        marks: [
+          {
+            type: 'link',
+            attrs: { href: url }
+          }
+        ]
+      }).run();
+      
+      moveCaretAfterLink(currentPos + text.length);
+    }
+  } catch (error) {
+    console.error('リンク挿入エラー:', error);
   }
 }
 
-// リンクの適用処理
+/**
+ * リンク適用を処理
+ * 既存リンクの編集または新規リンクの作成を行う
+ */
 function handleApplyLink(data: { url: string, text: string }) {
   if (!props.editor) return;
   
@@ -416,78 +407,53 @@ function handleApplyLink(data: { url: string, text: string }) {
   const { state } = props.editor;
   const { from } = state.selection;
   
-  // 既存のリンクを編集する場合
-  if (props.editor.isActive('link')) {
-    const linkRange = findLinkRange(state, from);
-    
-    if (linkRange) {
-      try {
-        // ステップ1: リンク範囲を選択してリンクマークを解除
+  try {
+    if (props.editor.isActive('link')) {
+      // 既存リンクの編集
+      const linkRange = findLinkRange(state, from);
+      
+      if (linkRange) {
         props.editor
           .chain()
           .focus()
           .setTextSelection({ from: linkRange.from, to: linkRange.to })
           .unsetMark('link')
-          .run();
-        
-        // ステップ2: リンクテキストを置換
-        props.editor
-          .chain()
-          .focus()
           .deleteRange({ from: linkRange.from, to: linkRange.to })
           .insertContent(text)
-          .run();
-        
-        // ステップ3: 新テキスト範囲を選択してリンクを設定
-        props.editor
-          .chain()
-          .focus()
           .setTextSelection({ from: linkRange.from, to: linkRange.from + text.length })
           .setLink({ href: url })
           .run();
         
-        // ステップ4: カーソルをリンクの後ろに移動
-        const newPos = linkRange.from + text.length;
-        setTimeout(() => {
-          moveCaretAfterLink(newPos);
-        }, 10);
-      } catch (error) {
-        console.error('リンク編集エラー:', error);
-        // エラー時は単純なリンク挿入
+        moveCaretAfterLink(linkRange.from + text.length);
+      } else {
         insertSimpleLink(url, text);
       }
     } else {
-      // リンク範囲が見つからない場合は通常挿入
+      // 新規リンクの作成
       insertSimpleLink(url, text);
     }
-  } else {
-    // 新規リンク挿入の場合
-    insertSimpleLink(url, text);
+  } catch (error) {
+    console.error('リンク適用エラー:', error);
+    try {
+      // エラー発生時はシンプルな挿入にフォールバック
+      insertSimpleLink(url, text);
+    } catch (e) {
+      console.error('フォールバック挿入エラー:', e);
+    }
   }
 }
 
-// リンク削除
-function removeLink() {
-  if (!props.editor) return;
-  
-  // リンク削除イベント発行
-  emit('remove');
-  
-  // 状態をリセットしてメニューを閉じる
-  cancel();
-}
-
-// キャンセル
+/**
+ * リンクメニューをキャンセル
+ */
 function cancel() {
-  // 状態をリセット
   url.value = '';
   text.value = '';
   
-  // メニューを閉じる
   emit('close');
 }
 
-// 外部に公開するメソッド
+// 外部から呼び出し可能な関数を公開
 defineExpose({
   showLinkMenu,
   handleApplyLink,
@@ -498,29 +464,35 @@ defineExpose({
 </script>
 
 <style scoped lang="postcss">
+/* フローティングリンクメニューのスタイル */
 .floating-link-menu {
   transition: all 0.2s ease-out;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   backdrop-filter: blur(8px);
-  /* モバイル向け最適化 */
-  touch-action: none;
+  touch-action: manipulation;
   user-select: none;
   -webkit-user-select: none;
 }
 
-/* モバイルでのタッチ操作最適化 */
+/* タッチ操作の最適化 */
 input, button {
   touch-action: manipulation;
 }
 
-/* 視認性向上のためのスタイル追加 */
+/* ボタンのトランジション */
 .btn {
   transition: all 0.15s ease-in-out;
 }
 
-/* フォーカス時のアウトライン強化 */
+/* フォーカス時のスタイル */
 input:focus {
   outline: 2px solid var(--color-primary-light, #4f46e5);
   outline-offset: 1px;
 }
-</style> 
+
+/* 無効化されたボタンのスタイル */
+button[disabled] {
+  pointer-events: auto;
+  opacity: 0.6;
+}
+</style>
