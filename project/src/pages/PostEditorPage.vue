@@ -22,7 +22,7 @@
           </div>
           
           <div>
-            <label for="excerpt" class="block text-sm font-medium mb-1 text-text-muted">抜粋</label>
+            <label for="excerpt" class="block text-sm font-medium mb-1 text-text-muted">概要</label>
             <textarea
               id="excerpt"
               v-model="formData.excerpt"
@@ -33,38 +33,13 @@
           </div>
           
           <div>
-            <label class="block text-sm font-medium mb-1 text-text-muted">アイキャッチ画像</label>
-            <div class="flex items-center space-x-4">
-              <div v-if="featuredImagePreview || formData.cover_image_path" class="relative w-32 h-24 bg-surface-variant rounded overflow-hidden">
-                <img 
-                  :src="featuredImagePreview || getCoverImageUrl(formData.cover_image_path as string)" 
-                  alt="プレビュー" 
-                  class="w-full h-full object-cover"
-                />
-                <button 
-                  type="button"
-                  @click="clearImage" 
-                  class="btn-icon btn-icon-error btn-icon-sm absolute top-1 right-1"
-                >
-                  <PhX class="w-4 h-4" />
-                </button>
-              </div>
-              
-              <div>
-                <label class="btn btn-outline-secondary cursor-pointer inline-flex items-center whitespace-nowrap">
-                  <PhImage class="w-5 h-5 mr-2" />
-                  <span>画像をアップロード</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    class="hidden w-px h-px opacity-0 absolute"
-                    @change="handleImageUpload"
-                    ref="featuredImageInput"
-                  />
-                </label>
-                <p class="text-xs text-text-muted mt-1">最大サイズ: 2MB</p>
-              </div>
-            </div>
+            <EyecatchUploader
+              v-model="formData.cover_image_path"
+              :richTextEditorRef="richTextEditorRef"
+              @file-selected="featuredImageFile = $event"
+              @upload-error="formError = $event"
+              ref="eyecatchUploaderRef"
+            />
           </div>
           
           <div>
@@ -80,71 +55,12 @@
           </div>
           
           <div>
-            <label class="block text-sm font-medium mb-1 text-text-muted">カテゴリ <span class="text-error">*</span></label>
-            
-            <div class="relative">
-              <div 
-                class="min-h-10 w-full px-4 py-2 rounded border border-border bg-surface flex flex-wrap gap-2 items-center cursor-text"
-                @click="isCategoryDropdownOpen = true"
-              >
-                <div 
-                  v-for="categoryId in formData.categories" 
-                  :key="categoryId"
-                  class="inline-flex items-center bg-primary/10 text-primary rounded-full px-3 py-1 text-sm"
-                >
-                  {{ getCategoryName(categoryId) }}
-                  <button 
-                    type="button" 
-                    @click.stop="removeCategory(categoryId)"
-                    class="ml-1 text-primary hover:text-primary-dark"
-                  >
-                    <PhX class="w-4 h-4" />
-                  </button>
-                </div>
-                
-                <input
-                  ref="categoryInputRef"
-                  v-model="categorySearchQuery"
-                  @focus="isCategoryDropdownOpen = true"
-                  @blur="handleCategoryBlur"
-                  @keydown.enter.prevent="handleCategoryEnterKey"
-                  class="flex-1 min-w-[120px] bg-transparent outline-none text-text"
-                  placeholder="カテゴリを選択または入力..."
-                />
-              </div>
-              
-              <div 
-                v-if="isCategoryDropdownOpen" 
-                class="absolute z-10 w-full mt-1 max-h-60 overflow-y-auto glass-card border border-border rounded shadow-lg"
-              >
-                <div 
-                  v-if="categorySearchQuery && filteredCategories.length === 0" 
-                  @click="createNewCategory"
-                  class="cursor-pointer px-4 py-2 hover:bg-surface-variant text-text-muted flex items-center"
-                >
-                  <PhPlus class="w-5 h-5 mr-2 text-success" />
-                  <span>「{{ categorySearchQuery }}」を新しいカテゴリとして追加</span>
-                </div>
-                
-                <div 
-                  v-for="category in filteredCategories" 
-                  :key="category.id"
-                  @click="addCategory(category.id)"
-                  class="cursor-pointer px-4 py-2 hover:bg-surface-variant text-text"
-                  :class="{'bg-surface-variant': formData.categories.includes(category.id.toString())}"
-                >
-                  {{ category.name }}
-                </div>
-                
-                <div v-if="!categorySearchQuery && !filteredCategories.length" class="px-4 py-2 text-text-muted">
-                  利用可能なカテゴリがありません
-                </div>
-              </div>
-            </div>
-            
-            <p v-if="formData.categories.length === 0" class="text-xs mt-1 text-error">
-              少なくとも1つのカテゴリを選択してください
-            </p>
+            <CategorySelector
+              ref="categorySelectorRef"
+              v-model="formData.categories"
+              :postId="props.id"
+              @error="formError = $event"
+            />
           </div>
           
           <div>
@@ -214,8 +130,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
 import RichTextEditor from '../components/PostEditorPage/Editor/RichTextEditor.vue';
-import { getCoverImageUrl } from '../lib/storage';
-import { PhX, PhImage, PhSpinner, PhPlus } from '@phosphor-icons/vue';
+import { PhSpinner } from '@phosphor-icons/vue';
+import EyecatchUploader from '../components/PostEditorPage/Eyecatch/EyecatchUploader.vue';
+import CategorySelector from '../components/PostEditorPage/Category/CategorySelector.vue';
 
 interface FormData {
   title: string;
@@ -224,12 +141,6 @@ interface FormData {
   cover_image_path: string | null;
   published: boolean;
   categories: string[];
-}
-
-interface Category {
-  id: number;
-  name: string;
-  description: string | null;
 }
 
 const props = defineProps({
@@ -251,9 +162,7 @@ const formData = reactive<FormData>({
   categories: []
 });
 
-const availableCategories = ref<Category[]>([]);
 const featuredImageFile = ref<File | null>(null);
-const featuredImagePreview = ref<string | null>(null);
 const submitting = ref(false);
 const formError = ref('');
 const isEditMode = computed(() => !!props.id);
@@ -276,40 +185,17 @@ const isFormValid = computed(() => {
 });
 
 const uploadedImages = ref<{path: string, userId: string}[]>([]);
-
-const isCategoryDropdownOpen = ref(false);
-const categorySearchQuery = ref('');
-const filteredCategories = computed(() => {
-  if (!categorySearchQuery.value.trim()) {
-    return availableCategories.value.filter(
-      cat => !formData.categories.includes(cat.id.toString())
-    );
-  }
-  
-  const query = categorySearchQuery.value.toLowerCase().trim();
-  return availableCategories.value.filter(
-    cat => cat.name.toLowerCase().includes(query) && 
-           !formData.categories.includes(cat.id.toString())
-  );
-});
-const categoryInputRef = ref<HTMLInputElement | null>(null);
-
 const isUploading = ref(false);
-
 const pendingImages = ref<{file: File, id: string}[]>([]);
-
 const richTextEditorRef = ref<InstanceType<typeof RichTextEditor> | null>(null);
-
-const featuredImageInput = ref<HTMLInputElement | null>(null);
-
+const categorySelectorRef = ref<InstanceType<typeof CategorySelector> | null>(null);
+const eyecatchUploaderRef = ref<InstanceType<typeof EyecatchUploader> | null>(null);
 const sessionCheckInterval = ref<number | null>(null);
 const sessionExpiredModalOpen = ref(false);
 const isSessionValid = ref(true);
 
 onMounted(async () => {
   resetUploadState();
-  
-  await fetchCategories();
   
   if (props.id) {
     await fetchPost(props.id);
@@ -332,21 +218,6 @@ onBeforeUnmount(() => {
     clearInterval(sessionCheckInterval.value);
   }
 });
-
-async function fetchCategories() {
-  try {
-    const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name');
-    
-    if (error) throw error;
-    availableCategories.value = data || [];
-  } catch (err) {
-    console.error('カテゴリ取得エラー:', err);
-    formError.value = 'カテゴリの読み込みに失敗しました';
-  }
-}
 
 async function fetchPost(postId: string) {
   try {
@@ -403,37 +274,6 @@ function preventEnterSubmit(e: KeyboardEvent) {
   
   if (target.tagName === 'INPUT' && e.key === 'Enter') {
     e.preventDefault();
-  }
-}
-
-async function handleImageUpload(event: Event) {
-  event.preventDefault();
-  event.stopPropagation();
-  
-  const input = event.target as HTMLInputElement;
-  
-  if (!input.files || input.files.length === 0) return;
-  
-  try {
-    const file = input.files[0];
-    
-    if (file.size > 2 * 1024 * 1024) {
-      throw new Error('画像サイズは2MB以下にしてください');
-    }
-    
-    if (richTextEditorRef.value) {
-      featuredImagePreview.value = await richTextEditorRef.value.encodeImageToBase64(file);
-      featuredImageFile.value = file;
-    } else {
-      featuredImageFile.value = file;
-      featuredImagePreview.value = URL.createObjectURL(file);
-    }
-  } catch (error: any) {
-    console.error('画像処理エラー:', error);
-    alert(error.message || '画像の処理に失敗しました');
-  } finally {
-    const input = event.target as HTMLInputElement;
-    if (input) input.value = '';
   }
 }
 
@@ -526,16 +366,12 @@ async function handleSubmit() {
     
     const userId = session.user.id;
     
-    if (featuredImageFile.value) {
-      const fileExt = featuredImageFile.value.name.split('.').pop();
-      const fileName = `${userId}/${uuidv4()}.${fileExt}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('cover_images')
-        .upload(fileName, featuredImageFile.value);
-      
-      if (uploadError) throw uploadError;
-      formData.cover_image_path = fileName;
+    // アイキャッチ画像のアップロード処理をEyecatchUploaderに委譲
+    if (eyecatchUploaderRef.value && eyecatchUploaderRef.value.imageFile) {
+      const coverImagePath = await eyecatchUploaderRef.value.uploadImage(userId);
+      if (coverImagePath) {
+        formData.cover_image_path = coverImagePath;
+      }
     }
     
     const uploadedImageMap = new Map<string, string>();
@@ -662,17 +498,9 @@ async function createPost(postData: any) {
       }
     }
     
-    if (formData.categories.length > 0) {
-      const categoryRelations = formData.categories.map(categoryId => ({
-        post_id: newPost.id,
-        category_id: parseInt(categoryId)
-      }));
-      
-      const { error: categoryError } = await supabase
-        .from('post_categories')
-        .insert(categoryRelations);
-      
-      if (categoryError) throw categoryError;
+    // カテゴリの保存をCategorySelectorコンポーネントに委譲
+    if (categorySelectorRef.value) {
+      await categorySelectorRef.value.savePostCategories(newPost.id);
     }
     
     return newPost;
@@ -754,24 +582,9 @@ async function updatePost(postData: any) {
       }
     }
     
-    const { error: deleteError } = await supabase
-      .from('post_categories')
-      .delete()
-      .eq('post_id', props.id);
-    
-    if (deleteError) throw deleteError;
-    
-    if (formData.categories.length > 0) {
-      const categoryRelations = formData.categories.map(categoryId => ({
-        post_id: props.id,
-        category_id: parseInt(categoryId)
-      }));
-      
-      const { error: categoryError } = await supabase
-        .from('post_categories')
-        .insert(categoryRelations);
-      
-      if (categoryError) throw categoryError;
+    // カテゴリの保存をCategorySelectorコンポーネントに委譲
+    if (categorySelectorRef.value && props.id) {
+      await categorySelectorRef.value.savePostCategories(props.id);
     }
   } catch (err) {
     console.error('投稿更新エラー:', err);
@@ -779,74 +592,9 @@ async function updatePost(postData: any) {
   }
 }
 
-function clearImage() {
-  featuredImageFile.value = null;
-  featuredImagePreview.value = null;
-  formData.cover_image_path = null;
-}
-
-function handleCategoryBlur() {
-  setTimeout(() => {
-    isCategoryDropdownOpen.value = false;
-  }, 150);
-}
-
-function handleCategoryEnterKey() {
-  if (categorySearchQuery.value.trim() && filteredCategories.value.length > 0) {
-    addCategory(filteredCategories.value[0].id);
-  } else if (categorySearchQuery.value.trim()) {
-    createNewCategory();
-  }
-}
-
-async function createNewCategory() {
-  if (!categorySearchQuery.value.trim()) return;
-  
-  try {
-    const { data, error } = await supabase
-      .from('categories')
-      .insert([{ name: categorySearchQuery.value.trim() }])
-      .select('*')
-      .single();
-    
-    if (error) throw error;
-    
-    if (data) {
-      availableCategories.value.push(data);
-      addCategory(data.id);
-      categorySearchQuery.value = '';
-    }
-  } catch (err) {
-    console.error('カテゴリ作成エラー:', err);
-    formError.value = 'カテゴリの作成に失敗しました';
-  }
-}
-
-function addCategory(categoryId: number) {
-  const categoryIdStr = categoryId.toString();
-  if (!formData.categories.includes(categoryIdStr)) {
-    formData.categories.push(categoryIdStr);
-  }
-  categorySearchQuery.value = '';
-  categoryInputRef.value?.focus();
-}
-
-function removeCategory(categoryId: string) {
-  formData.categories = formData.categories.filter(id => id !== categoryId);
-}
-
-function getCategoryName(categoryId: string): string {
-  const category = availableCategories.value.find(c => c.id.toString() === categoryId);
-  return category ? category.name : 'カテゴリなし';
-}
-
 function resetUploadState() {
   isUploading.value = false;
 }
-
-defineExpose({
-  featuredImageInput
-});
 
 function handleLoginRedirect() {
   saveToLocalStorage();
