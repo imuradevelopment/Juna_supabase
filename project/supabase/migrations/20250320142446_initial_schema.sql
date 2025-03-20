@@ -130,7 +130,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- 最初にprofilesテーブルを作成
 -- ユーザープロフィールテーブル
 CREATE TABLE profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
@@ -138,7 +137,7 @@ CREATE TABLE profiles (
   nickname TEXT,
   avatar_data TEXT,
   bio TEXT,
-  disability_description TEXT,
+  personal_attributes_description TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );
@@ -189,11 +188,36 @@ CREATE POLICY "スーパー管理者のみ管理者削除可能"
   ON admin_users FOR DELETE 
   USING (is_super_admin(auth.uid()));
 
+-- フォロー関係テーブル
+CREATE TABLE followers (
+  follower_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  following_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  PRIMARY KEY (follower_id, following_id),
+  CHECK (follower_id != following_id)
+);
+
+-- 行レベルセキュリティを有効化
+ALTER TABLE followers ENABLE ROW LEVEL SECURITY;
+
+-- セキュリティポリシーを設定
+CREATE POLICY "フォロー関係は誰でも参照可能" 
+  ON followers FOR SELECT USING (true);
+
+CREATE POLICY "認証済みユーザーのみフォロー可能" 
+  ON followers FOR INSERT WITH CHECK (auth.uid() = follower_id);
+
+CREATE POLICY "自分のフォローのみ削除可能" 
+  ON followers FOR DELETE USING (auth.uid() = follower_id);
+
+CREATE POLICY "管理者は全てのフォロー関係を操作可能" 
+  ON followers FOR ALL 
+  USING (is_admin(auth.uid()));
+
 -- カテゴリテーブル
 CREATE TABLE categories (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
-  description TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   creator_id UUID REFERENCES profiles(id)
@@ -218,32 +242,6 @@ CREATE POLICY "作成者と管理者はカテゴリを更新可能"
 
 CREATE POLICY "作成者と管理者はカテゴリを削除可能" 
   ON categories FOR DELETE 
-  USING (creator_id = auth.uid() OR is_admin(auth.uid()));
-
--- 障害種別テーブル
-CREATE TABLE disability_types (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL UNIQUE,
-  description TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-  creator_id UUID REFERENCES profiles(id)
-);
-
-ALTER TABLE disability_types ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "障害種別は誰でも参照可能" 
-  ON disability_types FOR SELECT USING (true);
-
-CREATE POLICY "認証済みユーザーは障害種別を作成可能" 
-  ON disability_types FOR INSERT 
-  WITH CHECK (auth.uid() IS NOT NULL);
-
-CREATE POLICY "作成者と管理者は障害種別を更新可能" 
-  ON disability_types FOR UPDATE 
-  USING (creator_id = auth.uid() OR is_admin(auth.uid()));
-
-CREATE POLICY "作成者と管理者は障害種別を削除可能" 
-  ON disability_types FOR DELETE 
   USING (creator_id = auth.uid() OR is_admin(auth.uid()));
 
 -- ブログ投稿テーブル
@@ -293,33 +291,6 @@ CREATE POLICY "管理者は全ての投稿を操作可能"
   ON posts FOR ALL 
   USING (is_admin(auth.uid()));
 
--- 投稿画像テーブル（修正版）
-CREATE TABLE post_images (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  post_id UUID REFERENCES posts(id) ON DELETE CASCADE NOT NULL,
-  image_path TEXT NOT NULL,
-  author_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
-);
-
-ALTER TABLE post_images ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "投稿画像は誰でも参照可能" 
-  ON post_images FOR SELECT USING (true);
-
-CREATE POLICY "認証済みユーザーのみ投稿画像追加可能" 
-  ON post_images FOR INSERT WITH CHECK (auth.uid() = author_id);
-
-CREATE POLICY "作者のみ投稿画像更新可能" 
-  ON post_images FOR UPDATE USING (auth.uid() = author_id);
-
-CREATE POLICY "作者のみ投稿画像削除可能" 
-  ON post_images FOR DELETE USING (auth.uid() = author_id);
-
-CREATE POLICY "管理者は全ての投稿画像を操作可能" 
-  ON post_images FOR ALL 
-  USING (is_admin(auth.uid()));
-
 -- 投稿カテゴリ関連テーブル
 CREATE TABLE post_categories (
   post_id UUID REFERENCES posts(id) ON DELETE CASCADE,
@@ -348,6 +319,106 @@ CREATE POLICY "作者のみ投稿カテゴリ削除可能"
 
 CREATE POLICY "管理者は全ての投稿カテゴリを操作可能" 
   ON post_categories FOR ALL 
+  USING (is_admin(auth.uid()));
+
+-- カテゴリのお気に入り機能
+CREATE TABLE favorite_categories (
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  PRIMARY KEY (user_id, category_id)
+);
+
+ALTER TABLE favorite_categories ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "お気に入りカテゴリは誰でも参照可能" 
+  ON favorite_categories FOR SELECT USING (true);
+
+CREATE POLICY "ユーザーは自分のお気に入りカテゴリのみ作成可能" 
+  ON favorite_categories FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "ユーザーは自分のお気に入りカテゴリのみ削除可能" 
+  ON favorite_categories FOR DELETE USING (auth.uid() = user_id);
+
+CREATE POLICY "管理者は全てのお気に入りカテゴリを操作可能" 
+  ON favorite_categories FOR ALL 
+  USING (is_admin(auth.uid()));
+
+-- 属性タイプテーブル
+CREATE TABLE attribute_types (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  creator_id UUID REFERENCES profiles(id)
+);
+
+ALTER TABLE attribute_types ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "属性タイプは誰でも参照可能" 
+  ON attribute_types FOR SELECT USING (true);
+
+CREATE POLICY "認証済みユーザーは属性タイプを作成可能" 
+  ON attribute_types FOR INSERT 
+  WITH CHECK (auth.uid() IS NOT NULL);
+
+CREATE POLICY "作成者と管理者は属性タイプを更新可能" 
+  ON attribute_types FOR UPDATE 
+  USING (creator_id = auth.uid() OR is_admin(auth.uid()));
+
+CREATE POLICY "作成者と管理者は属性タイプを削除可能" 
+  ON attribute_types FOR DELETE 
+  USING (creator_id = auth.uid() OR is_admin(auth.uid()));
+
+-- ユーザーと属性タイプの多対多関連テーブル
+CREATE TABLE user_attributes (
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  attribute_type_id INTEGER REFERENCES attribute_types(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
+  PRIMARY KEY (user_id, attribute_type_id)
+);
+
+-- 行レベルセキュリティを有効化
+ALTER TABLE user_attributes ENABLE ROW LEVEL SECURITY;
+
+-- セキュリティポリシーを設定
+CREATE POLICY "ユーザー属性は誰でも参照可能" 
+  ON user_attributes FOR SELECT USING (true);
+
+CREATE POLICY "ユーザーは自分の属性のみ作成可能" 
+  ON user_attributes FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "ユーザーは自分の属性のみ削除可能" 
+  ON user_attributes FOR DELETE USING (auth.uid() = user_id);
+
+CREATE POLICY "管理者は全てのユーザー属性を操作可能" 
+  ON user_attributes FOR ALL 
+  USING (is_admin(auth.uid()));
+
+-- 投稿画像テーブル（修正版）
+CREATE TABLE post_images (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  post_id UUID REFERENCES posts(id) ON DELETE CASCADE NOT NULL,
+  image_path TEXT NOT NULL,
+  author_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
+);
+
+ALTER TABLE post_images ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "投稿画像は誰でも参照可能" 
+  ON post_images FOR SELECT USING (true);
+
+CREATE POLICY "認証済みユーザーのみ投稿画像追加可能" 
+  ON post_images FOR INSERT WITH CHECK (auth.uid() = author_id);
+
+CREATE POLICY "作者のみ投稿画像更新可能" 
+  ON post_images FOR UPDATE USING (auth.uid() = author_id);
+
+CREATE POLICY "作者のみ投稿画像削除可能" 
+  ON post_images FOR DELETE USING (auth.uid() = author_id);
+
+CREATE POLICY "管理者は全ての投稿画像を操作可能" 
+  ON post_images FOR ALL 
   USING (is_admin(auth.uid()));
 
 -- コメントテーブル
@@ -457,38 +528,6 @@ CREATE POLICY "認証済みユーザーのみコメントにいいね可能"
 CREATE POLICY "自分のコメントいいねのみ削除可能" 
   ON comment_likes FOR DELETE USING (auth.uid() = user_id);
 
--- 通知タイプENUM
-CREATE TYPE notification_type AS ENUM (
-  'comment', 'like', 'follow', 'post_like', 'comment_like', 'comment_reply', 'comment_deleted'
-);
-
--- 通知テーブル
-CREATE TABLE notifications (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE NOT NULL,
-  content TEXT NOT NULL,
-  type notification_type NOT NULL,
-  is_read BOOLEAN DEFAULT false,
-  related_post_id UUID REFERENCES posts(id) ON DELETE CASCADE,
-  related_comment_id UUID REFERENCES comments(id) ON DELETE CASCADE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
-);
-
-ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "自分の通知のみ参照可能" 
-  ON notifications FOR SELECT USING (auth.uid() = user_id);
-
-CREATE POLICY "自分の通知のみ更新可能" 
-  ON notifications FOR UPDATE USING (auth.uid() = user_id);
-
--- 以下を追加：通知の作成・削除ポリシー
-CREATE POLICY "システムによる通知作成を許可" 
-  ON notifications FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "自分の通知のみ削除可能"
-  ON notifications FOR DELETE USING (auth.uid() = user_id);
-
 -- トリガー関数
 CREATE OR REPLACE FUNCTION link_post_images_on_post_create()
 RETURNS TRIGGER AS $$
@@ -526,114 +565,23 @@ CREATE TRIGGER delete_post_images_from_storage
 BEFORE DELETE ON posts
 FOR EACH ROW EXECUTE FUNCTION delete_post_images_from_storage();
 
-CREATE OR REPLACE FUNCTION create_comment_notification()
+-- 既存のデータに作成者情報を設定するトリガー関数
+CREATE OR REPLACE FUNCTION set_creator_id()
 RETURNS TRIGGER AS $$
 BEGIN
-  IF NEW.author_id != (SELECT author_id FROM posts WHERE id = NEW.post_id) THEN
-    INSERT INTO notifications (user_id, content, type, related_post_id, related_comment_id)
-    VALUES (
-      (SELECT author_id FROM posts WHERE id = NEW.post_id),
-      '投稿にコメントがつきました',
-      'comment',
-      NEW.post_id,
-      NEW.id
-    );
-  END IF;
+  NEW.creator_id = auth.uid();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql;
 
-CREATE TRIGGER create_comment_notification
-AFTER INSERT ON comments
-FOR EACH ROW EXECUTE FUNCTION create_comment_notification();
+-- 属性タイプとカテゴリの作成者を自動設定するトリガー
+CREATE TRIGGER set_attribute_type_creator
+BEFORE INSERT ON attribute_types
+FOR EACH ROW EXECUTE FUNCTION set_creator_id();
 
-CREATE OR REPLACE FUNCTION create_post_like_notification()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.user_id != (SELECT author_id FROM posts WHERE id = NEW.post_id) THEN
-    INSERT INTO notifications (user_id, content, type, related_post_id)
-    VALUES (
-      (SELECT author_id FROM posts WHERE id = NEW.post_id),
-      '投稿にいいねがつきました',
-      'post_like',
-      NEW.post_id
-    );
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER create_post_like_notification
-AFTER INSERT ON post_likes
-FOR EACH ROW EXECUTE FUNCTION create_post_like_notification();
-
-CREATE OR REPLACE FUNCTION create_comment_like_notification()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.user_id != (SELECT author_id FROM comments WHERE id = NEW.comment_id) THEN
-    INSERT INTO notifications (user_id, content, type, related_comment_id)
-    VALUES (
-      (SELECT author_id FROM comments WHERE id = NEW.comment_id),
-      'コメントにいいねがつきました',
-      'comment_like',
-      NEW.comment_id
-    );
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER create_comment_like_notification
-AFTER INSERT ON comment_likes
-FOR EACH ROW EXECUTE FUNCTION create_comment_like_notification();
-
-CREATE OR REPLACE FUNCTION process_comment_replies()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF TG_OP = 'INSERT' THEN
-    IF NEW.parent_comment_id IS NOT NULL THEN
-      IF NEW.author_id != (SELECT author_id FROM comments WHERE id = NEW.parent_comment_id) THEN
-        INSERT INTO notifications (
-          user_id, 
-          content,
-          type,
-          related_post_id,
-          related_comment_id
-        )
-        VALUES (
-          (SELECT author_id FROM comments WHERE id = NEW.parent_comment_id),
-          'コメントに返信がつきました',
-          'comment_reply',
-          NEW.post_id,
-          NEW.id
-        );
-      END IF;
-    END IF;
-  END IF;
-  
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER on_comment_reply_added
-AFTER INSERT ON comments
-FOR EACH ROW
-EXECUTE FUNCTION process_comment_replies();
-
-CREATE OR REPLACE FUNCTION process_comment_deletion()
-RETURNS TRIGGER AS $$
-BEGIN
-  DELETE FROM notifications 
-  WHERE related_comment_id = OLD.id;
-  
-  RETURN OLD;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE TRIGGER on_comment_deleted
-BEFORE DELETE ON comments
-FOR EACH ROW
-EXECUTE FUNCTION process_comment_deletion();
+CREATE TRIGGER set_category_creator
+BEFORE INSERT ON categories
+FOR EACH ROW EXECUTE FUNCTION set_creator_id();
 
 -- ユーティリティ関数
 CREATE OR REPLACE FUNCTION search_posts(search_term TEXT)
@@ -679,60 +627,65 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- ユーティリティ関数：フォロワー数取得
+CREATE OR REPLACE FUNCTION get_follower_count(profile_id UUID)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN (
+    SELECT COUNT(*) 
+    FROM followers 
+    WHERE following_id = profile_id
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ユーティリティ関数：フォロー数取得
+CREATE OR REPLACE FUNCTION get_following_count(profile_id UUID)
+RETURNS INTEGER AS $$
+BEGIN
+  RETURN (
+    SELECT COUNT(*) 
+    FROM followers 
+    WHERE follower_id = profile_id
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ユーティリティ関数：フォロー確認
+CREATE OR REPLACE FUNCTION is_following(follower UUID, following UUID)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 
+    FROM followers 
+    WHERE follower_id = follower AND following_id = following
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- メンション検出機能
+CREATE OR REPLACE FUNCTION extract_mentions(text_content TEXT)
+RETURNS SETOF TEXT AS $$
+DECLARE
+  mentions TEXT[];
+  mention TEXT;
+BEGIN
+  -- @username形式のメンションを抽出
+  SELECT ARRAY(
+    SELECT regexp_matches(text_content, '@([a-zA-Z0-9_]+)', 'g')
+  ) INTO mentions;
+  
+  -- 結果を平坦化
+  FOREACH mention IN ARRAY mentions LOOP
+    RETURN NEXT mention;
+  END LOOP;
+  
+  RETURN;
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
 -- Realtimeサブスクリプション設定
-ALTER PUBLICATION supabase_realtime ADD TABLE posts, comments, post_likes, comment_likes, notifications;
-
--- 基本的な障害種別データの登録
-INSERT INTO disability_types (name, description) VALUES
-('ASD', '自閉症スペクトラム障害'),
-('ADHD', '注意欠如・多動性障害'),
-('LD/SLD', '学習障害/限局性学習症'),
-('うつ病', '大うつ病性障害、気分変調症など'),
-('不安障害', '全般性不安障害、社交不安障害など'),
-('パニック障害', '反復する予期しないパニック発作'),
-('双極性障害', '躁状態とうつ状態を繰り返す気分障害'),
-('統合失調症', '思考・知覚・感情・行動に影響を与える精神障害'),
-('PTSD', '心的外傷後ストレス障害'),
-('強迫性障害', 'OCD、反復する侵入思考と強迫行動'),
-('線維筋痛症', '全身の慢性的な痛みと倦怠感'),
-('ME/CFS', '筋痛性脳脊髄炎/慢性疲労症候群'),
-('EDS', 'エーラス・ダンロス症候群、結合組織の障害'),
-('POTS', '体位性頻脈症候群'),
-('片頭痛', '重度の頭痛発作と随伴症状'),
-('関節リウマチ', '関節の炎症と痛みを伴う自己免疫疾患'),
-('クローン病', '消化管の慢性炎症性疾患'),
-('潰瘍性大腸炎', '大腸の粘膜に潰瘍ができる炎症性腸疾患'),
-('IBS', '過敏性腸症候群'),
-('感覚過敏', '音・光・触覚などへの過敏反応'),
-('内部障害', '心臓・腎臓・呼吸器などの機能障害'),
-('てんかん', '発作性の脳機能障害'),
-('難聴・聴覚障害', '軽度から中等度の聴覚障害'),
-('ブレインフォグ', '思考の明晰さの低下、記憶や集中の問題'),
-('失語症・言語障害', '後天的な言語機能の障害'),
-('慢性痛', '長期間持続する痛み'),
-('自律神経障害', '自律神経系の機能不全'),
-('化学物質過敏症', '微量の化学物質に対する過敏反応'),
-('その他の見えない障害', '上記に分類されない見えない障害');
-
--- 基本カテゴリの作成
-INSERT INTO categories (name, description) VALUES
-('ASD体験談', '自閉症スペクトラム障害の当事者体験'),
-('ADHD生活術', 'ADHDと共に生きるための工夫や戦略'),
-('感覚過敏対策', '感覚過敏への対処法や環境調整'),
-('慢性痛管理', '慢性痛との付き合い方や痛みの管理法'),
-('疲労管理', 'ME/CFSや慢性疲労における活動とエネルギー管理'),
-('ブレインフォグ対策', '認知機能低下への対応策'),
-('職場での配慮', '職場における合理的配慮や工夫'),
-('コミュニケーション', '見えない障害におけるコミュニケーション戦略'),
-('人間関係', '家族・友人・パートナーとの関係構築'),
-('医療との向き合い方', '医療機関の受診や医師とのコミュニケーション'),
-('福祉制度活用法', '障害福祉サービスや支援制度の利用方法'),
-('住環境の工夫', '住まいの環境調整やバリアフリー'),
-('学業と障害', '学校生活や学習における工夫や支援'),
-('自己理解', '自己受容や障害受容のプロセス'),
-('見た目と違うギャップ', '見た目と実際の状態のギャップによる誤解や対処法'),
-('社会の理解促進', '見えない障害に対する社会の理解を広げる取り組み'),
-('テクノロジー活用', '支援技術やアプリの活用例');
+ALTER PUBLICATION supabase_realtime ADD TABLE posts, comments, post_likes, comment_likes, user_attributes, followers, favorite_categories;
 
 --------------------------------------------------
 -- 管理者設定（本番環境で有効化）
@@ -742,53 +695,4 @@ INSERT INTO categories (name, description) VALUES
 -- VALUES ('00000000-0000-0000-0000-000000000000', 'admin@example.com', 'super_admin', '00000000-0000-0000-0000-000000000000');
 
 -- または、より安全な方法として、bootstrap_admin関数を使用
--- SELECT bootstrap_admin('admin@example.com', '00000000-0000-0000-0000-000000000000'); 
-
--- profilesテーブルから単一のdisability_type_idを削除
-ALTER TABLE profiles DROP COLUMN IF EXISTS disability_type_id;
-
--- ユーザーと障害種別の多対多関連テーブルを作成
-CREATE TABLE user_disability_types (
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  disability_type_id INTEGER REFERENCES disability_types(id) ON DELETE CASCADE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-  PRIMARY KEY (user_id, disability_type_id)
-);
-
--- 行レベルセキュリティを有効化
-ALTER TABLE user_disability_types ENABLE ROW LEVEL SECURITY;
-
--- セキュリティポリシーを設定
-CREATE POLICY "障害種別関連は誰でも参照可能" 
-  ON user_disability_types FOR SELECT USING (true);
-
-CREATE POLICY "ユーザーは自分の障害種別関連のみ作成可能" 
-  ON user_disability_types FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "ユーザーは自分の障害種別関連のみ削除可能" 
-  ON user_disability_types FOR DELETE USING (auth.uid() = user_id);
-
-CREATE POLICY "管理者は全ての障害種別関連を操作可能" 
-  ON user_disability_types FOR ALL 
-  USING (is_admin(auth.uid()));
-
--- Realtimeサブスクリプションに新しいテーブルを追加
-ALTER PUBLICATION supabase_realtime ADD TABLE user_disability_types;
-
--- 既存のデータに作成者情報を設定するトリガー関数
-CREATE OR REPLACE FUNCTION set_creator_id()
-RETURNS TRIGGER AS $$
-BEGIN
-  NEW.creator_id = auth.uid();
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- 障害種別とカテゴリの作成者を自動設定するトリガー
-CREATE TRIGGER set_disability_type_creator
-BEFORE INSERT ON disability_types
-FOR EACH ROW EXECUTE FUNCTION set_creator_id();
-
-CREATE TRIGGER set_category_creator
-BEFORE INSERT ON categories
-FOR EACH ROW EXECUTE FUNCTION set_creator_id();
+-- SELECT bootstrap_admin('admin@example.com', '00000000-0000-0000-0000-000000000000');
