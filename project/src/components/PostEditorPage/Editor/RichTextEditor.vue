@@ -92,12 +92,25 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { v4 as uuidv4 } from 'uuid';
 import EditorToolbar from './EditorToolbar.vue';
 import EditorLinkMenu from './EditorLinkMenu.vue';
+import { useImageUpload } from '../../../composables/useImageUpload';
 
 // リファレンス変数の定義
 const fileInput = ref<HTMLInputElement | null>(null); // 画像アップロード用input要素
-const uploading = ref(false); // 画像アップロード中フラグ
 const isFocused = ref(false); // エディタフォーカス状態
 const isKeyboardVisible = ref(false); // モバイルキーボード表示状態
+
+// 画像アップロード用コンポーザブル
+const { 
+  isUploading: uploading,
+  error: imageError,
+  handleFileSelect,
+  encodeToBase64 
+} = useImageUpload('post_images', {
+  maxSizeMB: 1.5,
+  maxWidthOrHeight: 1200, 
+  outputFormat: 'webp',
+  quality: 0.85
+});
 
 // ツールバー関連の参照
 const normalToolbarRef = ref<InstanceType<typeof EditorToolbar> | null>(null);
@@ -380,22 +393,21 @@ async function handleImageUpload(event: Event) {
   
   const file = input.files[0];
   
-  // ファイルサイズ制限チェック（2MB）
-  const maxSizeInBytes = 2 * 1024 * 1024;
-  if (file.size > maxSizeInBytes) {
-    alert('画像サイズは最大2MBまでです');
-    if (fileInput.value) fileInput.value.value = '';
-    return;
-  }
-  
+  // ファイルサイズなどのバリデーションはコンポーザブルで行われる
   const imageId = uuidv4();
   
   try {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (editor.value && e.target?.result) {
+    // コンポーザブルを使用して画像処理
+    const success = await handleFileSelect(file);
+    
+    if (success) {
+      // Base64画像を取得
+      const base64Image = await encodeToBase64(file);
+      
+      // 画像をエディタに挿入
+      if (editor.value && base64Image) {
         const imageOptions = {
-          src: e.target.result as string,
+          src: base64Image,
           'data-temp-id': imageId
         } as any;
         
@@ -410,8 +422,9 @@ async function handleImageUpload(event: Event) {
         
         emit('pending-images-updated', pendingImages.value);
       }
-    };
-    reader.readAsDataURL(file);
+    } else if (imageError.value) {
+      alert(imageError.value);
+    }
   } catch (error) {
     console.error('画像処理エラー:', error);
     alert('画像の処理に失敗しました');

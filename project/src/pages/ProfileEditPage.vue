@@ -27,21 +27,15 @@
                   alt="アバタープレビュー" 
                   class="absolute inset-0 w-full h-full object-cover"
                 />
-                <img 
-                  v-else-if="profileData.avatar_data" 
-                  :src="getAvatarUrl(profileData.avatar_data)" 
-                  alt="現在のアバター" 
-                  class="absolute inset-0 w-full h-full object-cover"
-                />
                 <span v-else-if="profileData.nickname">{{ getInitials(profileData.nickname) }}</span>
                 <span v-else>U</span>
               </div>
               
               <!-- 削除ボタンを画像の下に配置 -->
               <button 
-                v-if="avatarPreview || profileData.avatar_data" 
+                v-if="avatarPreview" 
                 type="button" 
-                @click="removeAvatar"
+                @click="handleRemoveAvatar"
                 class="mt-2 btn btn-outline-error btn-sm"
               >
                 <PhTrash class="h-4 w-4 mr-1" />
@@ -62,7 +56,7 @@
                   ref="avatarInput"
                 />
               </label>
-              <p class="text-sm text-text-muted mt-2">推奨サイズ: 200x200px (2MB以下)</p>
+              <p class="text-sm text-text-muted mt-2">推奨サイズ: 200x200px (1MB以下)</p>
             </div>
           </div>
         </div>
@@ -230,8 +224,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
-import { v4 as uuidv4 } from 'uuid';
-import { getProfileImageUrl } from '../lib/storage';
+import { useImageUpload } from '../composables/useImageUpload';
 import { 
   PhTrash, 
   PhCloudArrowUp, 
@@ -252,15 +245,30 @@ const profileData = ref({
   disability_description: '',
 });
 
+// 画像アップロード用コンポーザブル
+const { 
+  preview: avatarPreview, 
+  error: avatarError, 
+  handleFileSelect, 
+  uploadImage, 
+  clearImage: removeAvatar,
+  getImageUrl
+} = useImageUpload('profile_images', {
+  maxSizeMB: 1,
+  maxWidthOrHeight: 300,
+  outputFormat: 'webp',
+  quality: 0.85
+});
+
+// 新しい画像が選択されたかどうかを追跡
+const newImageSelected = ref(false);
+
 // 状態管理
 const error = ref('');
 const successMessage = ref('');
 const submitting = ref(false);
 const loading = ref(false);
-const avatarPreview = ref('');
-const avatarFile = ref<File | null>(null);
 const avatarInput = ref<HTMLInputElement | null>(null);
-const removeAvatarFlag = ref(false);
 const disabilityTypes = ref<any[]>([]);
 const selectedDisabilityTypes = ref<any[]>([]);
 const selectedDisabilityTypeId = ref('');
@@ -314,8 +322,9 @@ async function fetchProfileData() {
         disability_description: data.disability_description || '',
       };
       
+      // アバター画像を表示
       if (data.avatar_data) {
-        avatarPreview.value = getAvatarUrl(data.avatar_data);
+        await processExistingAvatar(data.avatar_data);
       }
       
       // ユーザーの障害種別を取得
@@ -327,6 +336,16 @@ async function fetchProfileData() {
   } finally {
     loading.value = false;
   }
+}
+
+// 既存のアバター画像を処理
+async function processExistingAvatar(avatarPath: string) {
+  if (!avatarPath) return;
+  
+  // 既存の画像URLを直接使用
+  avatarPreview.value = getImageUrl(avatarPath);
+  // 既存画像を読み込んだ場合は新規選択フラグをリセット
+  newImageSelected.value = false;
 }
 
 // 障害種別の取得
@@ -427,36 +446,29 @@ async function handleAvatarUpload(event: Event) {
   }
   
   const file = input.files[0];
-  removeAvatarFlag.value = false;
   
-  // ファイルサイズチェック（2MB以下）
-  if (file.size > 2 * 1024 * 1024) {
-    error.value = '画像サイズは2MB以下にしてください';
+  if (avatarError.value) {
+    error.value = avatarError.value;
     return;
   }
   
-  // プレビュー表示
-  avatarFile.value = file;
-  avatarPreview.value = URL.createObjectURL(file);
-}
-
-// アバター画像の削除
-function removeAvatar() {
-  // 画像プレビューをクリア
-  avatarPreview.value = '';
+  // 画像処理とプレビュー表示
+  await handleFileSelect(file);
+  
+  // 新しい画像が選択されたことを記録
+  newImageSelected.value = true;
   
   // ファイル選択をリセット
-  avatarFile.value = null;
-  
-  // すでに保存済みの画像を削除するためのフラグをセット
-  if (profileData.value.avatar_data) {
-    removeAvatarFlag.value = true;
-  }
-  
-  // ファイル入力をリセット（再アップロード可能にする）
   if (avatarInput.value) {
     avatarInput.value.value = '';
   }
+}
+
+// アバター画像を削除
+function handleRemoveAvatar() {
+  removeAvatar();
+  newImageSelected.value = true; // 削除も変更としてマーク
+  profileData.value.avatar_data = null; // 既存の画像パスをクリア
 }
 
 // プロフィール保存
@@ -471,22 +483,14 @@ async function saveProfile() {
     // アバターのアップロード処理
     let avatarUrl = profileData.value.avatar_data;
     
-    if (avatarFile.value) {
-      // ファイル名を一意にする
-      const fileExt = avatarFile.value.name.split('.').pop();
-      const fileName = `${uuidv4()}.${fileExt}`;
-      const filePath = `${authStore.user.id}/${fileName}`;
-      
-      // 画像をアップロード - バケット名を変更
-      const { error: uploadError } = await supabase.storage
-        .from('profile_images')
-        .upload(filePath, avatarFile.value);
-      
-      if (uploadError) throw uploadError;
-      
-      avatarUrl = filePath;
-    } else if (removeAvatarFlag.value) {
-      // アバターを削除する場合
+    // 新しい画像が選択された場合はアップロード
+    if (newImageSelected.value && avatarPreview.value) {
+      const result = await uploadImage(authStore.user.id);
+      if (result) {
+        avatarUrl = result.path;
+      }
+    } else if (newImageSelected.value && !avatarPreview.value) {
+      // 画像を削除した場合
       avatarUrl = null;
     }
     
@@ -535,16 +539,16 @@ async function saveProfile() {
     successMessage.value = 'プロフィールを更新しました';
     
     // 古いアバター画像があれば削除（新しい画像がアップロードされた場合）
-    if (avatarFile.value && profileData.value.avatar_data && avatarUrl !== profileData.value.avatar_data) {
-      await supabase.storage
-        .from('profile_images')
-        .remove([profileData.value.avatar_data]);
+    if (avatarUrl && avatarUrl !== profileData.value.avatar_data) {
+      if (profileData.value.avatar_data) {
+        await supabase.storage
+          .from('profile_images')
+          .remove([profileData.value.avatar_data]);
+      }
+      
+      // 状態を更新
+      profileData.value.avatar_data = avatarUrl;
     }
-    
-    // 状態を更新
-    profileData.value.avatar_data = avatarUrl;
-    avatarFile.value = null;
-    removeAvatarFlag.value = false;
     
   } catch (err: any) {
     console.error('プロフィール更新エラー:', err);
@@ -557,9 +561,5 @@ async function saveProfile() {
 // ヘルパー関数
 function getInitials(name: string): string {
   return name.charAt(0).toUpperCase();
-}
-
-function getAvatarUrl(path: string): string {
-  return getProfileImageUrl(path);
 }
 </script>
