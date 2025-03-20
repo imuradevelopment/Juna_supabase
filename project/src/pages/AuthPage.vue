@@ -211,9 +211,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, inject, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+import { useNotification } from '../composables/useNotification';
 import { PhSpinner, PhSignIn, PhUserPlus } from '@phosphor-icons/vue';
 
 const router = useRouter();
@@ -221,7 +222,7 @@ const route = useRoute();
 const authStore = useAuthStore();
 
 // 通知表示関数を取得
-const showNotification = inject('showNotification') as (type: 'success' | 'error' | 'info' | 'warning', title: string, message: string) => void;
+const { showNotification } = useNotification();
 
 // タブ切り替え
 const activeTab = ref('login');
@@ -288,26 +289,20 @@ async function handleLoginSubmit() {
     
     if (success) {
       // ログイン成功
-      if (showNotification) {
-        showNotification('success', 'ログイン成功', 'ようこそ、' + authStore.displayName + 'さん');
-      }
+      showNotification('success', 'ログイン成功', 'ようこそ、' + authStore.displayName + 'さん');
       // リダイレクト先が指定されていればそこへ、なければホームへ
       const redirectPath = route.query.redirect as string || '/';
       router.push(redirectPath);
     } else {
       loginFormError.value = error || 'ログインに失敗しました';
       // エラー通知
-      if (showNotification) {
-        showNotification('error', 'ログインエラー', loginFormError.value);
-      }
+      showNotification('error', 'ログインエラー', loginFormError.value);
     }
   } catch (err: any) {
     console.error('ログインエラー:', err);
     loginFormError.value = 'ログイン中にエラーが発生しました';
     // エラー通知
-    if (showNotification) {
-      showNotification('error', 'ログインエラー', loginFormError.value);
-    }
+    showNotification('error', 'ログインエラー', loginFormError.value);
   } finally {
     loginLoading.value = false;
   }
@@ -335,25 +330,19 @@ async function handleRegisterSubmit() {
     
     if (success) {
       // 登録成功通知を表示
-      if (showNotification) {
-        showNotification('success', '会員登録完了', '会員登録が完了しました。ログインしてください。');
-      }
+      showNotification('success', '会員登録完了', '会員登録が完了しました。ログインしてください。');
       // ログインタブに切り替え
       activeTab.value = 'login';
     } else {
       registerFormError.value = error || '登録に失敗しました';
       // エラー通知
-      if (showNotification) {
-        showNotification('error', '登録エラー', registerFormError.value);
-      }
+      showNotification('error', '登録エラー', registerFormError.value);
     }
   } catch (err: any) {
     console.error('登録エラー:', err);
     registerFormError.value = '登録中にエラーが発生しました';
     // エラー通知
-    if (showNotification) {
-      showNotification('error', '登録エラー', registerFormError.value);
-    }
+    showNotification('error', '登録エラー', registerFormError.value);
   } finally {
     registerLoading.value = false;
   }

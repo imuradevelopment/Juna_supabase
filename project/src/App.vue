@@ -33,8 +33,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, provide, onBeforeMount } from 'vue';
+import { ref, onMounted, nextTick, onBeforeMount } from 'vue';
 import { useAuthStore } from './stores/auth';
+import { useNotification } from './composables/useNotification';
 import Navbar from './components/App/Navbar.vue';
 import Footer from './components/App/Footer.vue';
 import Notifications from './components/App/Notifications.vue';
@@ -43,20 +44,7 @@ import { PhSpinner } from '@phosphor-icons/vue';
 const authStore = useAuthStore();
 const notificationsRef = ref<any>(null);
 const initialAuthCheckComplete = ref(false);
-
-// 通知を表示する機能
-function showNotification(type: 'success' | 'error' | 'info' | 'warning', title: string, message: string) {
-  if (notificationsRef.value) {
-    notificationsRef.value.addNotification({
-      type,
-      title,
-      message
-    });
-  }
-}
-
-// この関数をコンポーネントから使用できるようにする
-provide('showNotification', showNotification);
+const { setNotificationsRef, clearAllNotifications } = useNotification();
 
 // アプリケーション初期化前に認証状態をチェック
 onBeforeMount(async () => {
@@ -70,16 +58,11 @@ onMounted(async () => {
   // 通知コンポーネントの参照が解決されるまで待機
   await nextTick();
   
+  // 通知コンポーネントの参照を設定
+  setNotificationsRef(notificationsRef.value);
+  
   // 既存の通知をクリアする
-  if (notificationsRef.value) {
-    // clearAllNotificationsを直接使用
-    if (typeof notificationsRef.value.clearAllNotifications === 'function') {
-      notificationsRef.value.clearAllNotifications();
-    } 
-    else {
-      console.warn('clearAllNotifications method not available');
-    }
-  }
+  clearAllNotifications();
 });
 </script>
 

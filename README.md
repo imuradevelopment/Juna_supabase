@@ -36,11 +36,52 @@ npm run dev
 
 ## 機能改善
 
+- リアルタイム購読の使用
+- WebPush通知の実装
+- 管理者ページの実装
+- フォローの概念
 - 通知機能の集約
-    - @App.vue @Notifications.vue App.vueでprovideされている通知機能を注入して全てのユーザーに対する通知を一元化してください。
+    - @useNotification.ts useNotification.tsを使用してユーザーに対する通知を一元化してください。入力フィールド固有の物などはそのままにしてください。
 
 - リンクの更新
-    - index.tsに記載されているページ以外に遷移していませんか？
+    - @index.ts index.tsに記載されているページ以外に遷移していませんか？
+
+- 画像対応フォーマットの拡張
+    - @useImageUpload.ts useImageUpload.tsで下記のフォーマットに対応してください。 
+    ```markdown
+        # 対応フォーマット一覧（全27種類）
+
+        1. original（オリジナル形式を維持）
+        2. webp（WebP）
+        3. jpeg/jpg（JPEG）
+        4. png（PNG）
+        5. gif（GIF）
+        6. bmp（BMP）
+        7. tiff/tif（TIFF）
+        8. avif（AVIF）
+        9. heic（HEIC - Apple）
+        10. heif（HEIF - 高効率画像形式）
+        11. svg（SVG - ベクター画像）
+        12. ico（アイコン）
+        13. apng（アニメーションPNG）
+        14. jxl（JPEG XL）
+        15. jp2（JPEG 2000）
+        16. jpx（JPEG 2000 Part-2）
+        17. j2k（JPEG 2000 CodeStream）
+        18. jxr（JPEG XR）
+        19. wdp（Windows Digital Photo - JPEG XRの別名）
+        20. dng（Adobe Digital Negative - RAW）
+        21. arw（Sony Alpha RAW）
+        22. cr2/cr3（Canon RAW）
+        23. nef（Nikon Electronic Format - RAW）
+        24. orf（Olympus RAW Format）
+        25. raf（Fuji RAW Format）
+        26. rw2（Panasonic RAW）
+        27. pef（Pentax Electronic Format）
+        28. srw（Samsung RAW）
+        29. raw（汎用RAW形式）
+    ```
+
 
 ## よく使うプロンプト
 
@@ -48,7 +89,7 @@ npm run dev
 ### DB関連
 
 #### supabaseスキーマの把握
-@20250311102412_initial_schema.sql supabaseスキーマを拡張機能と基本設定、ストレージバケット設定、セキュリティ関数、カラムを含むテーブル詳細、トリガー関数、ユーティリティ関数、リアルタイム機能、セキュリティモデル、RLSなどを含めて、完全に把握してください。スキーマは修正しないでください。
+@20250316073437_initial_schema.sql supabaseスキーマを拡張機能と基本設定、ストレージバケット設定、セキュリティ関数、カラムを含むテーブル詳細、トリガー関数、ユーティリティ関数、リアルタイム機能、セキュリティモデル、RLSなどを含めて、完全に把握してください。スキーマは修正しないでください。
 
 
 ### デザイン関連
@@ -60,34 +101,34 @@ npm run dev
 ### 機能関連
 
 #### アプリ骨格
-@Notifications.vue @Navbar.vue @Footer.vue @auth.ts @App.vue @main.ts @index.html @tailwind.config.js @index.ts @storage.ts @supabase.ts アプリケーションの骨格です。どのようになっていますか？説明してください。
+@Notifications.vue @Navbar.vue @Footer.vue @auth.ts @App.vue @useNotification.ts @main.ts @index.html @tailwind.config.js @index.ts @storage.ts @supabase.ts アプリケーションの骨格です。どのようになっていますか？説明してください。
 
 #### 認証ページ
-@AuthPage.vue @auth.ts @index.ts @tailwind.config.js @storage.ts @supabase.ts これは認証ページです。どのようになっていますか？説明してください。
+@AuthPage.vue @useNotification.ts @auth.ts @index.ts @tailwind.config.js @storage.ts @supabase.ts これは認証ページです。どのようになっていますか？説明してください。
 
 #### ダッシュボードページ
-@DashboardPage.vue @auth.ts @DashboardPostsList.vue @DashboardDraftsList.vue @DashboardCommentsList.vue @DashboardLikesList.vue @DashboardStatistics.vue @index.ts @tailwind.config.js @storage.ts @supabase.ts @auth.ts これはダッシュボードページです。どのようになっていますか？説明してください。
+@DashboardPage.vue @useNotification.ts @auth.ts @DashboardPostsList.vue @DashboardDraftsList.vue @DashboardCommentsList.vue @DashboardLikesList.vue @DashboardStatistics.vue @index.ts @tailwind.config.js @storage.ts @supabase.ts @auth.ts これはダッシュボードページです。どのようになっていますか？説明してください。
 
 #### ホームページ
-@HomePage.vue @supabase.ts @PostCard.vue @index.ts  @tailwind.config.js @storage.ts @auth.ts これはホームページです。どのようになっていますか？説明してください。
+@HomePage.vue @useNotification.ts @supabase.ts @PostCard.vue @index.ts  @tailwind.config.js @storage.ts @auth.ts これはホームページです。どのようになっていますか？説明してください。
 
 #### NotFoundページ
-@NotFoundPage.vue @index.ts @tailwind.config.js @storage.ts @supabase.ts @auth.ts これはNotFoundページです。どのようになっていますか？説明してください。
+@NotFoundPage.vue @useNotification.ts @index.ts @tailwind.config.js @storage.ts @supabase.ts @auth.ts これはNotFoundページです。どのようになっていますか？説明してください。
 
 #### 投稿詳細ページ
-@PostDetailPage.vue @supabase.ts @auth.ts @RichTextContent.vue @CommentSystem.vue @CommentItem.vue @storage.ts @index.ts @tailwind.config.js これは投稿詳細ページです。どのようになっていますか？説明してください。
+@PostDetailPage.vue @useNotification.ts @supabase.ts @auth.ts @RichTextContent.vue @CommentSystem.vue @CommentItem.vue @storage.ts @index.ts @tailwind.config.js これは投稿詳細ページです。どのようになっていますか？説明してください。
 
 #### 投稿作成、編集ページ
-@PostEditorPage.vue @supabase.ts @auth.ts @RichTextEditor.vue @EditorToolbar.vue @EditorLinkMenu.vue @CategorySelector.vue @EyecatchUploader.vue @useImageUpload.ts @storage.ts @index.ts @tailwind.config.js @storage.ts これは投稿作成、編集ページです。どのようになっていますか？説明してください。
+@PostEditorPage.vue @useNotification.ts @supabase.ts @auth.ts @RichTextEditor.vue @EditorToolbar.vue @EditorLinkMenu.vue @CategorySelector.vue @EyecatchUploader.vue @useImageUpload.ts @storage.ts @index.ts @tailwind.config.js @storage.ts これは投稿作成、編集ページです。どのようになっていますか？説明してください。
 
 #### 投稿一覧ページ
-@PostsPage.vue @supabase.ts @PostCard.vue @index.ts @tailwind.config.js @storage.ts @auth.ts これは投稿一覧ページです。どのようになっていますか？説明してください。
+@PostsPage.vue @useNotification.ts @supabase.ts @PostCard.vue @index.ts @tailwind.config.js @storage.ts @auth.ts これは投稿一覧ページです。どのようになっていますか？説明してください。
 
 #### プロフィール編集ページ
-@ProfileEditPage.vue @supabase.ts @auth.ts @useImageUpload.ts @storage.ts @index.ts @tailwind.config.js これはプロフィール編集ページです。どのようになっていますか？説明してください。
+@ProfileEditPage.vue @useNotification.ts @supabase.ts @auth.ts @useImageUpload.ts @storage.ts @index.ts @tailwind.config.js これはプロフィール編集ページです。どのようになっていますか？説明してください。
 
 #### プロフィールページ
-@ProfilePage.vue @supabase.ts @auth.ts @storage.ts @PostCard.vue @tailwind.config.js @index.ts これはプロフィールページです。どのようになっていますか？説明してください。
+@ProfilePage.vue @useNotification.ts @supabase.ts @auth.ts @storage.ts @PostCard.vue @tailwind.config.js @index.ts これはプロフィールページです。どのようになっていますか？説明してください。
 
 #### 一時的
 各ファイルでsupabase.tsとstorage.ts、auth.tsはどのように使用されていますか？
