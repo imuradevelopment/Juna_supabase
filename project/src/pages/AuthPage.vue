@@ -102,11 +102,11 @@
           
           <!-- 表示名 -->
           <div class="mb-2 sm:mb-4">
-            <label for="displayName" class="block mb-1 text-xs sm:text-sm text-text">表示名 <span class="text-error">*</span></label>
+            <label for="nickname" class="block mb-1 text-xs sm:text-sm text-text">表示名 <span class="text-error">*</span></label>
             <input 
               type="text" 
-              id="displayName" 
-              v-model="registerData.displayName" 
+              id="nickname" 
+              v-model="registerData.nickname" 
               class="w-full p-2 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
               required
             />
@@ -237,7 +237,7 @@ const loginFormError = ref('');
 
 // 登録フォームの状態
 const registerData = ref({
-  displayName: '',
+  nickname: '',
   accountId: '',
   email: '',
   password: '',
@@ -255,7 +255,7 @@ const passwordsMatch = computed(() => {
 // 登録フォームの有効性確認
 const isRegisterFormValid = computed(() => {
   return (
-    registerData.value.displayName.length > 0 && 
+    registerData.value.nickname.length > 0 && 
     registerData.value.email.length > 0 && 
     registerData.value.password.length >= 8 && 
     passwordsMatch.value && 
@@ -324,7 +324,7 @@ async function handleRegisterSubmit() {
     const { success, error } = await authStore.register(
       registerData.value.email, 
       registerData.value.password, 
-      registerData.value.displayName,
+      registerData.value.nickname,
       registerData.value.accountId
     );
     

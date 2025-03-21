@@ -30,26 +30,11 @@
           <select
             id="category-filter"
             v-model="selectedCategoryId"
-            class="appearance-none w-full px-4 py-2 rounded border border-border bg-surface bg-no-repeat bg-[length:16px] bg-[right_10px_center] text-text sm:w-auto focus:outline-none focus:ring-2 focus:ring-primary"
+            class="appearance-none w-full pl-4 pr-10 py-2 rounded border border-border bg-surface bg-no-repeat bg-[length:16px] bg-[right_16px_center] text-text sm:min-w-[160px] focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option :value="null">すべて</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
               {{ category.name }} ({{ category.post_count || 0 }})
-            </option>
-          </select>
-        </div>
-        
-        <!-- 障害タイプフィルター -->
-        <div class="w-full sm:w-auto">
-          <label for="disability-filter" class="block text-sm font-medium mb-1 text-text">障害タイプ</label>
-          <select
-            id="disability-filter"
-            v-model="selectedDisabilityType"
-            class="appearance-none w-full px-4 py-2 rounded border border-border bg-surface bg-no-repeat bg-[length:16px] bg-[right_10px_center] text-text sm:w-auto focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option :value="null">すべて</option>
-            <option v-for="type in disabilityTypes" :key="type.id" :value="type.id">
-              {{ type.name }} ({{ type.post_count || 0 }})
             </option>
           </select>
         </div>
@@ -60,7 +45,7 @@
           <select
             id="sort-order"
             v-model="sortOrder"
-            class="appearance-none w-full px-4 py-2 rounded border border-border bg-surface bg-no-repeat bg-[length:16px] bg-[right_10px_center] text-text sm:w-auto focus:outline-none focus:ring-2 focus:ring-primary"
+            class="appearance-none w-full pl-4 pr-10 py-2 rounded border border-border bg-surface bg-no-repeat bg-[length:16px] bg-[right_16px_center] text-text sm:min-w-[160px] focus:outline-none focus:ring-2 focus:ring-primary"
           >
             <option value="created_at.desc">新しい順</option>
             <option value="created_at.asc">古い順</option>
@@ -108,14 +93,14 @@
       </div>
       
       <!-- 投稿が存在しない場合 -->
-      <div v-if="!loading && posts.length === 0" class="glass-card p-8 text-center">
-        <p v-if="searchQuery.trim() || selectedCategoryId || selectedDisabilityType" class="text-text-muted">
+      <div v-if="!loading && posts.length === 0" class="glass-card p-6 text-center">
+        <p v-if="searchQuery.trim() || selectedCategoryId" class="text-text-muted">
           条件に一致する投稿は見つかりませんでした
         </p>
         <p v-else class="text-text-muted">
-          投稿がありません
+          まだ投稿はありません。
         </p>
-        <button v-if="searchQuery.trim() || selectedCategoryId || selectedDisabilityType" 
+        <button v-if="searchQuery.trim() || selectedCategoryId" 
                 @click="resetFilters" 
                 class="btn btn-outline-primary mt-4">
           フィルターをリセット
@@ -197,13 +182,6 @@ interface Category {
   updated_at?: string;
 }
 
-// 障害タイプの型定義
-interface DisabilityType {
-  id: number;
-  name: string;
-  description?: string | null;
-}
-
 // 検索結果の型定義
 interface PostResult {
   id: string;
@@ -223,16 +201,13 @@ interface PostResult {
 const searchQuery = ref('');
 const posts = ref<PostResult[]>([]);
 const categories = ref<Category[]>([]);
-const disabilityTypes = ref<DisabilityType[]>([]);
 const selectedCategoryId = ref<number | null>(null);
 const selectedCategory = ref<Category | null>(null);
-const selectedDisabilityType = ref<number | null>(null);
 const sortOrder = ref('created_at.desc');
 
 // ローディング状態
 const loading = ref(false);
 const categoriesLoading = ref(false);
-const disabilityTypesLoading = ref(false);
 const error = ref('');
 const categoriesError = ref('');
 const isSearching = ref(false);
@@ -251,25 +226,21 @@ const router = useRouter();
 
 // 変数追加（スクリプト部分の上部）
 const isUpdatingCategoryCounts = ref(false);
-const isUpdatingDisabilityTypeCounts = ref(false);
 
 // 初期化
 onMounted(() => {
   // データの取得
   fetchCategories();
-  fetchDisabilityTypes();
   
   // URLからクエリパラメータを取得
   const query = route.query.q as string;
   const page = parseInt(route.query.page as string) || 1;
   const categoryId = route.query.category ? parseInt(route.query.category as string) : null;
-  const disabilityTypeId = route.query.disability_type ? parseInt(route.query.disability_type as string) : null;
   const sort = route.query.sort as string || 'created_at.desc';
   
   searchQuery.value = query || '';
   currentPage.value = page;
   selectedCategoryId.value = categoryId;
-  selectedDisabilityType.value = disabilityTypeId;
   sortOrder.value = sort;
   
   if (categoryId) {
@@ -299,7 +270,7 @@ watch(searchQuery, () => {
 });
 
 // フィルターやソートが変更されたらURLを更新
-watch([selectedCategoryId, selectedDisabilityType, sortOrder], () => {
+watch([selectedCategoryId, sortOrder], () => {
   updateQueryParams();
   currentPage.value = 1;
   
@@ -323,7 +294,6 @@ function updateQueryParams() {
   
   if (searchQuery.value.trim()) query.q = searchQuery.value;
   if (selectedCategoryId.value) query.category = selectedCategoryId.value.toString();
-  if (selectedDisabilityType.value) query.disability_type = selectedDisabilityType.value.toString();
   if (sortOrder.value !== 'created_at.desc') query.sort = sortOrder.value;
   if (currentPage.value > 1) query.page = currentPage.value.toString();
   
@@ -334,7 +304,6 @@ function updateQueryParams() {
 function resetFilters() {
   searchQuery.value = '';
   selectedCategoryId.value = null;
-  selectedDisabilityType.value = null;
   selectedCategory.value = null;
   sortOrder.value = 'created_at.desc';
   currentPage.value = 1;
@@ -396,68 +365,6 @@ async function fetchCategories() {
     categoriesError.value = err.message || 'カテゴリの読み込みに失敗しました';
   } finally {
     categoriesLoading.value = false;
-  }
-}
-
-// 障害タイプ一覧を取得
-async function fetchDisabilityTypes() {
-  disabilityTypesLoading.value = true;
-  
-  try {
-    const { data, error } = await supabase
-      .from('disability_types')
-      .select('*')
-      .order('name');
-    
-    if (error) throw error;
-    
-    // 各障害タイプの投稿数を取得（公開済み投稿のみカウント）
-    const typesWithPostCount = await Promise.all((data || []).map(async (type) => {
-      // 1. この障害タイプを持つユーザーIDを取得
-      const { data: profileIds, error: profileError } = await supabase
-        .from('user_disability_types')
-        .select('user_id')
-        .eq('disability_type_id', type.id);
-        
-      if (profileError) {
-        console.error(`障害タイプ ${type.id} のユーザー取得エラー:`, profileError);
-        return {
-          ...type,
-          post_count: 0
-        };
-      }
-      
-      if (!profileIds || profileIds.length === 0) {
-        return {
-          ...type,
-          post_count: 0
-        };
-      }
-      
-      // 2. ユーザーIDリストを作成
-      const userIds = profileIds.map(profile => profile.user_id);
-      
-      // 3. 該当ユーザーが書いた公開済み投稿をカウント
-      const { count, error: countError } = await supabase
-        .from('posts')
-        .select('*', { count: 'exact', head: true })
-        .in('author_id', userIds)
-        .eq('published', true);
-      
-      if (countError) console.error(`障害タイプ ${type.id} の投稿数取得エラー:`, countError);
-      
-      return {
-        ...type,
-        post_count: count || 0
-      };
-    }));
-    
-    disabilityTypes.value = typesWithPostCount;
-  } catch (err: any) {
-    console.error('障害タイプ取得エラー:', err);
-    // エラーは表示しない（UIに影響しないため）
-  } finally {
-    disabilityTypesLoading.value = false;
   }
 }
 
@@ -546,23 +453,6 @@ async function performSearch() {
         }
       }
       
-      // 障害タイプでさらにフィルタリング
-      if (selectedDisabilityType.value) {
-        const { data: userIds } = await supabase
-          .from('user_disability_types')
-          .select('user_id')
-          .eq('disability_type_id', selectedDisabilityType.value);
-          
-        if (userIds && userIds.length > 0) {
-          const userIdSet = new Set(userIds.map(u => u.user_id));
-          filteredData = filteredData.filter((post: PostResult) => userIdSet.has(post.author_id));
-        } else {
-          posts.value = [];
-          totalResults.value = 0;
-          return;
-        }
-      }
-      
       // ソート処理
       filteredData = sortPosts(filteredData);
       
@@ -629,10 +519,7 @@ async function fetchFilteredPosts() {
         *, 
         profiles:author_id(
           nickname, 
-          avatar_data,
-          user_disability_types(
-            disability_types(id, name)
-          )
+          avatar_data
         )
       `, { count: 'exact' })
       .eq('published', true);
@@ -648,25 +535,6 @@ async function fetchFilteredPosts() {
         query = query.in('id', postIds.map(p => p.post_id));
       } else {
         // カテゴリに一致する投稿がない場合
-        posts.value = [];
-        totalResults.value = 0;
-        loading.value = false;
-        return;
-      }
-    }
-    
-    // 障害タイプによるフィルタリング
-    if (selectedDisabilityType.value) {
-      const { data: userIds } = await supabase
-        .from('user_disability_types')
-        .select('user_id')
-        .eq('disability_type_id', selectedDisabilityType.value);
-        
-      if (userIds && userIds.length > 0) {
-        const userIdList = userIds.map(u => u.user_id);
-        query = query.in('author_id', userIdList);
-      } else {
-        // 障害タイプに一致するユーザーがない場合
         posts.value = [];
         totalResults.value = 0;
         loading.value = false;
@@ -740,16 +608,6 @@ async function fetchFilteredPosts() {
             name: String(cat.name)
           };
         });
-      
-      // disability_typesの整形を追加
-      if (post.profiles?.user_disability_types) {
-        post.profiles.disability_types = post.profiles.user_disability_types
-          .map((udt: any) => udt.disability_types)
-          .filter(Boolean);
-        
-        // 元のプロパティを削除
-        delete post.profiles.user_disability_types;
-      }
 
       return {
         ...post,
@@ -866,23 +724,6 @@ async function updateFilterCounts() {
       }
     }
     
-    // 障害タイプが選択されている場合
-    if (selectedDisabilityType.value && !isUpdatingDisabilityTypeCounts.value) {
-      const { data: profileIds } = await supabase
-        .from('user_disability_types')
-        .select('user_id')
-        .eq('disability_type_id', selectedDisabilityType.value);
-        
-      if (profileIds && profileIds.length > 0) {
-        const userIds = profileIds.map(profile => profile.user_id);
-        baseQuery = baseQuery.in('author_id', userIds);
-      } else {
-        // 選択された障害タイプに該当するユーザーがいない場合は空のカウントを設定して終了
-        updateEmptyCounts();
-        return;
-      }
-    }
-    
     // 現在のフィルター条件に一致する投稿IDを取得
     const { data: filteredPosts, error: postsError } = await baseQuery;
     
@@ -896,48 +737,7 @@ async function updateFilterCounts() {
     // 投稿IDリスト
     const postIds = filteredPosts.map(post => post.id);
     
-    // 障害タイプカウントの更新（カテゴリが選択されている場合）
-    if (!isUpdatingDisabilityTypeCounts.value) {
-      isUpdatingDisabilityTypeCounts.value = true;
-      
-      // 投稿IDから著者IDを取得
-      const { data: postsWithAuthors } = await supabase
-        .from('posts')
-        .select('author_id')
-        .in('id', postIds);
-        
-      const authorIds = postsWithAuthors ? postsWithAuthors.map(post => post.author_id) : [];
-      
-      // 障害タイプごとの投稿数をカウント
-      const updatedTypes = await Promise.all(disabilityTypes.value.map(async (type) => {
-        if (authorIds.length === 0) {
-          return { ...type, post_count: 0 };
-        }
-        
-        // この障害タイプを持つユーザーIDを取得
-        const { data: typeUserIds } = await supabase
-          .from('user_disability_types')
-          .select('user_id')
-          .eq('disability_type_id', type.id)
-          .in('user_id', authorIds);
-          
-        const userIds = typeUserIds ? typeUserIds.map(item => item.user_id) : [];
-        
-        // この障害タイプの著者による投稿数をカウント
-        const { count } = await supabase
-          .from('posts')
-          .select('*', { count: 'exact', head: true })
-          .in('author_id', userIds)
-          .in('id', postIds);
-          
-        return { ...type, post_count: count || 0 };
-      }));
-      
-      disabilityTypes.value = updatedTypes;
-      isUpdatingDisabilityTypeCounts.value = false;
-    }
-    
-    // カテゴリカウントの更新（障害タイプが選択されている場合）
+    // カテゴリカウントの更新
     if (!isUpdatingCategoryCounts.value) {
       isUpdatingCategoryCounts.value = true;
       
@@ -966,18 +766,14 @@ function updateEmptyCounts() {
   if (!isUpdatingCategoryCounts.value) {
     categories.value = categories.value.map(category => ({ ...category, post_count: 0 }));
   }
-  
-  if (!isUpdatingDisabilityTypeCounts.value) {
-    disabilityTypes.value = disabilityTypes.value.map(type => ({ ...type, post_count: 0 }));
-  }
 }
 
 // 選択変更時にもカウントを更新するために、watch関数を追加
-watch([selectedCategoryId, selectedDisabilityType, searchQuery], (newValues, oldValues) => {
+watch([selectedCategoryId, searchQuery], (newValues, oldValues) => {
   // 値が実際に変わった場合のみ更新
   if (JSON.stringify(newValues) !== JSON.stringify(oldValues)) {
     // ページロードなど初期状態では更新しない
-    if (oldValues[0] !== undefined || oldValues[1] !== undefined || oldValues[2] !== undefined) {
+    if (oldValues[0] !== undefined || oldValues[1] !== undefined) {
       updateFilterCounts();
     }
   }

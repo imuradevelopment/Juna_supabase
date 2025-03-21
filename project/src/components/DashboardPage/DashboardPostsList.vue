@@ -13,13 +13,10 @@
     </div>
     
     <!-- 投稿がない場合 -->
-    <div v-else-if="posts.length === 0" class="glass-card p-8 text-center">
-      <p class="mb-4 text-text-muted">
-        まだ投稿はありません
+    <div v-else-if="posts.length === 0" class="glass-card p-6 text-center">
+      <p class="text-text-muted">
+        まだ投稿はありません。
       </p>
-      <router-link to="/editor" class="btn btn-primary">
-        最初の投稿を作成する
-      </router-link>
     </div>
     
     <!-- 投稿リスト -->
@@ -188,14 +185,20 @@ async function fetchPosts() {
     
     // 各投稿のカテゴリを取得
     const postsWithCategories = await Promise.all((postsData || []).map(async (post) => {
-      const { data: categories } = await supabase
+      const { data: categoriesData } = await supabase
         .from('post_categories')
-        .select('categories(*)')
+        .select(`
+          category_id,
+          categories:category_id (
+            id,
+            name
+          )
+        `)
         .eq('post_id', post.id);
       
       return {
         ...post,
-        categories: categories?.map((c: any) => c.categories) || []
+        categories: categoriesData?.map((item: any) => item.categories) || []
       };
     }));
     

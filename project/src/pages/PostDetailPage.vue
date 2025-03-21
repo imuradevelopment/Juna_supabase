@@ -88,20 +88,9 @@
                   <p class="text-base font-medium text-text transition-colors group-hover:text-primary">
                     {{ post.profiles?.nickname || '不明なユーザー' }}
                   </p>
-                  <div class="flex items-center flex-wrap gap-1.5">
-                    <p class="text-xs text-text-muted">
-                      {{ formatDate(post.created_at) }}
-                    </p>
-                    <div v-if="authorDisabilityTypes.length > 0" class="flex flex-wrap gap-1 ml-2">
-                      <span 
-                        v-for="type in authorDisabilityTypes" 
-                        :key="type.id"
-                        class="px-1.5 py-0.5 text-xs rounded-full bg-primary-light/20 text-primary"
-                      >
-                        {{ type.name }}
-                      </span>
-                    </div>
-                  </div>
+                  <p class="text-xs text-text-muted">
+                    {{ formatDate(post.created_at) }}
+                  </p>
                 </div>
               </router-link>
               
@@ -153,6 +142,30 @@
         <div class="p-6">
           <RichTextContent 
             :content="post.content"
+          />
+        </div>
+      </div>
+      
+      <!-- 関連投稿セクション -->
+      <div class="mt-10">
+        <h3 class="text-xl font-bold mb-6 text-heading border-b border-border-light pb-3">関連投稿</h3>
+        
+        <!-- ローディング表示 -->
+        <div v-if="loadingRelatedPosts" class="flex justify-center p-6">
+          <PhSpinner class="h-8 w-8 animate-spin text-primary-light" />
+        </div>
+        
+        <!-- 関連投稿がない場合 -->
+        <div v-else-if="relatedPosts.length === 0" class="text-center py-8 text-text-muted">
+          関連投稿はありません
+        </div>
+        
+        <!-- 関連投稿一覧 -->
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <PostCard 
+            v-for="relatedPost in relatedPosts" 
+            :key="relatedPost.id" 
+            :post="relatedPost"
           />
         </div>
       </div>
@@ -257,6 +270,7 @@ import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
 import RichTextContent from '../components/PostDetailPage/RichTextContent.vue';
 import CommentSystem from '../components/PostDetailPage/CommentSystem.vue';
+import PostCard from '../components/common/PostCard.vue';
 import { getProfileImageUrl, getCoverImageUrl } from '../lib/storage';
 import { 
   PhSpinner,
@@ -279,7 +293,7 @@ const authStore = useAuthStore();
 // 投稿ID
 const postId = route.params.id;
 
-// 状態
+// 投稿情報
 const post = ref<any>(null);
 const postCategories = ref<any[]>([]);
 const loading = ref(true);
@@ -293,7 +307,10 @@ const showShareModal = ref(false);
 const showDeleteModal = ref(false);
 const deleteSubmitting = ref(false);
 const urlInput = ref<HTMLInputElement | null>(null);
-const authorDisabilityTypes = ref<any[]>([]);
+
+// 関連投稿
+const relatedPosts = ref<any[]>([]);
+const loadingRelatedPosts = ref(true);
 
 // 投稿の著者かどうか
 const isAuthor = computed(() => {
@@ -338,15 +355,15 @@ async function fetchPost() {
     // カテゴリ取得
     fetchCategories();
     
-    // 著者の障害種別を取得
-    fetchAuthorDisabilityTypes();
-    
     // 投稿閲覧数を更新
     incrementViews();
     
     // いいね数と状態を取得
     fetchLikes();
     checkIfLiked();
+    
+    // 関連投稿を取得
+    fetchRelatedPosts();
     
     // ページURLを設定
     pageUrl.value = window.location.href;
@@ -574,24 +591,52 @@ function getInitials(name: string): string {
   return name.charAt(0).toUpperCase();
 }
 
-// 著者の障害種別取得
-async function fetchAuthorDisabilityTypes() {
-  if (!post.value || !post.value.author_id) return;
+// 関連投稿の取得
+async function fetchRelatedPosts() {
+  if (!postId) return;
   
   try {
-    const { data, error: disabilityError } = await supabase
-      .from('user_disability_types')
-      .select(`
-        disability_type_id,
-        disability_types(id, name)
-      `)
-      .eq('user_id', post.value.author_id);
+    loadingRelatedPosts.value = true;
     
-    if (disabilityError) throw disabilityError;
+    const { data, error } = await supabase
+      .rpc('get_related_posts', { 
+        input_post_id: postId,
+        limit_count: 3
+      });
+      
+    if (error) throw error;
+    relatedPosts.value = data || [];
     
-    authorDisabilityTypes.value = data?.map(item => item.disability_types) || [];
   } catch (err) {
-    console.error('障害種別取得エラー:', err);
+    console.error('関連投稿取得エラー:', err);
+    relatedPosts.value = [];
+    
+    // エラー時にフォールバック関数を使用
+    try {
+      relatedPosts.value = await getFallbackRelatedPosts();
+    } catch (fallbackErr) {
+      console.error('フォールバック投稿取得エラー:', fallbackErr);
+    }
+  } finally {
+    loadingRelatedPosts.value = false;
+  }
+}
+
+// フォールバック用の関連投稿取得 - 必要に応じて利用
+async function getFallbackRelatedPosts() {
+  try {
+    // 最新の公開投稿を取得
+    const { data } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('published', true)
+      .neq('id', postId)
+      .order('published_at', { ascending: false })
+      .limit(3);
+    
+    return data || [];
+  } catch (e) {
+    return [];
   }
 }
 

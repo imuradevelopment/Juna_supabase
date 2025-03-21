@@ -18,7 +18,11 @@
       </div>
       
       <div>
-        <label class="btn btn-outline-secondary cursor-pointer inline-flex items-center whitespace-nowrap">
+        <label 
+          tabindex="0" 
+          @keydown.enter="featuredImageInput?.click()"
+          class="btn btn-outline-secondary cursor-pointer inline-flex items-center whitespace-nowrap focus:ring-2 focus:ring-primary focus:outline-none"
+        >
           <PhImage class="w-5 h-5 mr-2" />
           <span>画像をアップロード</span>
           <input
@@ -36,9 +40,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { PhX, PhImage } from '@phosphor-icons/vue';
 import { useImageUpload } from '../../../composables/useImageUpload';
+import { useImageCleanup } from '../../../composables/useImageCleanup';
 
 const props = defineProps({
   modelValue: {
@@ -61,6 +66,7 @@ const emit = defineEmits([
 ]);
 
 const featuredImageInput = ref<HTMLInputElement | null>(null);
+const previousImagePath = ref<string | null>(null);
 
 // 画像アップロード用コンポーザブル
 const {
@@ -79,8 +85,20 @@ const {
   quality: 0.85
 });
 
+// 画像クリーンアップコンポーザブル
+const { cleanupUnusedImages } = useImageCleanup();
+
 // Base64形式のデータを保持する変数
 const fileDataBase64 = ref<string | null>(null);
+
+// modelValueを監視して、変更があれば古いパスを保存
+watch(() => props.modelValue, (newVal, oldVal) => {
+  // 値が変更され、かつ古い値が存在する場合のみ保存
+  if (newVal !== oldVal && oldVal) {
+    console.log('アイキャッチ画像のパスを保存:', oldVal);
+    previousImagePath.value = oldVal;
+  }
+}, { immediate: true });
 
 // ファイル選択ハンドラーを拡張してBase64データを設定
 async function handleImageUpload(event: Event) {
@@ -121,12 +139,37 @@ async function uploadImageToStorage(userId: string): Promise<string | null> {
   emit('upload-started');
   
   try {
+    if (!userId) {
+      throw new Error('ユーザーIDが必要です');
+    }
+    
+    // 画像アップロード
     const result = await uploadImage(userId);
     
     if (result) {
-      // アップロード成功時にパスを更新
+      // 古い画像を削除
+      if (previousImagePath.value && previousImagePath.value !== result.path) {
+        try {
+          // パスを正規化
+          let normalizedPath = previousImagePath.value;
+          if (!normalizedPath.startsWith('cover_images/') && normalizedPath.includes('cover_images/')) {
+            normalizedPath = 'cover_images/' + normalizedPath.split('cover_images/')[1];
+          }
+          
+          console.log('アップロード時に削除する古い画像:', normalizedPath);
+          await cleanupUnusedImages('', '', normalizedPath, result.path);
+          console.log('古いアイキャッチ画像を削除しました:', previousImagePath.value);
+        } catch (cleanupError) {
+          console.error('古い画像の削除に失敗しました:', cleanupError);
+        }
+      }
+      
+      // スキーマのcover_image_pathフォーマットに合わせる
       emit('update:modelValue', result.path);
       emit('upload-success', result.path);
+      
+      // 新しい画像パスを保存
+      previousImagePath.value = result.path;
       
       return result.path;
     }
@@ -149,12 +192,38 @@ async function uploadImageToStorage(userId: string): Promise<string | null> {
 async function setExistingImage(path: string) {
   if (!path) return;
   preview.value = getImageUrl(path);
+  previousImagePath.value = path;
 }
 
 function clearImageData() {
+  const oldPath = props.modelValue;
+  
   clearImage();
   emit('update:modelValue', null);
   emit('file-selected', null);
+  
+  // modelValueがnullになった場合、古い画像を削除
+  if (oldPath) {
+    console.log('削除対象のアイキャッチ画像パス:', oldPath);
+    
+    // パスを正規化して確実に削除されるようにする
+    let normalizedPath = oldPath;
+    if (!normalizedPath.startsWith('cover_images/') && normalizedPath.includes('cover_images/')) {
+      normalizedPath = 'cover_images/' + normalizedPath.split('cover_images/')[1];
+    }
+    
+    cleanupUnusedImages('', '', normalizedPath, null)
+      .then(result => {
+        if (result.success) {
+          console.log('アイキャッチ画像を削除しました:', result.deletedPaths);
+        } else {
+          console.error('アイキャッチ画像の削除に失敗しました:', result.error);
+        }
+      })
+      .catch(err => {
+        console.error('画像削除エラー:', err);
+      });
+  }
 }
 
 // コンポーネントのマウント時に既存の画像パスがある場合は表示

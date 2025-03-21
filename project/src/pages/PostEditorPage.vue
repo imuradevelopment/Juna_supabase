@@ -392,7 +392,7 @@ function saveToLocalStorage(isPartial = false) {
     const storageKey = props.id ? `temp_edit_post_data_${props.id}` : 'temp_new_post_data';
     
     // ファイルデータのBase64エンコード
-    let fileDataBase64 = null;
+    let fileDataBase64: string | null = null;
     if (eyecatchUploaderRef.value?.imageFile) {
       if (eyecatchUploaderRef.value.fileDataBase64) {
         fileDataBase64 = eyecatchUploaderRef.value.fileDataBase64;
@@ -400,6 +400,9 @@ function saveToLocalStorage(isPartial = false) {
         fileDataBase64 = eyecatchUploaderRef.value.preview;
       }
     }
+    
+    // 新規カテゴリ情報の取得
+    const newCategories = categorySelectorRef.value?.getNewCategories() || [];
     
     const tempData = {
       title: formData.title,
@@ -414,7 +417,8 @@ function saveToLocalStorage(isPartial = false) {
       eyecatch_file_data: fileDataBase64,
       eyecatch_file_name: eyecatchUploaderRef.value?.imageFile?.name || null,
       eyecatch_file_type: eyecatchUploaderRef.value?.imageFile?.type || null,
-      isPartialSave: isPartial
+      isPartialSave: isPartial,
+      newCategories: newCategories // 新規カテゴリ情報を追加
     };
     
     localStorage.setItem(storageKey, JSON.stringify(tempData));
@@ -466,6 +470,11 @@ function restoreFromLocalStorage() {
               tempData.eyecatch_file_type
             );
           }
+        }
+        
+        // 新規カテゴリの復元
+        if (categorySelectorRef.value && tempData.newCategories) {
+          categorySelectorRef.value.setNewCategories(tempData.newCategories);
         }
         
         return true;
@@ -637,7 +646,7 @@ async function createPost(postData: any) {
     
     // カテゴリの保存をCategorySelectorコンポーネントに委譲
     if (categorySelectorRef.value) {
-      await categorySelectorRef.value.savePostCategories(newPost.id);
+      await categorySelectorRef.value.savePostWithNewCategories(newPost.id);
     }
     
     return newPost;
@@ -721,7 +730,7 @@ async function updatePost(postData: any) {
     
     // カテゴリの保存をCategorySelectorコンポーネントに委譲
     if (categorySelectorRef.value && props.id) {
-      await categorySelectorRef.value.savePostCategories(props.id);
+      await categorySelectorRef.value.savePostWithNewCategories(props.id);
     }
   } catch (err) {
     console.error('投稿更新エラー:', err);

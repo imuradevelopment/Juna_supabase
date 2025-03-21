@@ -95,27 +95,9 @@
             <!-- 著者情報 -->
             <div class="flex flex-col min-w-0 flex-grow">
               <!-- ユーザー名 - 切り詰めを最大幅設定で制御 -->
-              <span class="text-sm text-text overflow-hidden text-ellipsis mb-1" :class="{'truncate': isLongUsername}">
+              <span class="text-sm text-text overflow-hidden text-ellipsis" :class="{'truncate': isLongUsername}">
                 {{ getUserName() }}
               </span>
-              
-              <!-- 障害タイプバッジ表示 - 著者名の下に配置 -->
-              <div class="flex flex-wrap gap-1 overflow-hidden">
-                <span 
-                  v-if="post.profiles?.disability_types && post.profiles.disability_types.length > 0" 
-                  v-for="type in limitedDisabilityTypes"
-                  :key="type.id"
-                  class="text-xs px-1.5 py-0.5 rounded-full bg-primary/20 text-primary-light inline-block truncate"
-                >
-                  {{ type.name }}
-                </span>
-                <span 
-                  v-if="post.profiles?.disability_types && post.profiles.disability_types.length > maxDisabilityTypes" 
-                  class="text-xs px-1.5 py-0.5 rounded-full bg-surface-variant text-text-muted"
-                >
-                  +{{ post.profiles.disability_types.length - maxDisabilityTypes }}
-                </span>
-              </div>
             </div>
           </div>
           
@@ -172,10 +154,6 @@ interface Post {
   profiles?: {
     nickname?: string | null;
     avatar_data?: string | null;
-    disability_types?: Array<{
-      id: number;
-      name: string;
-    }>;
   };
   author_id?: string;
   nickname?: string | null;
@@ -244,19 +222,6 @@ const maxCategories = 3;
 const limitedCategories = computed(() => {
   if (!props.post.categories) return [];
   return props.post.categories.slice(0, maxCategories);
-});
-
-// 障害タイプの最大表示数
-const maxDisabilityTypes = 2;
-
-// 表示する障害タイプを制限する計算プロパティ
-const limitedDisabilityTypes = computed(() => {
-  if (!props.post.profiles?.disability_types) return [];
-  // 配列かどうかチェック
-  const types = Array.isArray(props.post.profiles.disability_types) 
-    ? props.post.profiles.disability_types 
-    : [props.post.profiles.disability_types];
-  return types.slice(0, maxDisabilityTypes);
 });
 </script>
 

@@ -215,7 +215,7 @@ export function useImageUpload(bucket: ImageBucket, options: ImageProcessingOpti
   
   // 画像アップロード処理
   const uploadImage = async (customUserId?: string, uploadOptions?: Partial<ImageProcessingOptions>): Promise<UploadResult | null> => {
-    if (!processedFile.value) return null
+    if (!processedFile.value) return null;
     
     const userIdToUse = customUserId || userId
     if (!userIdToUse) {
@@ -227,6 +227,11 @@ export function useImageUpload(bucket: ImageBucket, options: ImageProcessingOpti
     error.value = null
     
     try {
+      // バケット名の検証
+      if (!['profile_images', 'post_images', 'cover_images'].includes(bucket)) {
+        throw new Error(`無効なバケット名: ${bucket}。許可されるバケット: profile_images, post_images, cover_images`);
+      }
+      
       const file = processedFile.value
       const originalSize = originalFile.value?.size || 0
       const fileExt = getExtension(uploadOptions?.outputFormat || outputFormat, file)

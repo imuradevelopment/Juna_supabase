@@ -93,11 +93,13 @@ import { v4 as uuidv4 } from 'uuid';
 import EditorToolbar from './EditorToolbar.vue';
 import EditorLinkMenu from './EditorLinkMenu.vue';
 import { useImageUpload } from '../../../composables/useImageUpload';
+import { useImageCleanup } from '../../../composables/useImageCleanup';
 
 // リファレンス変数の定義
 const fileInput = ref<HTMLInputElement | null>(null); // 画像アップロード用input要素
 const isFocused = ref(false); // エディタフォーカス状態
 const isKeyboardVisible = ref(false); // モバイルキーボード表示状態
+const previousContent = ref<string>(''); // 以前のコンテンツ（画像比較用）
 
 // 画像アップロード用コンポーザブル
 const { 
@@ -111,6 +113,9 @@ const {
   outputFormat: 'webp',
   quality: 0.85
 });
+
+// 画像クリーンアップ用コンポーザブル
+const { cleanupUnusedImages, extractImagePathsFromContent } = useImageCleanup();
 
 // ツールバー関連の参照
 const normalToolbarRef = ref<InstanceType<typeof EditorToolbar> | null>(null);
@@ -259,6 +264,17 @@ const editor = useEditor({
   onUpdate: ({ editor }) => {
     const html = editor.getHTML();
     emit('update:modelValue', html);
+
+    // 内容が変わっていない場合は何もしない
+    if (html === previousContent.value) {
+      return;
+    }
+
+    // 画像の削除/変更を検出して古い画像を削除
+    handleImageChanges(previousContent.value, html);
+
+    // 現在の内容を保存
+    previousContent.value = html;
     
     // リンク選択状態の処理
     if (editor.isActive('link')) {
@@ -293,6 +309,31 @@ const editor = useEditor({
   enablePasteRules: true
 });
 
+/**
+ * コンテンツ内の画像変更を検出して古い画像を削除する
+ */
+async function handleImageChanges(oldContent: string, newContent: string) {
+  try {
+    // 削除すべき古い画像パスを検出
+    const oldImagePaths = extractImagePathsFromContent(oldContent);
+    const newImagePaths = extractImagePathsFromContent(newContent);
+
+    // 変更がない場合は処理しない
+    if (oldImagePaths.length === 0 || JSON.stringify(oldImagePaths) === JSON.stringify(newImagePaths)) {
+      return;
+    }
+
+    // 古い画像を削除
+    const result = await cleanupUnusedImages(oldContent, newContent);
+    
+    if (result.deletedPaths.length > 0) {
+      console.log(`エディタ内容の変更により${result.deletedPaths.length}個の画像を削除しました:`, result.deletedPaths);
+    }
+  } catch (err) {
+    console.error('画像クリーンアップエラー:', err);
+  }
+}
+
 // props.modelValueの変更を監視して、エディタ内容を更新
 watch(() => props.modelValue, (newValue) => {
   if (!editor.value || !newValue) return;
@@ -302,9 +343,11 @@ watch(() => props.modelValue, (newValue) => {
     const currentJson = editor.value.getJSON();
     if (JSON.stringify(currentJson) !== JSON.stringify(newValue)) {
       editor.value.commands.setContent(newValue);
+      previousContent.value = editor.value.getHTML();
     }
   } else if (typeof newValue === 'string' && newValue !== editorContent) {
     editor.value.commands.setContent(newValue);
+    previousContent.value = newValue;
   }
 }, { deep: true });
 
@@ -312,6 +355,13 @@ watch(() => props.modelValue, (newValue) => {
 watch(() => uploading.value, (newValue) => {
   emit('upload-status-changed', newValue);
 });
+
+// エディタ初期化時に内容を保存
+watch(() => editor.value, (newEditor) => {
+  if (newEditor) {
+    previousContent.value = newEditor.getHTML();
+  }
+}, { immediate: true });
 
 // コンポーネント破棄時にエディタを破棄
 onBeforeUnmount(() => {
@@ -538,10 +588,17 @@ defineExpose({
   setContent(content: string | object) {
     if (!editor.value) return;
     editor.value.commands.setContent(content);
+    previousContent.value = editor.value.getHTML();
   },
 
   // エディタにフォーカスを確保
-  ensureEditorFocus
+  ensureEditorFocus,
+  
+  // エディタ内の画像パスを取得
+  getImagePaths() {
+    if (!editor.value) return [];
+    return extractImagePathsFromContent(editor.value.getHTML());
+  }
 });
 </script>
 

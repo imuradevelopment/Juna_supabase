@@ -37,7 +37,7 @@
           
           <!-- ユーザー情報 - レイアウト改善 -->
           <div class="flex-1 text-center md:text-left">
-            <h1 class="mb-2 text-3xl font-bold text-heading">{{ profile.nickname }}</h1>
+            <h1 class="mb-2 text-3xl font-bold text-primary">{{ profile.nickname }}</h1>
             
             <div class="mb-4 flex flex-wrap items-center justify-center space-x-3 text-sm text-text-muted md:justify-start">
               <p class="flex items-center">
@@ -47,32 +47,11 @@
               <p>登録日: {{ formatDate(profile.created_at) }}</p>
             </div>
             
-            <!-- 障害タイプ情報 - 複数表示対応に修正 -->
-            <div v-if="disabilityTypes.length > 0" class="mb-4">
-              <div class="flex flex-wrap gap-2">
-                <span 
-                  v-for="type in disabilityTypes" 
-                  :key="type.id" 
-                  class="rounded-full bg-primary/20 px-3 py-1 text-sm text-primary-light"
-                >
-                  {{ type.name }}
-                </span>
-              </div>
-            </div>
-            
             <!-- 自己紹介 -->
             <div v-if="profile.bio" class="mb-6">
               <h3 class="mb-2 text-sm uppercase tracking-wide text-text-muted">自己紹介</h3>
               <p class="leading-relaxed text-text">
                 {{ profile.bio }}
-              </p>
-            </div>
-            
-            <!-- 障害に関する説明 -->
-            <div v-if="profile.disability_description" class="mb-6">
-              <h3 class="mb-2 text-sm uppercase tracking-wide text-text-muted">障害について</h3>
-              <p class="leading-relaxed text-text">
-                {{ profile.disability_description }}
               </p>
             </div>
             
@@ -84,14 +63,6 @@
               >
                 <PhTwitterLogo class="h-5 w-5" />
                 X(Twitter)でシェア
-              </button>
-              
-              <button 
-                @click="shareProfile('facebook')" 
-                class="btn btn-info btn-sm"
-              >
-                <PhFacebookLogo class="h-5 w-5" />
-                Facebookでシェア
               </button>
               
               <button 
@@ -110,7 +81,7 @@
                 class="btn btn-outline-primary"
               >
                 <PhPencilSimple class="h-5 w-5 mr-1.5" />
-                プロフィールを編集
+                編集
               </router-link>
               
               <router-link 
@@ -118,7 +89,7 @@
                 class="btn btn-outline-secondary"
               >
                 <PhChartBar class="h-5 w-5 mr-1.5" />
-                ダッシュボードを表示
+                ダッシュボード
               </router-link>
               
               <!-- 削除ボタン -->
@@ -127,7 +98,7 @@
                 class="btn btn-outline-error"
               >
                 <PhTrash class="h-5 w-5 mr-1.5" />
-                プロフィールを削除
+                削除
               </button>
             </div>
           </div>
@@ -141,15 +112,8 @@
           投稿一覧
         </h2>
         
-        <div v-if="posts.length === 0" class="glass-card p-8 text-center">
-          <PhNote class="mx-auto mb-4 h-16 w-16 text-text-muted" />
-          <p class="mb-3 text-text-muted">まだ投稿がありません</p>
-          <div v-if="isOwnProfile">
-            <router-link to="/editor" class="btn btn-primary">
-              <PhPlus class="h-5 w-5 mr-1.5" />
-              最初の投稿を作成
-            </router-link>
-          </div>
+        <div v-if="posts.length === 0" class="glass-card p-6 text-center">
+          <p class="text-text-muted">まだ投稿はありません。</p>
         </div>
         
         <div v-else class="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -184,10 +148,10 @@
     <!-- 削除確認モーダル -->
     <div v-if="showDeleteConfirmation" class="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4">
       <div class="glass-card w-full max-w-md p-6">
-        <h3 class="mb-4 text-xl font-bold text-error">プロフィール削除の確認</h3>
+        <h3 class="mb-4 text-xl font-bold text-error">削除の確認</h3>
         
         <p class="mb-6 text-text">
-          プロフィールを削除すると、あなたの全ての投稿、コメント、いいねなども削除されます。
+          削除すると、あなたの全ての投稿、コメント、いいねなども削除されます。
           この操作は元に戻せません。本当に削除しますか？
         </p>
         
@@ -215,33 +179,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, inject } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
 import { getProfileImageUrl } from '../lib/storage';
 import PostCard from '../components/common/PostCard.vue';
+import { useNotification } from '../composables/useNotification';
 import { 
   PhSpinner,
   PhWarning,
   PhTwitterLogo,
-  PhFacebookLogo, 
   PhCopy,
   PhPencilSimple,
   PhChartBar,
   PhTrash,
   PhArticle,
-  PhNote,
-  PhPlus,
   PhTag
 } from '@phosphor-icons/vue';
-
-// 通知機能を注入
-const showNotification = inject('showNotification') as (type: 'success' | 'error' | 'info' | 'warning', title: string, message: string) => void;
 
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+
+// 通知機能をコンポーザブルから取得
+const { showNotification } = useNotification();
 
 // 状態
 const profile = ref<any>({});
@@ -252,7 +214,6 @@ const currentPage = ref(1);
 const pageSize = 10;
 const totalPosts = ref(0);
 const topCategories = ref<any[]>([]);
-const disabilityTypes = ref<any[]>([]);
 const showDeleteConfirmation = ref(false);
 const isDeleting = ref(false);
 
@@ -296,9 +257,6 @@ async function fetchProfile() {
     // データを設定
     profile.value = data;
     
-    // 障害種別を別途取得
-    await fetchDisabilityTypes(id);
-    
     // 追加情報を取得
     await Promise.all([
       fetchPosts(),
@@ -310,26 +268,6 @@ async function fetchProfile() {
     error.value = 'プロフィールの読み込みに失敗しました';
   } finally {
     loading.value = false;
-  }
-}
-
-// 障害種別の取得（修正済み）
-async function fetchDisabilityTypes(userId: string) {
-  try {
-    const { data, error: typesError } = await supabase
-      .from('user_disability_types')
-      .select('disability_type_id, disability_types:disability_type_id(id, name, description)')
-      .eq('user_id', userId);
-    
-    if (typesError) throw typesError;
-    
-    // 障害種別データの整形
-    disabilityTypes.value = (data || [])
-      .filter(item => item.disability_types)
-      .map(item => item.disability_types);
-      
-  } catch (err) {
-    console.error('障害種別取得エラー:', err);
   }
 }
 
@@ -458,8 +396,6 @@ function shareProfile(platform: string) {
   
   if (platform === 'twitter') {
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`, '_blank');
-  } else if (platform === 'facebook') {
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
   }
 }
 
@@ -561,11 +497,16 @@ async function deleteProfile() {
       throw new Error(result.error || 'アカウント削除に失敗しました');
     }
     
-    // ログアウト処理を先に実行
-    await supabase.auth.signOut({ scope: 'global' });
-    
-    // ストアの状態をクリア
+    // ユーザーデータが削除されているので、まずストアの状態をクリア
     authStore.clearUser();
+    
+    // ログアウト処理はエラーを無視して実行
+    try {
+      await supabase.auth.signOut({ scope: 'global' });
+    } catch (logoutError) {
+      console.log('ログアウト中のエラーは無視します:', logoutError);
+      // エラーは無視して処理を続行
+    }
     
     // 削除成功メッセージを表示
     showNotification(

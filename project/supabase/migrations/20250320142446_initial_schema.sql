@@ -78,20 +78,6 @@ CREATE POLICY "ユーザーは自分のアイキャッチ画像のみ削除可�
   );
 
 -- セキュリティ関数
-CREATE OR REPLACE FUNCTION is_admin(uid uuid)
-RETURNS BOOLEAN AS $$
-BEGIN
-  RETURN EXISTS (SELECT 1 FROM admin_users WHERE user_id = uid);
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
-CREATE OR REPLACE FUNCTION is_super_admin(uid uuid)
-RETURNS BOOLEAN AS $$
-BEGIN
-  RETURN EXISTS (SELECT 1 FROM admin_users WHERE user_id = uid AND admin_level = 'super_admin');
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
 CREATE OR REPLACE FUNCTION is_post_author(uid uuid, p_id uuid)
 RETURNS BOOLEAN AS $$
 BEGIN
@@ -137,7 +123,6 @@ CREATE TABLE profiles (
   nickname TEXT,
   avatar_data TEXT,
   bio TEXT,
-  personal_attributes_description TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
 );
@@ -159,60 +144,6 @@ CREATE POLICY "認証済みユーザーのみプロフィール作成可能"
 
 CREATE POLICY "ユーザーは自分のプロフィールのみ削除可能" 
   ON profiles FOR DELETE USING (auth.uid() = id);
-
--- 管理者ユーザーテーブル
-CREATE TABLE admin_users (
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
-  email TEXT NOT NULL,
-  admin_level TEXT NOT NULL DEFAULT 'moderator',
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-  created_by UUID REFERENCES auth.users(id),
-  CONSTRAINT admin_level_check CHECK (admin_level IN ('moderator', 'super_admin'))
-);
-
-ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "初期セットアップ用参照ポリシー" 
-  ON admin_users FOR SELECT 
-  USING (true);
-
-CREATE POLICY "スーパー管理者のみ管理者追加可能" 
-  ON admin_users FOR INSERT 
-  WITH CHECK (is_super_admin(auth.uid()));
-
-CREATE POLICY "スーパー管理者のみ管理者更新可能" 
-  ON admin_users FOR UPDATE 
-  USING (is_super_admin(auth.uid()));
-
-CREATE POLICY "スーパー管理者のみ管理者削除可能" 
-  ON admin_users FOR DELETE 
-  USING (is_super_admin(auth.uid()));
-
--- フォロー関係テーブル
-CREATE TABLE followers (
-  follower_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  following_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-  PRIMARY KEY (follower_id, following_id),
-  CHECK (follower_id != following_id)
-);
-
--- 行レベルセキュリティを有効化
-ALTER TABLE followers ENABLE ROW LEVEL SECURITY;
-
--- セキュリティポリシーを設定
-CREATE POLICY "フォロー関係は誰でも参照可能" 
-  ON followers FOR SELECT USING (true);
-
-CREATE POLICY "認証済みユーザーのみフォロー可能" 
-  ON followers FOR INSERT WITH CHECK (auth.uid() = follower_id);
-
-CREATE POLICY "自分のフォローのみ削除可能" 
-  ON followers FOR DELETE USING (auth.uid() = follower_id);
-
-CREATE POLICY "管理者は全てのフォロー関係を操作可能" 
-  ON followers FOR ALL 
-  USING (is_admin(auth.uid()));
 
 -- カテゴリテーブル
 CREATE TABLE categories (
@@ -236,13 +167,13 @@ CREATE POLICY "認証済みユーザーはカテゴリを作成可能"
   ON categories FOR INSERT 
   WITH CHECK (auth.uid() IS NOT NULL);
 
-CREATE POLICY "作成者と管理者はカテゴリを更新可能" 
+CREATE POLICY "作成者はカテゴリを更新可能" 
   ON categories FOR UPDATE 
-  USING (creator_id = auth.uid() OR is_admin(auth.uid()));
+  USING (creator_id = auth.uid());
 
-CREATE POLICY "作成者と管理者はカテゴリを削除可能" 
+CREATE POLICY "作成者はカテゴリを削除可能" 
   ON categories FOR DELETE 
-  USING (creator_id = auth.uid() OR is_admin(auth.uid()));
+  USING (creator_id = auth.uid());
 
 -- ブログ投稿テーブル
 CREATE TABLE posts (
@@ -287,10 +218,6 @@ CREATE POLICY "作者のみ投稿更新可能"
 CREATE POLICY "作者のみ投稿削除可能" 
   ON posts FOR DELETE USING (auth.uid() = author_id);
 
-CREATE POLICY "管理者は全ての投稿を操作可能" 
-  ON posts FOR ALL 
-  USING (is_admin(auth.uid()));
-
 -- 投稿カテゴリ関連テーブル
 CREATE TABLE post_categories (
   post_id UUID REFERENCES posts(id) ON DELETE CASCADE,
@@ -317,83 +244,6 @@ CREATE POLICY "作者のみ投稿カテゴリ削除可能"
     )
   );
 
-CREATE POLICY "管理者は全ての投稿カテゴリを操作可能" 
-  ON post_categories FOR ALL 
-  USING (is_admin(auth.uid()));
-
--- カテゴリのお気に入り機能
-CREATE TABLE favorite_categories (
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-  PRIMARY KEY (user_id, category_id)
-);
-
-ALTER TABLE favorite_categories ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "お気に入りカテゴリは誰でも参照可能" 
-  ON favorite_categories FOR SELECT USING (true);
-
-CREATE POLICY "ユーザーは自分のお気に入りカテゴリのみ作成可能" 
-  ON favorite_categories FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "ユーザーは自分のお気に入りカテゴリのみ削除可能" 
-  ON favorite_categories FOR DELETE USING (auth.uid() = user_id);
-
-CREATE POLICY "管理者は全てのお気に入りカテゴリを操作可能" 
-  ON favorite_categories FOR ALL 
-  USING (is_admin(auth.uid()));
-
--- 属性タイプテーブル
-CREATE TABLE attribute_types (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL UNIQUE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-  creator_id UUID REFERENCES profiles(id)
-);
-
-ALTER TABLE attribute_types ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "属性タイプは誰でも参照可能" 
-  ON attribute_types FOR SELECT USING (true);
-
-CREATE POLICY "認証済みユーザーは属性タイプを作成可能" 
-  ON attribute_types FOR INSERT 
-  WITH CHECK (auth.uid() IS NOT NULL);
-
-CREATE POLICY "作成者と管理者は属性タイプを更新可能" 
-  ON attribute_types FOR UPDATE 
-  USING (creator_id = auth.uid() OR is_admin(auth.uid()));
-
-CREATE POLICY "作成者と管理者は属性タイプを削除可能" 
-  ON attribute_types FOR DELETE 
-  USING (creator_id = auth.uid() OR is_admin(auth.uid()));
-
--- ユーザーと属性タイプの多対多関連テーブル
-CREATE TABLE user_attributes (
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-  attribute_type_id INTEGER REFERENCES attribute_types(id) ON DELETE CASCADE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-  PRIMARY KEY (user_id, attribute_type_id)
-);
-
--- 行レベルセキュリティを有効化
-ALTER TABLE user_attributes ENABLE ROW LEVEL SECURITY;
-
--- セキュリティポリシーを設定
-CREATE POLICY "ユーザー属性は誰でも参照可能" 
-  ON user_attributes FOR SELECT USING (true);
-
-CREATE POLICY "ユーザーは自分の属性のみ作成可能" 
-  ON user_attributes FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "ユーザーは自分の属性のみ削除可能" 
-  ON user_attributes FOR DELETE USING (auth.uid() = user_id);
-
-CREATE POLICY "管理者は全てのユーザー属性を操作可能" 
-  ON user_attributes FOR ALL 
-  USING (is_admin(auth.uid()));
-
 -- 投稿画像テーブル（修正版）
 CREATE TABLE post_images (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -416,10 +266,6 @@ CREATE POLICY "作者のみ投稿画像更新可能"
 
 CREATE POLICY "作者のみ投稿画像削除可能" 
   ON post_images FOR DELETE USING (auth.uid() = author_id);
-
-CREATE POLICY "管理者は全ての投稿画像を操作可能" 
-  ON post_images FOR ALL 
-  USING (is_admin(auth.uid()));
 
 -- コメントテーブル
 CREATE TABLE comments (
@@ -473,10 +319,6 @@ CREATE POLICY "自分のコメントのみ削除可能"
       SELECT 1 FROM posts WHERE id = post_id AND author_id = auth.uid()
     )
   );
-
-CREATE POLICY "管理者は全てのコメントを操作可能" 
-  ON comments FOR ALL 
-  USING (is_admin(auth.uid()));
 
 -- 投稿いいねテーブル
 CREATE TABLE post_likes (
@@ -574,11 +416,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- 属性タイプとカテゴリの作成者を自動設定するトリガー
-CREATE TRIGGER set_attribute_type_creator
-BEFORE INSERT ON attribute_types
-FOR EACH ROW EXECUTE FUNCTION set_creator_id();
-
+-- カテゴリの作成者を自動設定するトリガー
 CREATE TRIGGER set_category_creator
 BEFORE INSERT ON categories
 FOR EACH ROW EXECUTE FUNCTION set_creator_id();
@@ -596,103 +434,70 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION get_related_posts(post_id UUID, limit_count INTEGER DEFAULT 5)
+CREATE OR REPLACE FUNCTION get_related_posts(input_post_id UUID, limit_count INTEGER DEFAULT 5)
 RETURNS SETOF posts AS $$
 BEGIN
   RETURN QUERY
-  WITH post_categories AS (
-    SELECT category_id FROM post_categories WHERE post_id = get_related_posts.post_id
+  WITH target_categories AS (
+    SELECT category_id FROM post_categories WHERE post_id = input_post_id
+  ),
+  category_counts AS (
+    SELECT 
+      p.id,
+      COUNT(*) AS category_match_count
+    FROM posts p
+    JOIN post_categories pc ON p.id = pc.post_id
+    WHERE pc.category_id IN (SELECT category_id FROM target_categories)
+    GROUP BY p.id
   )
-  SELECT DISTINCT p.*
+  SELECT p.*
   FROM posts p
-  JOIN post_categories pc ON p.id = pc.post_id
+  JOIN category_counts cc ON p.id = cc.id
   WHERE p.published = true
-    AND p.id != get_related_posts.post_id
-    AND pc.category_id IN (SELECT category_id FROM post_categories)
-  ORDER BY 
-    (SELECT COUNT(*) FROM post_categories pc2 
-     WHERE pc2.post_id = p.id AND pc2.category_id IN (SELECT category_id FROM post_categories)) DESC,
-    p.published_at DESC
+    AND p.id != input_post_id
+  ORDER BY cc.category_match_count DESC, p.published_at DESC
   LIMIT limit_count;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE OR REPLACE FUNCTION bootstrap_admin(admin_email text, admin_id uuid)
-RETURNS void AS $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM admin_users) THEN
-    INSERT INTO admin_users (user_id, email, admin_level, created_by)
-    VALUES (admin_id, admin_email, 'super_admin', admin_id);
-  END IF;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- ユーティリティ関数：フォロワー数取得
-CREATE OR REPLACE FUNCTION get_follower_count(profile_id UUID)
-RETURNS INTEGER AS $$
-BEGIN
-  RETURN (
-    SELECT COUNT(*) 
-    FROM followers 
-    WHERE following_id = profile_id
-  );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- ユーティリティ関数：フォロー数取得
-CREATE OR REPLACE FUNCTION get_following_count(profile_id UUID)
-RETURNS INTEGER AS $$
-BEGIN
-  RETURN (
-    SELECT COUNT(*) 
-    FROM followers 
-    WHERE follower_id = profile_id
-  );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- ユーティリティ関数：フォロー確認
-CREATE OR REPLACE FUNCTION is_following(follower UUID, following UUID)
-RETURNS BOOLEAN AS $$
-BEGIN
-  RETURN EXISTS (
-    SELECT 1 
-    FROM followers 
-    WHERE follower_id = follower AND following_id = following
-  );
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
-
--- メンション検出機能
-CREATE OR REPLACE FUNCTION extract_mentions(text_content TEXT)
-RETURNS SETOF TEXT AS $$
-DECLARE
-  mentions TEXT[];
-  mention TEXT;
-BEGIN
-  -- @username形式のメンションを抽出
-  SELECT ARRAY(
-    SELECT regexp_matches(text_content, '@([a-zA-Z0-9_]+)', 'g')
-  ) INTO mentions;
-  
-  -- 結果を平坦化
-  FOREACH mention IN ARRAY mentions LOOP
-    RETURN NEXT mention;
-  END LOOP;
-  
-  RETURN;
-END;
-$$ LANGUAGE plpgsql IMMUTABLE;
-
 -- Realtimeサブスクリプション設定
-ALTER PUBLICATION supabase_realtime ADD TABLE posts, comments, post_likes, comment_likes, user_attributes, followers, favorite_categories;
+ALTER PUBLICATION supabase_realtime ADD TABLE posts, comments, post_likes, comment_likes;
 
---------------------------------------------------
--- 管理者設定（本番環境で有効化）
---------------------------------------------------
--- 最初のスーパー管理者設定（本番環境で適切なユーザーIDとメールアドレスに置き換える）
--- INSERT INTO admin_users (user_id, email, admin_level, created_by) 
--- VALUES ('00000000-0000-0000-0000-000000000000', 'admin@example.com', 'super_admin', '00000000-0000-0000-0000-000000000000');
+-- システム管理者設定（必要に応じてコメントを外して実行）
+/*
+-- システムユーザー用のUUID
+INSERT INTO auth.users (
+  id,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  created_at,
+  updated_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  is_super_admin,
+  role
+)
+VALUES (
+  '00000000-0000-0000-0000-000000000000',
+  'system@example.com',
+  '$2a$10$x123456789012345678901uabc123456789012345678901234567890',
+  NOW(),
+  NOW(),
+  NOW(),
+  '{"provider":"email","providers":["email"]}',
+  '{}',
+  false,
+  'authenticated'
+);
 
--- または、より安全な方法として、bootstrap_admin関数を使用
--- SELECT bootstrap_admin('admin@example.com', '00000000-0000-0000-0000-000000000000');
+-- システム管理用のプロフィールを作成
+INSERT INTO profiles (id, account_id, nickname, created_at, updated_at)
+VALUES (
+  '00000000-0000-0000-0000-000000000000',
+  'system',
+  'システム',
+  NOW(),
+  NOW()
+);
+*/

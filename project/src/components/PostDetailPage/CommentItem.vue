@@ -29,7 +29,7 @@
           <div v-if="editingCommentId === comment.id" class="mb-2">
             <textarea 
               :value="editedContent" 
-              @input="$emit('update:editedContent', $event.target.value)"
+              @input="$emit('update:editedContent', ($event.target as HTMLTextAreaElement).value)"
               class="w-full rounded border px-3 py-2 focus:outline-none bg-surface text-text border-border shadow-primary/20"
               rows="2"
             ></textarea>
@@ -259,7 +259,7 @@ const props = defineProps({
   },
   editingCommentId: {
     type: String,
-    default: null
+    default: null as string | null
   },
   editedContent: {
     type: String,
@@ -279,7 +279,7 @@ const props = defineProps({
   },
   replyingToId: {
     type: String,
-    default: null
+    default: null as string | null
   },
   isLastNestedLevel: {
     type: Boolean,
@@ -287,17 +287,17 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits([
-  'reply', 
-  'edit', 
-  'delete', 
-  'toggle-like', 
-  'save-edit', 
-  'cancel-edit',
-  'update:editedContent',
-  'submit-reply',
-  'cancel-reply'
-]);
+const emit = defineEmits<{
+  (e: 'reply', comment: Comment): void;
+  (e: 'edit', comment: Comment): void;
+  (e: 'delete', comment: Comment): void;
+  (e: 'toggle-like', comment: Comment): void;
+  (e: 'save-edit', comment: Comment): void;
+  (e: 'cancel-edit'): void;
+  (e: 'update:editedContent', content: string): void;
+  (e: 'submit-reply', id: string, text: string): void;
+  (e: 'cancel-reply'): void;
+}>();
 
 const authStore = useAuthStore();
 const replyContent = ref('');

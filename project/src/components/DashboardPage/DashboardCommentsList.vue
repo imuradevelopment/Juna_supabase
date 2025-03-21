@@ -237,10 +237,10 @@ async function fetchComments() {
         updated_at,
         post_id,
         parent_comment_id,
-        posts:post_id (
+        post:post_id (
           id,
           title,
-          profiles:author_id (
+          author:author_id (
             id,
             nickname,
             avatar_data
@@ -263,12 +263,12 @@ async function fetchComments() {
         post_id: item.post_id,
         parent_comment_id: item.parent_comment_id,
         post: {
-          id: item.posts.id,
-          title: item.posts.title,
+          id: item.post?.id,
+          title: item.post?.title,
           author: {
-            id: item.posts.profiles.id,
-            nickname: item.posts.profiles.nickname,
-            avatar_data: item.posts.profiles.avatar_data
+            id: item.post?.author?.id,
+            nickname: item.post?.author?.nickname,
+            avatar_data: item.post?.author?.avatar_data
           }
         }
       } as Comment;

@@ -133,37 +133,43 @@
         <PhCircleNotch :size="40" class="animate-spin text-primary" weight="bold" />
       </div>
       
-      <!-- エラー表示 -->
-      <div v-else-if="error" class="glass-card p-6 text-center">
-        <p class="text-error">{{ error }}</p>
-        <button @click="fetchFeaturedPosts" class="btn btn-primary mt-4">再読み込み</button>
-      </div>
-      
       <!-- 投稿の表示 -->
       <div v-else>
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div v-if="featuredPosts.length > 0" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           <PostCard 
             v-for="post in featuredPosts" 
             :key="post.id" 
             :post="post"
           />
         </div>
+        <div v-else class="glass-card p-6 text-center">
+          <p class="text-text-muted">まだ投稿はありません。</p>
+        </div>
       </div>
     </section>
     
     <!-- 最新の投稿 -->
     <section class="mb-10">
-      <div class="mb-6 flex items-center justify-between">
-        <h2 class="text-2xl font-bold text-heading">最新の投稿</h2>
-        <router-link to="/posts?sort=created_at.desc" class="text-primary hover:underline">すべて見る</router-link>
+      <div class="mb-8 flex items-center justify-between">
+        <h2 class="flex items-center text-2xl font-bold text-heading md:text-3xl">
+          <span class="mr-3 inline-block h-6 w-2 rounded-full bg-primary"></span>
+          最新の投稿
+        </h2>
+        <router-link to="/posts?sort=created_at.desc" class="flex items-center text-primary-light hover:underline">
+          すべて見る
+          <PhArrowRight :size="20" class="ml-1" weight="bold" />
+        </router-link>
       </div>
       
-      <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div v-if="recentPosts.length > 0" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         <PostCard 
           v-for="post in recentPosts" 
           :key="post.id" 
           :post="post"
         />
+      </div>
+      <div v-else class="glass-card p-6 text-center">
+        <p class="text-text-muted">まだ投稿はありません。</p>
       </div>
     </section>
 
@@ -660,7 +666,6 @@ onMounted(async () => {
     ]);
   } catch (err: any) {
     console.error('データ取得エラー:', err);
-    error.value = 'データの読み込みに失敗しました';
   } finally {
     loading.value = false;
   }
@@ -716,33 +721,16 @@ async function fetchFeaturedPosts() {
         *,
         profiles:author_id(
           nickname, 
-          avatar_data,
-          user_disability_types(
-            disability_types(id, name)
-          )
+          avatar_data
         )
       `)
       .eq('published', true)
       .order('views', { ascending: false })
       .limit(6);
     
-    const posts = await fetchCompletePostData(query);
-    
-    // disability_typesを整形
-    featuredPosts.value = posts.map(post => {
-      if (post.profiles?.user_disability_types) {
-        post.profiles.disability_types = post.profiles.user_disability_types
-          .map((udt: any) => udt.disability_types)
-          .filter(Boolean);
-        
-        // 元のプロパティを削除
-        delete post.profiles.user_disability_types;
-      }
-      return post;
-    });
+    featuredPosts.value = await fetchCompletePostData(query);
   } catch (err) {
     console.error('注目投稿取得エラー:', err);
-    error.value = '投稿の読み込みに失敗しました';
   } finally {
     loading.value = false;
   }
@@ -757,30 +745,14 @@ async function fetchRecentPosts() {
         *,
         profiles:author_id(
           nickname, 
-          avatar_data,
-          user_disability_types(
-            disability_types(id, name)
-          )
+          avatar_data
         )
       `)
       .eq('published', true)
       .order('created_at', { ascending: false })
       .limit(5);
     
-    const posts = await fetchCompletePostData(query);
-    
-    // disability_typesを整形
-    recentPosts.value = posts.map(post => {
-      if (post.profiles?.user_disability_types) {
-        post.profiles.disability_types = post.profiles.user_disability_types
-          .map((udt: any) => udt.disability_types)
-          .filter(Boolean);
-        
-        // 元のプロパティを削除
-        delete post.profiles.user_disability_types;
-      }
-      return post;
-    });
+    recentPosts.value = await fetchCompletePostData(query);
   } catch (err) {
     console.error('最新投稿取得エラー:', err);
   }

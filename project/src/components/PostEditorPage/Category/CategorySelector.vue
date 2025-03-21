@@ -79,6 +79,11 @@ interface Category {
   description: string | null;
 }
 
+interface NewCategory {
+  id: string;
+  name: string;
+}
+
 const props = defineProps({
   modelValue: {
     type: Array as () => string[],
@@ -93,6 +98,7 @@ const props = defineProps({
 const emit = defineEmits(['update:modelValue', 'error', 'categories-loaded']);
 
 const availableCategories = ref<Category[]>([]);
+const newCategories = ref<NewCategory[]>([]);
 const isCategoryDropdownOpen = ref(false);
 const categorySearchQuery = ref('');
 const categoryInputRef = ref<HTMLInputElement | null>(null);
@@ -147,77 +153,40 @@ function handleCategoryEnterKey() {
   }
 }
 
-async function createNewCategory() {
+function createNewCategory() {
   if (!categorySearchQuery.value.trim()) return;
   const categoryName = categorySearchQuery.value.trim();
   
-  try {
-    // まず既存のカテゴリで同名のものを検索
-    const { data: existingCategory, error: searchError } = await supabase
-      .from('categories')
-      .select('*')
-      .ilike('name', categoryName)
-      .single();
-    
-    if (!searchError && existingCategory) {
-      // 既存のカテゴリが見つかった場合はそれを使用
-      availableCategories.value = availableCategories.value.filter(c => c.id !== existingCategory.id);
-      availableCategories.value.push(existingCategory);
-      addCategory(existingCategory.id);
-      categorySearchQuery.value = '';
-      return;
-    }
-    
-    // 新しいカテゴリを作成
-    const { data, error } = await supabase
-      .from('categories')
-      .insert([{ name: categoryName }])
-      .select('*')
-      .single();
-    
-    if (error) {
-      // 一意制約違反の場合（既に他のユーザーが作成した）
-      if (error.code === '23505') { // PostgreSQLの一意制約違反コード
-        console.log('同名カテゴリが既に存在します。既存のカテゴリを使用します。');
-        
-        // 再度検索して最新のカテゴリを取得
-        const { data: newlyAddedCategory } = await supabase
-          .from('categories')
-          .select('*')
-          .ilike('name', categoryName)
-          .single();
-        
-        if (newlyAddedCategory) {
-          availableCategories.value = availableCategories.value.filter(c => c.id !== newlyAddedCategory.id);
-          availableCategories.value.push(newlyAddedCategory);
-          addCategory(newlyAddedCategory.id);
-          categorySearchQuery.value = '';
-          return;
-        }
-      }
-      throw error;
-    }
-    
-    if (data) {
-      availableCategories.value.push(data);
-      addCategory(data.id);
-      categorySearchQuery.value = '';
-    }
-  } catch (err: any) {
-    console.error('カテゴリ作成エラー:', err);
-    
-    // エラーメッセージの改善
-    if (err.code === '23505') {
-      formError.value = '同名のカテゴリが既に存在します。カテゴリリストから選択してください。';
-      emit('error', '同名のカテゴリが既に存在します。カテゴリリストから選択してください。');
-      
-      // カテゴリリストを再取得して最新の状態に
-      await fetchCategories();
-    } else {
-      formError.value = 'カテゴリの作成に失敗しました。再度お試しください。';
-      emit('error', 'カテゴリの作成に失敗しました。再度お試しください。');
-    }
+  // カテゴリ名のバリデーション - 最低2文字以上必要
+  if (categoryName.length < 2) {
+    emit('error', 'カテゴリ名は2文字以上必要です');
+    return;
   }
+  
+  // まず既存のカテゴリで同名のものを検索
+  const existingCategory = availableCategories.value.find(
+    cat => cat.name.toLowerCase() === categoryName.toLowerCase()
+  );
+  
+  if (existingCategory) {
+    // 既存のカテゴリが見つかった場合はそれを使用
+    addCategory(existingCategory.id);
+    categorySearchQuery.value = '';
+    return;
+  }
+  
+  // 新しいカテゴリを一時的に保存
+  const tempId = `new-${Date.now()}`;
+  newCategories.value.push({
+    id: tempId,
+    name: categoryName
+  });
+  
+  // 選択中のカテゴリに追加
+  const updatedCategories = [...props.modelValue, tempId];
+  emit('update:modelValue', updatedCategories);
+  categorySearchQuery.value = '';
+  categoryInputRef.value?.focus();
 }
 
 function addCategory(categoryId: number) {
@@ -236,12 +205,23 @@ function removeCategory(categoryId: string) {
 }
 
 function getCategoryName(categoryId: string): string {
+  // 新しく追加された一時カテゴリの場合
+  if (categoryId.startsWith('new-')) {
+    const newCategory = newCategories.value.find(c => c.id === categoryId);
+    return newCategory ? newCategory.name : 'カテゴリなし';
+  }
+  
+  // 既存のカテゴリの場合
   const category = availableCategories.value.find(c => c.id.toString() === categoryId);
   return category ? category.name : 'カテゴリなし';
 }
 
 async function savePostCategories(postId: string) {
   try {
+    if (!postId || typeof postId !== 'string' || !postId.trim()) {
+      throw new Error('投稿IDが無効です');
+    }
+
     // 既存のカテゴリ関連を削除
     const { error: deleteError } = await supabase
       .from('post_categories')
@@ -251,16 +231,33 @@ async function savePostCategories(postId: string) {
     if (deleteError) throw deleteError;
     
     if (props.modelValue.length > 0) {
-      const categoryRelations = props.modelValue.map(categoryId => ({
-        post_id: postId,
-        category_id: parseInt(categoryId)
-      }));
+      // 実際のカテゴリIDのリストを作成
+      const categoryIds = [];
       
-      const { error: categoryError } = await supabase
-        .from('post_categories')
-        .insert(categoryRelations);
+      for (const categoryId of props.modelValue) {
+        // 既存のカテゴリの場合はそのまま追加
+        if (!categoryId.startsWith('new-')) {
+          const numId = parseInt(categoryId);
+          if (isNaN(numId)) {
+            throw new Error(`無効なカテゴリID: ${categoryId}`);
+          }
+          categoryIds.push(numId);
+        }
+      }
       
-      if (categoryError) throw categoryError;
+      // カテゴリと投稿の関連付けを作成
+      if (categoryIds.length > 0) {
+        const categoryRelations = categoryIds.map(categoryId => ({
+          post_id: postId,
+          category_id: categoryId
+        }));
+        
+        const { error: categoryError } = await supabase
+          .from('post_categories')
+          .insert(categoryRelations);
+        
+        if (categoryError) throw categoryError;
+      }
     }
     
     return true;
@@ -271,10 +268,143 @@ async function savePostCategories(postId: string) {
   }
 }
 
-// 公開メソッドを定義
+// 新しいカテゴリをデータベースに保存する
+async function saveNewCategories() {
+  const savedCategoryIds: { [tempId: string]: number } = {};
+  
+  try {
+    for (const newCategory of newCategories.value) {
+      // カテゴリ名のバリデーション
+      if (newCategory.name.length < 2) {
+        console.warn(`スキップ: カテゴリ名「${newCategory.name}」は短すぎます`);
+        continue;
+      }
+      
+      // すべてのカテゴリを取得して、JavaScriptでフィルタリング
+      const { data: allCategories, error: fetchError } = await supabase
+        .from('categories')
+        .select('*');
+      
+      if (fetchError) throw fetchError;
+      
+      // 同じ名前のカテゴリを検索
+      const existingCategory = allCategories?.find(
+        cat => cat.name.toLowerCase() === newCategory.name.toLowerCase()
+      );
+      
+      if (existingCategory) {
+        // 既存のカテゴリが見つかった場合はそれを使用
+        savedCategoryIds[newCategory.id] = existingCategory.id;
+        continue;
+      }
+      
+      // 新しいカテゴリを作成
+      const { data, error } = await supabase
+        .from('categories')
+        .insert([{ name: newCategory.name }])
+        .select('*')
+        .single();
+      
+      if (error) {
+        // 一意制約違反の場合（既に他のユーザーが作成した）
+        if (error.code === '23505') { // PostgreSQLの一意制約違反コード
+          // 再度すべてのカテゴリを取得して検索
+          const { data: updatedCategories } = await supabase
+            .from('categories')
+            .select('*');
+          
+          if (updatedCategories) {
+            const newlyAddedCategory = updatedCategories.find(
+              cat => cat.name.toLowerCase() === newCategory.name.toLowerCase()
+            );
+            
+            if (newlyAddedCategory) {
+              savedCategoryIds[newCategory.id] = newlyAddedCategory.id;
+            }
+          }
+        } else {
+          throw error;
+        }
+      } else if (data) {
+        savedCategoryIds[newCategory.id] = data.id;
+      }
+    }
+    
+    return savedCategoryIds;
+  } catch (err) {
+    console.error('新規カテゴリ保存エラー:', err);
+    throw err;
+  }
+}
+
+// 投稿に新しいカテゴリを関連付ける
+async function savePostWithNewCategories(postId: string) {
+  try {
+    // 新しいカテゴリを保存し、一時IDと実際のIDのマッピングを取得
+    const categoryIdMap = await saveNewCategories();
+    
+    // 選択されたカテゴリIDを実際のIDに変換
+    const actualCategoryIds = props.modelValue.map(categoryId => {
+      if (categoryId.startsWith('new-')) {
+        return categoryIdMap[categoryId];
+      }
+      return parseInt(categoryId);
+    }).filter(id => !isNaN(id));
+    
+    // 既存のカテゴリ関連を削除
+    const { error: deleteError } = await supabase
+      .from('post_categories')
+      .delete()
+      .eq('post_id', postId);
+    
+    if (deleteError) throw deleteError;
+    
+    // 新しいカテゴリ関連を作成
+    if (actualCategoryIds.length > 0) {
+      const categoryRelations = actualCategoryIds.map(categoryId => ({
+        post_id: postId,
+        category_id: categoryId
+      }));
+      
+      const { error: categoryError } = await supabase
+        .from('post_categories')
+        .insert(categoryRelations);
+      
+      if (categoryError) throw categoryError;
+    }
+    
+    // 新規カテゴリリストをクリア
+    newCategories.value = [];
+    
+    // 利用可能なカテゴリリストを再取得
+    await fetchCategories();
+    
+    return true;
+  } catch (err) {
+    console.error('カテゴリ関連付けエラー:', err);
+    emit('error', 'カテゴリの保存に失敗しました');
+    return false;
+  }
+}
+
+// 新しいカテゴリのリストを取得
+function getNewCategories() {
+  return newCategories.value;
+}
+
+// 新しいカテゴリのリストを設定
+function setNewCategories(categories: NewCategory[]) {
+  newCategories.value = categories;
+}
+
+// 公開メソッド
 defineExpose({
   fetchCategories,
   savePostCategories,
+  saveNewCategories,
+  savePostWithNewCategories,
+  getNewCategories,
+  setNewCategories,
   getAvailableCategories: () => availableCategories.value
 });
 </script> 

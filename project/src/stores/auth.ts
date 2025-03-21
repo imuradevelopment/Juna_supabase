@@ -11,7 +11,6 @@ type Profile = {
   nickname: string | null;
   bio: string | null;
   avatar_data: string | null;
-  disability_description: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -183,7 +182,7 @@ export const useAuthStore = defineStore('auth', () => {
   };
   
   // 会員登録処理
-  const register = async (email: string, password: string, displayName: string, accountId: string = '') => {
+  const register = async (email: string, password: string, nickname: string, accountId: string = '') => {
     loading.value = true;
     error.value = null;
     
@@ -197,7 +196,7 @@ export const useAuthStore = defineStore('auth', () => {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
           },
-          body: JSON.stringify({ email, password, displayName, accountId })
+          body: JSON.stringify({ email, password, nickname, accountId })
         }
       );
       
@@ -291,10 +290,13 @@ export const useAuthStore = defineStore('auth', () => {
     try {
       if (!user.value) throw new Error('ユーザーが認証されていません');
       
-      // profileDataからdisability_type_idを削除
-      if ('disability_type_id' in profileData) {
-        delete profileData.disability_type_id;
-      }
+      // スキーマに存在しないフィールドを削除
+      const validFields = ['nickname', 'bio', 'avatar_data', 'account_id'];
+      Object.keys(profileData).forEach(key => {
+        if (!validFields.includes(key)) {
+          delete profileData[key];
+        }
+      });
       
       const { error: updateError } = await supabase
         .from('profiles')

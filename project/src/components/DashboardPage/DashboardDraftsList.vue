@@ -13,13 +13,10 @@
     </div>
     
     <!-- 下書きがない場合 -->
-    <div v-else-if="drafts.length === 0" class="glass-card text-center">
-      <p class="mb-4 text-text-muted">
-        下書きはありません
+    <div v-else-if="drafts.length === 0" class="glass-card p-6 text-center">
+      <p class="text-text-muted">
+        まだ投稿はありません。
       </p>
-      <router-link to="/editor" class="btn btn-primary">
-        新しい投稿を作成する
-      </router-link>
     </div>
     
     <!-- 下書きリスト -->

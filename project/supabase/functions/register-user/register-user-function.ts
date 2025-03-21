@@ -15,7 +15,7 @@ serve(async (req) => {
   }
 
   try {
-    const { email, password, displayName, accountId } = await req.json();
+    const { email, password, nickname, accountId } = await req.json();
     
     // サービスロールキーでクライアントを作成
     const supabaseAdmin = createClient(
@@ -39,18 +39,17 @@ serve(async (req) => {
     const userId = authData.user.id;
     
     // アカウントID生成
-    const generatedAccountId = accountId || generateAccountId(displayName);
+    const generatedAccountId = accountId || generateAccountId(nickname);
     
     // プロフィール作成
     const { error: profileError } = await supabaseAdmin
       .from('profiles')
       .insert({
         id: userId,
-        nickname: displayName,
+        nickname: nickname,
         account_id: generatedAccountId,
         bio: null,
         avatar_data: null,
-        disability_description: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       });

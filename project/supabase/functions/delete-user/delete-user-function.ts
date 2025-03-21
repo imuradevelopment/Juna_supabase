@@ -8,6 +8,9 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
 }
 
+// システムユーザーのID
+const SYSTEM_USER_ID = '00000000-0000-0000-0000-000000000000';
+
 interface RequestBody {
   userId: string;
 }
@@ -115,28 +118,9 @@ serve(async (req: Request) => {
 
     console.log('認証成功:', user.id.substring(0, 8) + '...')
 
-    // プロフィール削除前に必要なデータをバックアップ（ストレージパス特定用）
-    try {
-      console.log('1. プロフィール削除開始')
-      const { error: profileError } = await supabaseAdmin
-        .from('profiles')
-        .delete()
-        .eq('id', userId)
-
-      if (profileError) {
-        console.error('プロフィール削除エラー:', profileError)
-        // エラーは記録するが処理は続行
-      } else {
-        console.log('プロフィール削除成功')
-      }
-    } catch (error) {
-      console.error('プロフィール削除例外:', error)
-      // エラーは記録するが処理は続行
-    }
-
     // ストレージ削除処理
     try {
-      console.log('2. ストレージ削除開始')
+      console.log('1. ストレージ削除開始')
       
       // バケットごとに処理を分離し、エラーが発生しても続行できるように
       const buckets = ['profile_images', 'post_images', 'cover_images']
@@ -178,9 +162,136 @@ serve(async (req: Request) => {
       // エラーは記録するが処理は続行
     }
 
+    // 投稿の削除（カスケード削除によりコメントや画像も削除される）
+    try {
+      console.log('2. 投稿削除開始')
+      const { error: postsError } = await supabaseAdmin
+        .from('posts')
+        .delete()
+        .eq('author_id', userId)
+
+      if (postsError) {
+        console.error('投稿削除エラー:', postsError)
+      } else {
+        console.log('投稿削除成功')
+      }
+    } catch (error) {
+      console.error('投稿削除例外:', error)
+      // エラーは記録するが処理は続行
+    }
+
+    // いいねの削除
+    try {
+      console.log('3. いいね削除開始')
+      await Promise.all([
+        supabaseAdmin.from('post_likes').delete().eq('user_id', userId),
+        supabaseAdmin.from('comment_likes').delete().eq('user_id', userId)
+      ])
+      console.log('いいね削除成功')
+    } catch (error) {
+      console.error('いいね削除例外:', error)
+      // エラーは記録するが処理は続行
+    }
+
+    // カテゴリの処理
+    try {
+      console.log('4. カテゴリ処理開始')
+      
+      // ユーザーが作成したカテゴリを取得
+      const { data: userCategories, error: categoriesError } = await supabaseAdmin
+        .from('categories')
+        .select('id')
+        .eq('creator_id', userId);
+      
+      if (categoriesError) {
+        console.error('カテゴリ取得エラー:', categoriesError);
+        // エラーは記録するが処理は続行
+      } else if (userCategories && userCategories.length > 0) {
+        console.log(`ユーザー作成カテゴリ: ${userCategories.length}件`);
+        
+        // 他のユーザーが使用しているカテゴリを特定
+        const categoryIds = userCategories.map(c => c.id);
+        
+        // 他のユーザーの投稿で使われているカテゴリを特定
+        const { data: sharedCategoryData, error: sharedError } = await supabaseAdmin
+          .from('post_categories')
+          .select('category_id, posts!inner(author_id)')
+          .in('category_id', categoryIds)
+          .neq('posts.author_id', userId);
+          
+        if (sharedError) {
+          console.error('共有カテゴリ特定エラー:', sharedError);
+        } else {
+          // 他のユーザーが使用しているカテゴリIDの配列を作成
+          const sharedCategoryIds = [...new Set(
+            (sharedCategoryData || []).map(item => item.category_id)
+          )];
+          
+          if (sharedCategoryIds.length > 0) {
+            console.log(`他ユーザー使用カテゴリ: ${sharedCategoryIds.length}件`);
+            
+            // 他のユーザーが使用しているカテゴリをシステムユーザーに移管
+            const { error: updateError } = await supabaseAdmin
+              .from('categories')
+              .update({ creator_id: SYSTEM_USER_ID })
+              .in('id', sharedCategoryIds);
+              
+            if (updateError) {
+              console.error('カテゴリ移管エラー:', updateError);
+            } else {
+              console.log(`システムユーザーへ移管: ${sharedCategoryIds.length}件`);
+            }
+          }
+          
+          // 他のユーザーが使用していないカテゴリを特定して削除
+          const unusedCategoryIds = categoryIds.filter(id => !sharedCategoryIds.includes(id));
+          
+          if (unusedCategoryIds.length > 0) {
+            console.log(`未共有カテゴリ: ${unusedCategoryIds.length}件`);
+            
+            // 未共有カテゴリを削除
+            const { error: deleteError } = await supabaseAdmin
+              .from('categories')
+              .delete()
+              .in('id', unusedCategoryIds);
+              
+            if (deleteError) {
+              console.error('未共有カテゴリ削除エラー:', deleteError);
+            } else {
+              console.log(`未共有カテゴリ削除完了: ${unusedCategoryIds.length}件`);
+            }
+          }
+        }
+      } else {
+        console.log('ユーザー作成カテゴリなし');
+      }
+    } catch (error) {
+      console.error('カテゴリ処理例外:', error);
+      // エラーは記録するが処理は続行
+    }
+
+    // プロフィール削除（最後にプロフィールを削除）
+    try {
+      console.log('5. プロフィール削除開始')
+      const { error: profileError } = await supabaseAdmin
+        .from('profiles')
+        .delete()
+        .eq('id', userId)
+
+      if (profileError) {
+        console.error('プロフィール削除エラー:', profileError)
+        // エラーは記録するが処理は続行
+      } else {
+        console.log('プロフィール削除成功')
+      }
+    } catch (error) {
+      console.error('プロフィール削除例外:', error)
+      // エラーは記録するが処理は続行
+    }
+
     // 認証ユーザーの削除
     try {
-      console.log('3. ユーザー削除開始')
+      console.log('6. ユーザー削除開始')
       const { error: deleteUserError } = await supabaseAdmin.auth.admin.deleteUser(userId)
 
       if (deleteUserError) {

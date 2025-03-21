@@ -364,20 +364,30 @@ function applyLink() {
     return;
   }
   
-  // URLの形式を調整（http/httpsプレフィックスがなければ追加）
-  let finalUrl = url.value.trim();
-  if (!/^https?:\/\//i.test(finalUrl)) {
-    finalUrl = 'https://' + finalUrl;
+  try {
+    // URLの形式を調整（http/httpsプレフィックスがなければ追加）
+    let finalUrl = url.value.trim();
+    if (!/^https?:\/\//i.test(finalUrl)) {
+      finalUrl = 'https://' + finalUrl;
+    }
+    
+    // URLの検証
+    if (!finalUrl.match(urlRegex)) {
+      throw new Error('無効なURLです');
+    }
+    
+    const finalText = text.value.trim() || finalUrl;
+    
+    emit('apply', {
+      url: finalUrl,
+      text: finalText
+    });
+    
+    cancel();
+  } catch (error) {
+    console.error('リンク適用エラー:', error);
+    // エラー処理をここに追加
   }
-  
-  const finalText = text.value.trim() || finalUrl;
-  
-  emit('apply', {
-    url: finalUrl,
-    text: finalText
-  });
-  
-  cancel();
 }
 
 /**
