@@ -117,7 +117,7 @@
       </div>
     </div>
 
-    <div v-if="lastAutoSaveTime" class="fixed bottom-4 right-4 rounded bg-surface-variant p-2 text-sm text-text-muted shadow-md opacity-70">
+    <div v-if="lastAutoSaveTime" class="fixed bottom-4 right-4 rounded bg-surface-variant p-2 text-sm text-text-muted shadow-md opacity-70 z-50">
       最終自動保存: {{ lastAutoSaveTime.toLocaleTimeString() }}
     </div>
   </div>
