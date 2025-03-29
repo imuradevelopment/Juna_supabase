@@ -111,6 +111,11 @@ async function handleImageUpload(event: Event) {
   try {
     const file = input.files[0];
     
+    // 上書き前に現在のパスを保存
+    if (props.modelValue) {
+      previousImagePath.value = props.modelValue;
+    }
+    
     // コンポーザブルを使って画像を処理
     const success = await handleFileSelect(file);
     
@@ -142,22 +147,25 @@ async function uploadImageToStorage(userId: string): Promise<string | null> {
       throw new Error('ユーザーIDが必要です');
     }
     
+    // アップロード前に現在の値を確保（modelValueが変わる可能性があるため）
+    const currentPath = props.modelValue;
+    
     // 画像アップロード
     const result = await uploadImage(userId);
     
     if (result) {
       // 古い画像を削除
-      if (previousImagePath.value && previousImagePath.value !== result.path) {
+      if (currentPath && currentPath !== result.path) {
         try {
           // パスを正規化
-          let normalizedPath = previousImagePath.value;
+          let normalizedPath = currentPath;
           if (!normalizedPath.startsWith('cover_images/') && normalizedPath.includes('cover_images/')) {
             normalizedPath = 'cover_images/' + normalizedPath.split('cover_images/')[1];
           }
           
           console.log('アップロード時に削除する古い画像:', normalizedPath);
           await cleanupUnusedImages('', '', normalizedPath, result.path);
-          console.log('古いアイキャッチ画像を削除しました:', previousImagePath.value);
+          console.log('古いアイキャッチ画像を削除しました:', currentPath);
         } catch (cleanupError) {
           console.error('古い画像の削除に失敗しました:', cleanupError);
         }
