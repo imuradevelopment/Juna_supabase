@@ -262,7 +262,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale';
@@ -291,7 +291,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 
 // 投稿ID
-const postId = route.params.id;
+const postId = computed(() => route.params.id as string);
 
 // 投稿情報
 const post = ref<any>(null);
@@ -317,6 +317,9 @@ const isAuthor = computed(() => {
   return authStore.user && post.value && post.value.author_id === authStore.user.id;
 });
 
+// クリーンアップ用の変数
+let routerGuard: Function | null = null;
+
 // 投稿取得
 async function fetchPost() {
   loading.value = true;
@@ -335,7 +338,7 @@ async function fetchPost() {
           bio
         )
       `)
-      .eq('id', postId)
+      .eq('id', postId.value)
       .single();
     
     if (fetchError) throw fetchError;
@@ -381,7 +384,7 @@ async function fetchCategories() {
     const { data, error: categoriesError } = await supabase
       .from('post_categories')
       .select('categories(*)')
-      .eq('post_id', postId);
+      .eq('post_id', postId.value);
     
     if (categoriesError) throw categoriesError;
     
@@ -403,7 +406,7 @@ async function incrementViews() {
     const { error: updateError } = await supabase
       .from('posts')
       .update({ views: currentViews + 1 })
-      .eq('id', postId);
+      .eq('id', postId.value);
     
     if (updateError) throw updateError;
     
@@ -420,7 +423,7 @@ async function fetchLikes() {
     const { count, error: likesError } = await supabase
       .from('post_likes')
       .select('*', { count: 'exact' })
-      .eq('post_id', postId);
+      .eq('post_id', postId.value);
     
     if (likesError) throw likesError;
     likeCount.value = count || 0;
@@ -437,7 +440,7 @@ async function checkIfLiked() {
     const { data, error: likeError } = await supabase
       .from('post_likes')
       .select('*')
-      .eq('post_id', postId)
+      .eq('post_id', postId.value)
       .eq('user_id', authStore.user.id)
       .maybeSingle();
     
@@ -462,7 +465,7 @@ async function toggleLike() {
       const { error: deleteError } = await supabase
         .from('post_likes')
         .delete()
-        .eq('post_id', postId)
+        .eq('post_id', postId.value)
         .eq('user_id', authStore.user!.id);
       
       if (deleteError) {
@@ -477,7 +480,7 @@ async function toggleLike() {
       const { error: insertError } = await supabase
         .from('post_likes')
         .insert({
-          post_id: postId,
+          post_id: postId.value,
           user_id: authStore.user!.id
         });
       
@@ -549,7 +552,7 @@ async function deletePost() {
     const { error: deleteError } = await supabase
       .from('posts')
       .delete()
-      .eq('id', postId)
+      .eq('id', postId.value)
       .eq('author_id', authStore.user.id);
     
     if (deleteError) throw deleteError;
@@ -593,19 +596,80 @@ function getInitials(name: string): string {
 
 // 関連投稿の取得
 async function fetchRelatedPosts() {
-  if (!postId) return;
+  if (!postId.value) return;
   
   try {
     loadingRelatedPosts.value = true;
     
-    const { data, error } = await supabase
+    // RPC関数を使用した場合、必要な情報が全て取得できない可能性があるため
+    // より詳細なクエリに変更
+    const { data: relatedPostIds, error: rpcError } = await supabase
       .rpc('get_related_posts', { 
-        input_post_id: postId,
+        input_post_id: postId.value,
         limit_count: 3
       });
       
-    if (error) throw error;
-    relatedPosts.value = data || [];
+    if (rpcError) throw rpcError;
+    
+    if (relatedPostIds && relatedPostIds.length > 0) {
+      // 関連投稿IDを使って詳細情報を取得
+      const postIds = relatedPostIds.map((post: any) => post.id);
+      
+      const { data: detailedPosts, error: postsError } = await supabase
+        .from('posts')
+        .select(`
+          *,
+          profiles:author_id (
+            id, 
+            nickname, 
+            avatar_data
+          )
+        `)
+        .in('id', postIds)
+        .order('published_at', { ascending: false });
+      
+      if (postsError) throw postsError;
+      
+      // 各投稿のカテゴリを取得
+      if (detailedPosts && detailedPosts.length > 0) {
+        const enhancedPosts = await Promise.all(
+          detailedPosts.map(async (post: any) => {
+            // カテゴリ情報を取得
+            const { data: categoryData } = await supabase
+              .from('post_categories')
+              .select('categories(*)')
+              .eq('post_id', post.id);
+            
+            // いいね数を個別に取得
+            const { count: likeCount } = await supabase
+              .from('post_likes')
+              .select('*', { count: 'exact', head: true })
+              .eq('post_id', post.id);
+              
+            // コメント数を個別に取得
+            const { count: commentCount } = await supabase
+              .from('comments')
+              .select('*', { count: 'exact', head: true })
+              .eq('post_id', post.id);
+            
+            return {
+              ...post,
+              like_count: likeCount || 0,
+              likes_count: likeCount || 0,
+              comment_count: commentCount || 0,
+              comments_count: commentCount || 0,
+              categories: categoryData?.map(item => item.categories) || []
+            };
+          })
+        );
+        
+        relatedPosts.value = enhancedPosts;
+      } else {
+        relatedPosts.value = [];
+      }
+    } else {
+      relatedPosts.value = [];
+    }
     
   } catch (err) {
     console.error('関連投稿取得エラー:', err);
@@ -625,17 +689,58 @@ async function fetchRelatedPosts() {
 // フォールバック用の関連投稿取得 - 必要に応じて利用
 async function getFallbackRelatedPosts() {
   try {
-    // 最新の公開投稿を取得
+    // 最新の公開投稿を取得（必要な全ての情報を含む）
     const { data } = await supabase
       .from('posts')
-      .select('*')
+      .select(`
+        *,
+        profiles:author_id (
+          id,
+          nickname,
+          avatar_data
+        )
+      `)
       .eq('published', true)
-      .neq('id', postId)
+      .neq('id', postId.value)
       .order('published_at', { ascending: false })
       .limit(3);
+
+    if (data && data.length > 0) {
+      return await Promise.all(
+        data.map(async (post: any) => {
+          // カテゴリ情報を取得
+          const { data: categoryData } = await supabase
+            .from('post_categories')
+            .select('categories(*)')
+            .eq('post_id', post.id);
+          
+          // いいね数を個別に取得
+          const { count: likeCount } = await supabase
+            .from('post_likes')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', post.id);
+            
+          // コメント数を個別に取得
+          const { count: commentCount } = await supabase
+            .from('comments')
+            .select('*', { count: 'exact', head: true })
+            .eq('post_id', post.id);
+          
+          return {
+            ...post,
+            like_count: likeCount || 0,
+            likes_count: likeCount || 0,
+            comment_count: commentCount || 0,
+            comments_count: commentCount || 0,
+            categories: categoryData?.map(item => item.categories) || []
+          };
+        })
+      );
+    }
     
-    return data || [];
+    return [];
   } catch (e) {
+    console.error('フォールバックデータ取得エラー:', e);
     return [];
   }
 }
@@ -643,11 +748,32 @@ async function getFallbackRelatedPosts() {
 // 初期化
 onMounted(() => {
   fetchPost();
+  
+  // ルーターガードを設定
+  routerGuard = router.beforeEach(async (to, from) => {
+    if (to.name === 'post-detail' && from.name === 'post-detail' && to.params.id !== from.params.id) {
+      // 同じ型のルートだが、IDが異なる場合（関連投稿への遷移など）
+      loading.value = true;
+      post.value = null;
+      relatedPosts.value = [];
+      
+      // 次のティックまで待機してからデータを取得
+      await fetchPost();
+    }
+  });
 });
 
-// ルートパラメータが変更されたら再取得
-watch(() => route.params.id, (newId) => {
-  if (newId) {
+// クリーンアップ
+onBeforeUnmount(() => {
+  // ルーターガードを解除
+  if (routerGuard) {
+    routerGuard();
+  }
+});
+
+// 既存のwatchを更新
+watch(() => route.params.id, (newId, oldId) => {
+  if (newId && newId !== oldId) {
     fetchPost();
   }
 });
