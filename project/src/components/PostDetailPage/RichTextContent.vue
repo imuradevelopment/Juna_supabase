@@ -188,74 +188,90 @@ const content = computed(() => sanitizedContent.value);
 </script>
 
 <style>
-@media print {
-  .rich-text-container > div:first-child,
-  .fixed {
-    display: none !important;
-  }
-}
-
 /* リストマーカーの色をテキスト色に合わせる */
 .rich-text-content ul li::marker,
 .rich-text-content ol li::marker {
   color: rgb(var(--color-text));
 }
 
-/* エディタと同じスタイルに調整 */
-.rich-text-content ul,
-.rich-text-content ol {
-  margin-bottom: 0.75rem;
+/* エディタコンポーネントのスタイルを移植 */
+.rich-text-content {
+  & h2 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: rgb(var(--color-heading));
+    border-bottom: 1px solid rgb(var(--color-border-light));
+    padding-bottom: 0.5rem;
+  }
+  
+  & h3 {
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: rgb(var(--color-heading));
+  }
+  
+  & p {
+    margin-bottom: 0.75rem;
+    color: rgb(var(--color-text));
+  }
+  
+  & ul {
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+    list-style-type: disc;
+    
+    & li::marker {
+      color: rgb(var(--color-text));
+    }
+  }
+  
+  & ol {
+    padding-left: 1.5rem;
+    margin-bottom: 0.75rem;
+    list-style-type: decimal;
+    
+    & li::marker {
+      color: rgb(var(--color-text));
+    }
+  }
+  
+  & blockquote {
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    border-left: 3px solid rgb(var(--color-border-light));
+    color: rgb(var(--color-text-muted));
+  }
+  
+  & hr {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 0;
+    border-top: 2px solid rgb(var(--color-border-light));
+  }
+  
+  & img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
+  }
+  
+  & a {
+    color: rgb(var(--color-primary));
+    text-decoration: underline;
+  }
 }
 
-.rich-text-content ul {
-  padding-left: 1.5rem;
-  list-style-type: disc;
-}
-
-.rich-text-content ol {
-  padding-left: 1.5rem;
-  list-style-type: decimal;
-}
-
-.rich-text-content p {
-  margin-bottom: 0.75rem;
-  color: rgb(var(--color-text));
-}
-
-.rich-text-content h2 {
-  margin-top: 1.5rem;
-  margin-bottom: 0.5rem;
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: rgb(var(--color-heading));
-}
-
-.rich-text-content h3 {
-  margin-top: 1.25rem;
-  margin-bottom: 0.5rem;
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: rgb(var(--color-heading));
-}
-
-.rich-text-content blockquote {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  padding-left: 1rem;
-  border-left: 3px solid rgb(var(--color-border-light));
-  color: rgb(var(--color-text-muted));
-}
-
-.rich-text-content img {
-  max-width: 100%;
-  height: auto;
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-  border-radius: 0.25rem;
-}
-
-.rich-text-content a {
-  color: rgb(var(--color-primary));
-  text-decoration: underline;
+@media print {
+  .rich-text-container > div:first-child,
+  .fixed {
+    display: none !important;
+  }
 }
 </style> 

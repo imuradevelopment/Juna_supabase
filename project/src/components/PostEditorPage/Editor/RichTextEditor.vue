@@ -623,6 +623,8 @@ defineExpose({
     font-size: 1.5rem;
     font-weight: bold;
     color: theme('colors.heading');
+    border-bottom: 1px solid theme('colors.border-light');
+    padding-bottom: 0.5rem;
   }
   
   & :deep(.ProseMirror h3) {
