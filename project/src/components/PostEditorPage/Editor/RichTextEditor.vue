@@ -642,12 +642,20 @@ defineExpose({
     padding-left: 1.5rem;
     margin-bottom: 0.75rem;
     list-style-type: disc;
+    
+    & li::marker {
+      color: theme('colors.text');
+    }
   }
   
   & :deep(.ProseMirror ol) {
     padding-left: 1.5rem;
     margin-bottom: 0.75rem;
     list-style-type: decimal;
+    
+    & li::marker {
+      color: theme('colors.text');
+    }
   }
   
   & :deep(.ProseMirror blockquote) {
