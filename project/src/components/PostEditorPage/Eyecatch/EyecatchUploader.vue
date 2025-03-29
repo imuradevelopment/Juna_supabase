@@ -33,7 +33,6 @@
             ref="featuredImageInput"
           />
         </label>
-        <p class="mt-1 text-xs text-text-muted">最大サイズ: 1.5MB</p>
       </div>
     </div>
   </div>
@@ -79,8 +78,8 @@ const {
   getImageUrl,
   encodeToBase64
 } = useImageUpload('cover_images', {
-  maxSizeMB: 1.5,
-  maxWidthOrHeight: 800,
+  maxWidth: 320,
+  maxHeight: 200,
   outputFormat: 'webp',
   quality: 0.85
 });

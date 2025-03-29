@@ -14,6 +14,10 @@ export interface ImageProcessingOptions {
   maxSizeMB?: number
   // 画像の最大幅 (px)
   maxWidthOrHeight?: number
+  // 画像の最大幅 (px)
+  maxWidth?: number
+  // 画像の最大高さ (px)
+  maxHeight?: number
   // ユーザーID (パス生成用)
   userId?: string
   // 一意のファイル名を生成するか
@@ -42,7 +46,9 @@ export interface UploadResult {
 export function useImageUpload(bucket: ImageBucket, options: ImageProcessingOptions = {}) {
   const {
     maxSizeMB = 2,
-    maxWidthOrHeight = 1920,
+    maxWidthOrHeight,
+    maxWidth,
+    maxHeight,
     userId = '',
     generateUniqueName = true,
     outputFormat = 'webp',
@@ -50,6 +56,12 @@ export function useImageUpload(bucket: ImageBucket, options: ImageProcessingOpti
     alwaysCompress = false,
     fileNamePrefix = ''
   } = options
+
+  // maxWidth, maxHeightの両方が指定されている場合は、それらを優先
+  // 片方だけ指定されている場合もそれを使用
+  // どちらも指定がない場合のみmaxWidthOrHeightを使用（デフォルト1920）
+  const effectiveMaxWidth = maxWidth || maxWidthOrHeight || 1920
+  const effectiveMaxHeight = maxHeight || maxWidthOrHeight || 1920
 
   const preview = ref<string | null>(null)
   const originalFile = ref<File | null>(null)
@@ -61,26 +73,6 @@ export function useImageUpload(bucket: ImageBucket, options: ImageProcessingOpti
   
   // 画像の寸法情報
   const imageInfo = ref<{width: number, height: number} | null>(null)
-  
-  // 画像フォーマットのMIMEタイプを取得
-  const getMimeType = (format: ImageFormat, originalType: string): string => {
-    if (format === 'original') return originalType
-    switch (format) {
-      case 'webp': return 'image/webp'
-      case 'jpeg': return 'image/jpeg'
-      case 'png': return 'image/png'
-      default: return 'image/webp'
-    }
-  }
-  
-  // 拡張子を取得
-  const getExtension = (format: ImageFormat, originalFile: File): string => {
-    if (format === 'original') {
-      const ext = originalFile.name.split('.').pop()?.toLowerCase() || 'jpg'
-      return ext
-    }
-    return format
-  }
   
   // 画像の寸法を取得
   const getImageDimensions = (file: File): Promise<{width: number, height: number}> => {
@@ -131,9 +123,10 @@ export function useImageUpload(bucket: ImageBucket, options: ImageProcessingOpti
       // カスタムオプションと既存のオプションをマージ
       const mergedOptions = {
         maxSizeMB: customOptions?.maxSizeMB || maxSizeMB,
-        maxWidthOrHeight: customOptions?.maxWidthOrHeight || maxWidthOrHeight,
+        maxWidth: customOptions?.maxWidth || maxWidth || effectiveMaxWidth,
+        maxHeight: customOptions?.maxHeight || maxHeight || effectiveMaxHeight,
         quality: customOptions?.quality || quality,
-        fileType: getMimeType(customOptions?.outputFormat || outputFormat, file.type)
+        fileType: 'image/webp' // 常にwebpを使用
       }
       
       // 圧縮が必要かチェック
@@ -144,10 +137,43 @@ export function useImageUpload(bucket: ImageBucket, options: ImageProcessingOpti
         return file
       }
       
+      // 画像の元のサイズを取得
+      const originalDimensions = await getImageDimensions(file)
+      
       // 画像圧縮実行
+      // browser-image-compressionはmaxWidthOrHeightのみサポートしているため、
+      // maxWidthとmaxHeightから適切なmaxWidthOrHeightを計算
+      let effectiveMaxWidthOrHeight = Math.max(mergedOptions.maxWidth, mergedOptions.maxHeight)
+      
+      // アスペクト比を維持しながら、幅と高さの制限を考慮
+      const aspectRatio = originalDimensions.width / originalDimensions.height
+      
+      // 元の画像がmaxWidthとmaxHeightの制限を超える場合のみリサイズ
+      if (originalDimensions.width > mergedOptions.maxWidth || 
+          originalDimensions.height > mergedOptions.maxHeight) {
+        
+        // 幅を基準にしたリサイズ後の高さ
+        const heightBasedOnMaxWidth = mergedOptions.maxWidth / aspectRatio
+        
+        // 高さを基準にしたリサイズ後の幅
+        const widthBasedOnMaxHeight = mergedOptions.maxHeight * aspectRatio
+        
+        // アスペクト比を維持しながら両方の制限を満たす値を選択
+        if (heightBasedOnMaxWidth <= mergedOptions.maxHeight) {
+          // 幅の制限を優先
+          effectiveMaxWidthOrHeight = mergedOptions.maxWidth
+        } else {
+          // 高さの制限を優先
+          effectiveMaxWidthOrHeight = widthBasedOnMaxHeight
+        }
+      } else {
+        // 元の画像が十分小さい場合は、元のサイズを維持
+        effectiveMaxWidthOrHeight = Math.max(originalDimensions.width, originalDimensions.height)
+      }
+      
       const compressedFile = await imageCompression(file, {
         maxSizeMB: mergedOptions.maxSizeMB,
-        maxWidthOrHeight: mergedOptions.maxWidthOrHeight,
+        maxWidthOrHeight: effectiveMaxWidthOrHeight,
         useWebWorker: true,
         fileType: mergedOptions.fileType,
         initialQuality: mergedOptions.quality
@@ -157,13 +183,12 @@ export function useImageUpload(bucket: ImageBucket, options: ImageProcessingOpti
       imageInfo.value = await getImageDimensions(compressedFile)
       
       // 元の名前を基に新しいファイル名を生成
-      const extension = getExtension(customOptions?.outputFormat || outputFormat, file)
       const nameWithoutExt = file.name.substring(0, file.name.lastIndexOf('.'))
-      const newFilename = `${nameWithoutExt}.${extension}`
+      const newFilename = `${nameWithoutExt}.webp` // 常にwebp拡張子を使用
       
       // 新しいFilesオブジェクトを作成（名前を修正）
       return new File([compressedFile], newFilename, { 
-        type: mergedOptions.fileType,
+        type: 'image/webp', // 常にwebpを使用
         lastModified: new Date().getTime()
       })
     } catch (err: any) {
@@ -234,7 +259,7 @@ export function useImageUpload(bucket: ImageBucket, options: ImageProcessingOpti
       
       const file = processedFile.value
       const originalSize = originalFile.value?.size || 0
-      const fileExt = getExtension(uploadOptions?.outputFormat || outputFormat, file)
+      const fileExt = 'webp' // 常にwebpを使用
       const prefix = (uploadOptions?.fileNamePrefix || fileNamePrefix) ? 
                     `${uploadOptions?.fileNamePrefix || fileNamePrefix}_` : ''
       

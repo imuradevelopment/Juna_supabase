@@ -56,7 +56,6 @@
                   ref="avatarInput"
                 />
               </label>
-              <p class="mt-2 text-sm text-text-muted">推奨サイズ: 200x200px (1MB以下)</p>
             </div>
           </div>
         </div>
@@ -155,8 +154,8 @@ const {
   clearImage: removeAvatar,
   getImageUrl
 } = useImageUpload('profile_images', {
-  maxSizeMB: 1,
-  maxWidthOrHeight: 300,
+  maxWidth: 160,
+  maxHeight: 160,
   outputFormat: 'webp',
   quality: 0.85
 });

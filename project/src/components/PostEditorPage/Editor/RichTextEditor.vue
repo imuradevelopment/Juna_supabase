@@ -108,8 +108,8 @@ const {
   handleFileSelect,
   encodeToBase64 
 } = useImageUpload('post_images', {
-  maxSizeMB: 1.5,
-  maxWidthOrHeight: 1200, 
+  maxWidth: 910,
+  maxHeight: 1620,
   outputFormat: 'webp',
   quality: 0.85
 });
