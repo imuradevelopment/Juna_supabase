@@ -4,7 +4,7 @@
     
     <div 
       ref="contentRef"
-      :class="['rich-text-content prose max-w-none leading-[1.75] text-text dark:prose-invert prose-headings:text-heading prose-a:text-primary hover:prose-a:text-primary-dark prose-a:no-underline hover:prose-a:underline prose-blockquote:my-4 prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:border-primary prose-blockquote:text-text-muted prose-pre:my-4 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-pre:bg-surface-variant prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:rounded prose-code:font-mono prose-code:bg-surface-variant prose-ul:my-4 prose-ul:pl-6 prose-ul:list-disc prose-ol:my-4 prose-ol:pl-6 prose-ol:list-decimal prose-li:my-1 prose-img:rounded-lg prose-img:shadow-background/50 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-6 [&_h2]:mb-4 [&_h2]:pb-2 [&_h2]:border-b [&_h2]:border-border-light', fontSizeClass]"
+      :class="['rich-text-content prose max-w-none leading-[1.75] text-text dark:prose-invert prose-headings:text-heading prose-a:text-primary prose-a:no-underline prose-blockquote:my-4 prose-blockquote:border-l-4 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:border-primary prose-blockquote:text-text-muted prose-pre:my-4 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto prose-pre:bg-surface-variant prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:rounded prose-code:font-mono prose-code:bg-surface-variant prose-ul:my-4 prose-ul:pl-6 prose-ul:list-disc prose-ol:my-4 prose-ol:pl-6 prose-ol:list-decimal prose-li:my-1 prose-img:rounded-lg prose-img:shadow-background/50 [&_h2]:mt-6 [&_h2]:mb-4 [&_h2]:pb-2 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:border-b [&_h2]:border-border-light hover:prose-a:text-primary-dark hover:prose-a:underline', fontSizeClass]"
       v-html="content"
     ></div>
     
@@ -89,7 +89,7 @@ function renderTiptapContent(doc: any): string {
                     if (mark.type === 'italic') text = `<em>${text}</em>`;
                     if (mark.type === 'code') text = `<code>${text}</code>`;
                     if (mark.type === 'link' && mark.attrs?.href) {
-                      text = `<a href="${mark.attrs.href}" target="_blank" rel="noopener noreferrer" class="text-primary hover:text-primary-dark transition-all">${text}</a>`;
+                      text = `<a href="${mark.attrs.href}" target="_blank" rel="noopener noreferrer" class="text-primary transition-all hover:text-primary-dark hover:underline">${text}</a>`;
                     }
                   });
                 }
@@ -100,9 +100,9 @@ function renderTiptapContent(doc: any): string {
           html += '</p>';
         } else if (node.type === 'heading') {
           const level = node.attrs?.level || 1;
-          const headingClasses = level === 1 ? 'text-2xl font-bold mt-6 mb-4 text-heading' : 
-                                level === 2 ? 'text-xl font-semibold mt-6 mb-3 pb-2 border-b border-border-light text-heading' : 
-                                'text-lg font-semibold mt-5 mb-2 text-heading';
+          const headingClasses = level === 1 ? 'mt-6 mb-4 text-2xl font-bold text-heading' : 
+                                level === 2 ? 'mt-6 mb-3 pb-2 border-b border-border-light text-xl font-semibold text-heading' : 
+                                'mt-5 mb-2 text-lg font-semibold text-heading';
           
           html += `<h${level} class="${headingClasses}">`;
           if (node.content) {

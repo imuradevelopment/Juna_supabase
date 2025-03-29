@@ -1,17 +1,17 @@
 <template>
-  <div class="max-w-4xl mx-auto py-8">
+  <div class="mx-auto max-w-4xl py-8">
     <!-- ローディング状態 -->
     <div v-if="loading" class="glass-card flex flex-col items-center justify-center p-8">
       <div class="flex flex-col items-center">
-        <PhSpinner class="h-10 w-10 mb-4 animate-spin text-primary" />
+        <PhSpinner class="mb-4 h-10 w-10 animate-spin text-primary" />
         <p class="text-text-muted">読み込み中...</p>
       </div>
     </div>
     
     <!-- エラー表示 -->
     <div v-else-if="error" class="glass-card p-8 text-center">
-      <PhWarning class="h-16 w-16 mx-auto mb-4 text-error" />
-      <h2 class="text-2xl font-bold mb-2">エラーが発生しました</h2>
+      <PhWarning class="mx-auto mb-4 h-16 w-16 text-error" />
+      <h2 class="mb-2 text-2xl font-bold">エラーが発生しました</h2>
       <p class="mb-4 text-text-muted">{{ error }}</p>
       <router-link to="/" class="btn btn-primary">ホームに戻る</router-link>
     </div>
@@ -21,11 +21,11 @@
       <!-- プロフィールヘッダー - 視覚的改善 -->
       <div class="glass-card relative mb-8 overflow-hidden p-8">
         <!-- 装飾的な背景要素 -->
-        <div class="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full bg-primary/10 filter blur-3xl"></div>
+        <div class="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 rounded-full bg-primary bg-opacity-10 filter blur-3xl"></div>
         
         <div class="relative z-10 flex flex-col items-center md:flex-row md:items-start">
           <!-- アバター - サイズ拡大と効果追加 -->
-          <div class="mb-6 flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-primary-light text-4xl text-text-white ring-4 ring-primary-light/30 shadow-primary-dark/20 transition-transform duration-300 hover:scale-105 md:mb-0 md:mr-8 md:h-40 md:w-40">
+          <div class="mb-6 flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-primary-light text-4xl text-text-white ring-4 ring-primary-light ring-opacity-30 shadow-primary-dark shadow-opacity-20 transition-transform duration-300 hover:scale-105 md:mb-0 md:mr-8 md:h-40 md:w-40">
             <img 
               v-if="profile.avatar_data" 
               :src="getAvatarUrl(profile.avatar_data)" 
@@ -80,7 +80,7 @@
                 to="/profile/edit" 
                 class="btn btn-outline-primary"
               >
-                <PhPencilSimple class="h-5 w-5 mr-1.5" />
+                <PhPencilSimple class="mr-1.5 h-5 w-5" />
                 編集
               </router-link>
               
@@ -88,7 +88,7 @@
                 to="/dashboard" 
                 class="btn btn-outline-secondary"
               >
-                <PhChartBar class="h-5 w-5 mr-1.5" />
+                <PhChartBar class="mr-1.5 h-5 w-5" />
                 ダッシュボード
               </router-link>
               
@@ -97,7 +97,7 @@
                 @click="showDeleteConfirmation = true" 
                 class="btn btn-outline-error"
               >
-                <PhTrash class="h-5 w-5 mr-1.5" />
+                <PhTrash class="mr-1.5 h-5 w-5" />
                 削除
               </button>
             </div>
@@ -137,7 +137,7 @@
             v-for="category in topCategories" 
             :key="category.id" 
             :to="{path: '/posts', query: {category: category.id}}"
-            class="rounded-full bg-primary/20 px-3 py-1 text-sm text-primary-light hover:bg-primary/30 transition-colors"
+            class="rounded-full bg-primary bg-opacity-20 px-3 py-1 text-sm text-primary-light transition-colors hover:bg-primary hover:bg-opacity-30"
           >
             {{ category.name }}
           </router-link>
@@ -146,7 +146,7 @@
     </div>
 
     <!-- 削除確認モーダル -->
-    <div v-if="showDeleteConfirmation" class="fixed inset-0 z-50 flex items-center justify-center bg-background/70 p-4">
+    <div v-if="showDeleteConfirmation" class="fixed inset-0 z-50 flex items-center justify-center bg-background bg-opacity-70 p-4">
       <div class="glass-card w-full max-w-md p-6">
         <h3 class="mb-4 text-xl font-bold text-error">削除の確認</h3>
         
@@ -168,7 +168,7 @@
             class="btn btn-error"
             :disabled="isDeleting"
           >
-            <PhSpinner v-if="isDeleting" class="h-5 w-5 mr-1.5 animate-spin" />
+            <PhSpinner v-if="isDeleting" class="mr-1.5 h-5 w-5 animate-spin" />
             <span v-if="isDeleting">削除中...</span>
             <span v-else>削除する</span>
           </button>

@@ -1,12 +1,12 @@
 <template>
   <header class="sticky top-0 z-50 transition-all duration-300">
-    <nav class="border-b border-border/50 px-4 py-3 backdrop-blur-md bg-background/80">
+    <nav class="border-b border-border/50 bg-background/80 px-4 py-3 backdrop-blur-md">
       <div class="container mx-auto">
         <!-- モバイルナビゲーション -->
         <div class="flex items-center justify-between">
           <!-- ロゴ -->
           <router-link to="/" class="group flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8 text-primary-light transition-transform group-hover:scale-110">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="h-8 w-8 text-primary-light group-hover:scale-110 transition-transform">
               <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-12h2v6h-2zm0 8h2v2h-2z" />
             </svg>
             <span class="ml-2 text-xl font-bold tracking-wide text-primary-light">Juna</span>
@@ -17,7 +17,7 @@
             <div class="hidden items-center space-x-5 sm:flex">
               <router-link 
                 to="/posts" 
-                class="active-nav-link relative py-1 text-secondary tracking-[0.02em] transition-colors hover:text-primary-light"
+                class="active-nav-link relative py-1 tracking-[0.02em] text-secondary hover:text-primary-light transition-colors"
                 active-class="active-nav-link"
               >投稿一覧</router-link>
               
@@ -25,7 +25,7 @@
               <router-link 
                 v-if="authStore.isAuthenticated" 
                 to="/editor" 
-                class="hidden items-center text-primary-light transition-colors hover:text-primary md:flex"
+                class="hidden items-center text-primary-light hover:text-primary transition-colors md:flex"
               >
                 <PhPlus class="mr-1 h-4 w-4" />
                 <span>投稿作成</span>
@@ -54,7 +54,7 @@
               <div v-else class="relative" ref="dropdownRef">
                 <div 
                   @click="handleAvatarClick" 
-                  class="flex cursor-pointer items-center rounded-full bg-primary/20 px-2 py-1.5 transition-colors hover:bg-primary/30"
+                  class="flex items-center rounded-full bg-primary/20 px-2 py-1.5 cursor-pointer hover:bg-primary/30 transition-colors"
                 >
                   <div 
                     class="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full"
@@ -69,17 +69,17 @@
                       {{ getInitials(authStore.displayName) }}
                     </div>
                   </div>
-                  <PhCaretDown class="ml-1 h-4 w-4 text-text hidden sm:block" />
+                  <PhCaretDown class="ml-1 h-4 w-4 hidden text-text sm:block" />
                 </div>
                 
                 <!-- ドロップダウンメニュー -->
                 <div 
                   v-show="dropdownOpen" 
-                  class="absolute right-0 mt-2 z-50 w-48 rounded-lg border border-border-light/20 bg-background/80 py-2 shadow-lg backdrop-blur-md transition-all duration-200 ease-out animate-[dropdown_0.2s_ease-out_forwards] overflow-hidden sm:block hidden"
+                  class="absolute right-0 z-50 mt-2 hidden w-48 overflow-hidden rounded-lg border border-border-light/20 bg-background/80 py-2 shadow-lg backdrop-blur-md transition-all duration-200 ease-out animate-[dropdown_0.2s_ease-out_forwards] sm:block"
                 >
                   <router-link 
                     to="/dashboard" 
-                    class="flex items-center px-4 py-2.5 text-sm text-text transition-colors hover:bg-primary/15"
+                    class="flex items-center px-4 py-2.5 text-sm text-text hover:bg-primary/15 transition-colors"
                     @click="dropdownOpen = false"
                   >
                     <PhList class="mr-2 h-4 w-4" />
@@ -88,7 +88,7 @@
                   
                   <router-link 
                     :to="`/profile/${authStore.user?.id}`" 
-                    class="flex items-center px-4 py-2.5 text-sm text-text transition-colors hover:bg-primary/15"
+                    class="flex items-center px-4 py-2.5 text-sm text-text hover:bg-primary/15 transition-colors"
                     @click="dropdownOpen = false"
                   >
                     <PhUser class="mr-2 h-4 w-4" />
@@ -97,7 +97,7 @@
                   
                   <router-link 
                     to="/editor" 
-                    class="flex items-center px-4 py-2.5 text-sm text-text transition-colors hover:bg-primary/15"
+                    class="flex items-center px-4 py-2.5 text-sm text-text hover:bg-primary/15 transition-colors"
                     @click="dropdownOpen = false"
                   >
                     <PhPlus class="mr-2 h-4 w-4" />
@@ -106,7 +106,7 @@
                   
                   <router-link 
                     to="/profile/edit" 
-                    class="flex items-center px-4 py-2.5 text-sm text-text transition-colors hover:bg-primary/15"
+                    class="flex items-center px-4 py-2.5 text-sm text-text hover:bg-primary/15 transition-colors"
                     @click="dropdownOpen = false"
                   >
                     <PhGear class="mr-2 h-4 w-4" />
@@ -117,7 +117,7 @@
                   
                   <button 
                     @click="handleLogout" 
-                    class="flex w-full items-center px-4 py-2.5 text-left text-sm text-error transition-colors hover:bg-primary/15 hover:text-error-dark"
+                    class="flex w-full items-center px-4 py-2.5 text-left text-sm text-error hover:bg-primary/15 hover:text-error-dark transition-colors"
                   >
                     <PhSignOut class="mr-2 h-4 w-4" />
                     ログアウト
@@ -151,7 +151,7 @@
       @click="isMenuOpen = false"
     >
       <div 
-        class="ml-auto h-full w-full max-w-xs overflow-y-auto bg-surface-variant px-4 py-6 shadow-background/50 shadow-xl"
+        class="h-full w-full max-w-xs overflow-y-auto bg-surface-variant px-4 py-6 shadow-xl shadow-background/50 ml-auto"
         @click.stop
       >
         <div class="mb-6 flex items-center justify-between">
@@ -165,8 +165,8 @@
         </div>
           
         <nav class="space-y-1">
-          <router-link to="/" class="block rounded px-2 py-2.5 text-text transition-colors hover:bg-primary/10" @click="isMenuOpen = false">ホーム</router-link>
-          <router-link to="/posts" class="block rounded px-2 py-2.5 text-text transition-colors hover:bg-primary/10" @click="isMenuOpen = false">投稿一覧</router-link>
+          <router-link to="/" class="block rounded px-2 py-2.5 text-text hover:bg-primary/10 transition-colors" @click="isMenuOpen = false">ホーム</router-link>
+          <router-link to="/posts" class="block rounded px-2 py-2.5 text-text hover:bg-primary/10 transition-colors" @click="isMenuOpen = false">投稿一覧</router-link>
           
           <div class="my-3 border-t border-border"></div>
           
@@ -183,10 +183,10 @@
               </div>
               <span class="font-medium text-heading">{{ authStore.displayName }}</span>
             </div>
-            <router-link to="/editor" class="block rounded px-2 py-2.5 text-text transition-colors hover:bg-primary/10" @click="isMenuOpen = false">投稿作成</router-link>
-            <router-link to="/dashboard" class="block rounded px-2 py-2.5 text-text transition-colors hover:bg-primary/10" @click="isMenuOpen = false">ダッシュボード</router-link>
-            <router-link :to="`/profile/${authStore.user?.id}`" class="block rounded px-2 py-2.5 text-text transition-colors hover:bg-primary/10" @click="isMenuOpen = false">プロフィール</router-link>
-            <router-link to="/profile/edit" class="block rounded px-2 py-2.5 text-text transition-colors hover:bg-primary/10" @click="isMenuOpen = false">設定</router-link>
+            <router-link to="/editor" class="block rounded px-2 py-2.5 text-text hover:bg-primary/10 transition-colors" @click="isMenuOpen = false">投稿作成</router-link>
+            <router-link to="/dashboard" class="block rounded px-2 py-2.5 text-text hover:bg-primary/10 transition-colors" @click="isMenuOpen = false">ダッシュボード</router-link>
+            <router-link :to="`/profile/${authStore.user?.id}`" class="block rounded px-2 py-2.5 text-text hover:bg-primary/10 transition-colors" @click="isMenuOpen = false">プロフィール</router-link>
+            <router-link to="/profile/edit" class="block rounded px-2 py-2.5 text-text hover:bg-primary/10 transition-colors" @click="isMenuOpen = false">設定</router-link>
             
             <div class="my-3 border-t border-border"></div>
             

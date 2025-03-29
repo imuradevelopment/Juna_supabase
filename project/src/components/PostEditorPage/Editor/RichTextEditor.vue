@@ -5,7 +5,7 @@
     <div 
       v-if="!isKeyboardVisible"
       ref="normalToolbar"
-      class="glass-card flex flex-wrap gap-1 p-2 mb-2"
+      class="glass-card flex flex-wrap mb-2 gap-1 p-2"
     >
       <EditorToolbar 
         ref="normalToolbarRef"
@@ -38,7 +38,7 @@
       ref="fileInput"
       type="file" 
       accept="image/*" 
-      class="hidden w-px h-px opacity-0 absolute" 
+      class="hidden absolute w-px h-px opacity-0" 
       @change="uploadImage"
     />
   </div>
@@ -47,7 +47,7 @@
   <Teleport to="body" v-if="isKeyboardVisible && (isFocused || showLinkMenu)">
     <div 
       ref="floatingToolbar"
-      class="editor-toolbar glass-card flex flex-wrap gap-1 p-2"
+      class="editor-toolbar glass-card fixed bottom-0 left-0 right-0 z-100 flex flex-wrap w-full gap-1 p-2"
     >
       <EditorToolbar 
         ref="floatingToolbarRef"
@@ -618,18 +618,18 @@ defineExpose({
   }
   
   & :deep(.ProseMirror h2) {
-    font-size: 1.5rem;
-    font-weight: bold;
     margin-top: 1.5rem;
     margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: bold;
     color: theme('colors.heading');
   }
   
   & :deep(.ProseMirror h3) {
-    font-size: 1.25rem;
-    font-weight: bold;
     margin-top: 1.25rem;
     margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+    font-weight: bold;
     color: theme('colors.heading');
   }
   
@@ -639,38 +639,38 @@ defineExpose({
   }
   
   & :deep(.ProseMirror ul) {
-    list-style-type: disc;
     padding-left: 1.5rem;
     margin-bottom: 0.75rem;
+    list-style-type: disc;
   }
   
   & :deep(.ProseMirror ol) {
-    list-style-type: decimal;
     padding-left: 1.5rem;
     margin-bottom: 0.75rem;
+    list-style-type: decimal;
   }
   
   & :deep(.ProseMirror blockquote) {
-    border-left: 3px solid theme('colors.border-light');
-    padding-left: 1rem;
-    color: theme('colors.text-muted');
     margin-top: 1rem;
     margin-bottom: 1rem;
+    padding-left: 1rem;
+    border-left: 3px solid theme('colors.border-light');
+    color: theme('colors.text-muted');
   }
   
   & :deep(.ProseMirror hr) {
-    border: 0;
-    border-top: 2px solid theme('colors.border-light');
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
+    border: 0;
+    border-top: 2px solid theme('colors.border-light');
   }
   
   & :deep(.ProseMirror img) {
     max-width: 100%;
     height: auto;
-    border-radius: 0.25rem;
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
+    border-radius: 0.25rem;
   }
   
   & :deep(.ProseMirror a) {
@@ -681,9 +681,6 @@ defineExpose({
 
 /* モバイルキーボード表示時のフローティングツールバー */
 .editor-toolbar {
-  transition: none;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.15);
-  backdrop-filter: blur(8px);
   position: fixed;
   bottom: 0;
   left: 0;
@@ -691,6 +688,9 @@ defineExpose({
   z-index: 100;
   width: 100%;
   padding-bottom: env(safe-area-inset-bottom, 0);
+  transition: none;
+  box-shadow: 0 -2px 10px rgb(var(--color-background) / 0.15);
+  backdrop-filter: blur(8px);
   touch-action: none;
 }
 </style>

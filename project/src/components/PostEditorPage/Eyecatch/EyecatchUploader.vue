@@ -1,8 +1,8 @@
 <template>
   <div>
-    <label class="block text-sm font-medium mb-1 text-text-muted">アイキャッチ画像</label>
+    <label class="block mb-1 text-sm font-medium text-text-muted">アイキャッチ画像</label>
     <div class="flex items-center space-x-4">
-      <div v-if="modelValue || preview" class="relative w-32 h-24 bg-surface-variant rounded overflow-hidden">
+      <div v-if="modelValue || preview" class="relative w-32 h-24 overflow-hidden rounded bg-surface-variant">
         <img 
           :src="preview || getImageUrl(modelValue as string)" 
           alt="プレビュー" 
@@ -11,7 +11,7 @@
         <button 
           type="button"
           @click="clearImageData" 
-          class="btn-icon btn-icon-error btn-icon-sm absolute top-1 right-1"
+          class="absolute top-1 right-1 btn-icon-error btn-icon-sm"
         >
           <PhX class="w-4 h-4" />
         </button>
@@ -21,19 +21,19 @@
         <label 
           tabindex="0" 
           @keydown.enter="featuredImageInput?.click()"
-          class="btn btn-outline-secondary cursor-pointer inline-flex items-center whitespace-nowrap focus:ring-2 focus:ring-primary focus:outline-none"
+          class="inline-flex items-center cursor-pointer whitespace-nowrap btn btn-outline-secondary focus:outline-none focus:ring-2 focus:ring-primary"
         >
           <PhImage class="w-5 h-5 mr-2" />
           <span>画像をアップロード</span>
           <input
             type="file"
             accept="image/*"
-            class="hidden w-px h-px opacity-0 absolute"
+            class="hidden absolute w-px h-px opacity-0"
             @change="handleImageUpload"
             ref="featuredImageInput"
           />
         </label>
-        <p class="text-xs text-text-muted mt-1">最大サイズ: 1.5MB</p>
+        <p class="mt-1 text-xs text-text-muted">最大サイズ: 1.5MB</p>
       </div>
     </div>
   </div>

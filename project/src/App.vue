@@ -1,14 +1,14 @@
 <template>
-  <div class="flex flex-col min-h-screen relative bg-background">
+  <div class="relative flex min-h-screen flex-col bg-background">
     <!-- 背景装飾 -->
-    <div class="fixed inset-0 z-0 pointer-events-none">
-      <div class="absolute top-0 right-0 w-1/3 h-1/3 rounded-full blur-3xl bg-primary/5 shadow-primary/20"></div>
-      <div class="absolute bottom-0 left-0 w-1/2 h-1/2 rounded-full blur-3xl bg-primary/5 shadow-primary/20"></div>
+    <div class="pointer-events-none fixed inset-0 z-0">
+      <div class="absolute top-0 right-0 h-1/3 w-1/3 rounded-full bg-primary/5 blur-3xl shadow-primary/20"></div>
+      <div class="absolute bottom-0 left-0 h-1/2 w-1/2 rounded-full bg-primary/5 blur-3xl shadow-primary/20"></div>
     </div>
     
     <Navbar />
     
-    <main class="flex-1 relative z-10 mx-auto px-5 py-8 container">
+    <main class="container relative z-10 mx-auto flex-1 px-5 py-8">
       <div v-if="initialAuthCheckComplete">
         <router-view v-slot="{ Component }">
           <transition name="page" mode="out-in">
@@ -16,10 +16,10 @@
           </transition>
         </router-view>
       </div>
-      <div v-else class="flex justify-center items-center h-full">
+      <div v-else class="flex h-full items-center justify-center">
         <!-- 認証初期化中のローディング表示 -->
         <div class="flex flex-col items-center">
-          <PhSpinner class="w-12 h-12 mb-4 text-primary animate-spin" />
+          <PhSpinner class="mb-4 h-12 w-12 animate-spin text-primary" />
           <div class="text-text-muted">読み込み中...</div>
         </div>
       </div>

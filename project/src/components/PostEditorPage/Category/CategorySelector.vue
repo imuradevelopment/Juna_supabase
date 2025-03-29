@@ -1,16 +1,16 @@
 <template>
   <div>
-    <label class="block text-sm font-medium mb-1 text-text-muted">カテゴリ <span class="text-error">*</span></label>
+    <label class="block mb-1 text-sm font-medium text-text-muted">カテゴリ <span class="text-error">*</span></label>
     
     <div class="relative">
       <div 
-        class="min-h-10 w-full px-4 py-2 rounded border border-border bg-surface flex flex-wrap gap-2 items-center cursor-text"
+        class="flex flex-wrap items-center w-full min-h-10 gap-2 px-4 py-2 border border-border rounded bg-surface cursor-text"
         @click="isCategoryDropdownOpen = true"
       >
         <div 
           v-for="categoryId in modelValue" 
           :key="categoryId"
-          class="inline-flex items-center bg-primary/10 text-primary rounded-full px-3 py-1 text-sm"
+          class="inline-flex items-center px-3 py-1 text-sm rounded-full bg-primary/10 text-primary"
         >
           {{ getCategoryName(categoryId) }}
           <button 
@@ -28,19 +28,19 @@
           @focus="isCategoryDropdownOpen = true"
           @blur="handleCategoryBlur"
           @keydown.enter.prevent="handleCategoryEnterKey"
-          class="flex-1 min-w-[120px] bg-transparent outline-none text-text"
+          class="flex-1 min-w-[120px] bg-transparent text-text outline-none"
           placeholder="カテゴリを選択または入力..."
         />
       </div>
       
       <div 
         v-if="isCategoryDropdownOpen" 
-        class="absolute z-10 w-full mt-1 max-h-60 overflow-y-auto glass-card border border-border rounded shadow-lg"
+        class="absolute z-10 w-full max-h-60 mt-1 overflow-y-auto border border-border rounded glass-card shadow-lg"
       >
         <div 
           v-if="categorySearchQuery && filteredCategories.length === 0" 
           @click="createNewCategory"
-          class="cursor-pointer px-4 py-2 hover:bg-surface-variant text-text-muted flex items-center"
+          class="flex items-center px-4 py-2 cursor-pointer text-text-muted hover:bg-surface-variant"
         >
           <PhPlus class="w-5 h-5 mr-2 text-success" />
           <span>「{{ categorySearchQuery }}」を新しいカテゴリとして追加</span>
@@ -50,7 +50,7 @@
           v-for="category in filteredCategories" 
           :key="category.id"
           @click="addCategory(category.id)"
-          class="cursor-pointer px-4 py-2 hover:bg-surface-variant text-text"
+          class="px-4 py-2 cursor-pointer text-text hover:bg-surface-variant"
           :class="{'bg-surface-variant': modelValue.includes(category.id.toString())}"
         >
           {{ category.name }}
@@ -62,7 +62,7 @@
       </div>
     </div>
     
-    <p v-if="modelValue.length === 0" class="text-xs mt-1 text-error">
+    <p v-if="modelValue.length === 0" class="mt-1 text-xs text-error">
       少なくとも1つのカテゴリを選択してください
     </p>
   </div>

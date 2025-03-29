@@ -11,10 +11,10 @@
         :key="notification.id" 
         class="flex rounded-lg p-4 backdrop-blur-md"
         :class="{
-          'bg-success/10 border border-success/60 shadow-success/20': notification.type === 'success',
-          'bg-error/10 border border-error/60 shadow-error/20': notification.type === 'error',
-          'bg-info/10 border border-info/60 shadow-info/20': notification.type === 'info',
-          'bg-warning/10 border border-warning/60 shadow-warning/20': notification.type === 'warning'
+          'border border-success/60 bg-success/10 shadow-success/20': notification.type === 'success',
+          'border border-error/60 bg-error/10 shadow-error/20': notification.type === 'error',
+          'border border-info/60 bg-info/10 shadow-info/20': notification.type === 'info',
+          'border border-warning/60 bg-warning/10 shadow-warning/20': notification.type === 'warning'
         }"
       >
         <!-- アイコン部分 -->

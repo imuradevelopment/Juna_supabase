@@ -1,14 +1,14 @@
 <template>
-  <div class="max-w-6xl mx-auto py-8 px-4">
-    <h1 class="text-3xl font-bold mb-6 text-heading">投稿一覧</h1>
+  <div class="mx-auto max-w-6xl px-4 py-8">
+    <h1 class="mb-6 text-3xl font-bold text-heading">投稿一覧</h1>
     
     <!-- 検索フォーム -->
-    <div class="max-w-3xl mx-auto mb-8">
+    <div class="mx-auto mb-8 max-w-3xl">
       <div class="relative">
         <input
           v-model="searchQuery"
           type="text"
-          class="w-full px-4 py-3 pr-10 rounded-full bg-surface border border-border text-text focus:border-primary focus:ring-2 focus:ring-primary/30"
+          class="w-full rounded-full border border-border bg-surface px-4 py-3 pr-10 text-text focus:border-primary focus:ring-2 focus:ring-primary focus:ring-opacity-30"
           placeholder="検索キーワードを入力してください"
           @input="debouncedSearch"
         />
@@ -22,15 +22,16 @@
     </div>
     
     <!-- フィルターとソート -->
-    <div class="glass-card p-4 mb-6">
+    <div class="glass-card mb-6 p-4">
       <div class="flex flex-wrap items-center gap-4">
         <!-- カテゴリフィルター -->
         <div class="w-full sm:w-auto">
-          <label for="category-filter" class="block text-sm font-medium mb-1 text-text">カテゴリ</label>
+          <label for="category-filter" class="mb-1 block text-sm font-medium text-text">カテゴリ</label>
           <select
             id="category-filter"
             v-model="selectedCategoryId"
-            class="appearance-none w-full pl-4 pr-10 py-2 rounded border border-border bg-surface bg-no-repeat bg-[length:16px] bg-[right_16px_center] text-text sm:min-w-[160px] focus:outline-none focus:ring-2 focus:ring-primary"
+            class="appearance-none w-full rounded border border-border bg-surface bg-no-repeat pl-4 pr-10 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary sm:min-w-[160px]"
+            style="background-size: 16px; background-position: right 16px center;"
           >
             <option :value="null">すべて</option>
             <option v-for="category in categories" :key="category.id" :value="category.id">
@@ -41,11 +42,12 @@
         
         <!-- ソート -->
         <div class="w-full sm:w-auto">
-          <label for="sort-order" class="block text-sm font-medium mb-1 text-text">並び順</label>
+          <label for="sort-order" class="mb-1 block text-sm font-medium text-text">並び順</label>
           <select
             id="sort-order"
             v-model="sortOrder"
-            class="appearance-none w-full pl-4 pr-10 py-2 rounded border border-border bg-surface bg-no-repeat bg-[length:16px] bg-[right_16px_center] text-text sm:min-w-[160px] focus:outline-none focus:ring-2 focus:ring-primary"
+            class="appearance-none w-full rounded border border-border bg-surface bg-no-repeat pl-4 pr-10 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary sm:min-w-[160px]"
+            style="background-size: 16px; background-position: right 16px center;"
           >
             <option value="created_at.desc">新しい順</option>
             <option value="created_at.asc">古い順</option>
@@ -55,9 +57,9 @@
         </div>
         
         <!-- フィルターリセットボタン -->
-        <div class="w-full mt-auto ml-auto sm:w-auto">
+        <div class="mt-auto ml-auto w-full sm:w-auto">
           <button @click="resetFilters" class="btn btn-outline-primary flex items-center">
-            <PhArrowCounterClockwise class="h-5 w-5 mr-1" />
+            <PhArrowCounterClockwise class="mr-1 h-5 w-5" />
             フィルターをリセット
           </button>
         </div>
@@ -67,8 +69,8 @@
     <!-- メインコンテンツ -->
     <div>
       <!-- 検索中ローディング -->
-      <div v-if="loading" class="flex items-center justify-center h-32">
-        <PhSpinner class="w-8 h-8 animate-spin text-primary" />
+      <div v-if="loading" class="flex h-32 items-center justify-center">
+        <PhSpinner class="h-8 w-8 animate-spin text-primary" />
       </div>
       
       <!-- エラー表示 -->
@@ -122,14 +124,14 @@
         </div>
         
         <!-- ページネーション -->
-        <div v-if="totalPages > 1" class="flex justify-center mt-8">
+        <div v-if="totalPages > 1" class="mt-8 flex justify-center">
           <div class="flex space-x-2">
             <button 
               @click="changePage(currentPage - 1)" 
               class="btn btn-outline-primary btn-sm flex items-center"
               :disabled="currentPage === 1"
             >
-              <PhCaretLeft class="h-4 w-4 mr-1" />
+              <PhCaretLeft class="mr-1 h-4 w-4" />
               前へ
             </button>
             
@@ -149,7 +151,7 @@
               :disabled="currentPage === totalPages"
             >
               次へ
-              <PhCaretRight class="h-4 w-4 ml-1" />
+              <PhCaretRight class="ml-1 h-4 w-4" />
             </button>
           </div>
         </div>

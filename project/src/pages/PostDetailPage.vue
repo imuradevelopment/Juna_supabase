@@ -1,26 +1,26 @@
 <template>
   <div class="max-w-5xl mx-auto my-8 animate-[fadeIn_0.5s_ease_forwards] md:my-12">
     <!-- ローディング状態 -->
-    <div v-if="loading" class="glass-card flex items-center justify-center min-h-[300px] p-8">
+    <div v-if="loading" class="glass-card flex min-h-[300px] items-center justify-center p-8">
       <div class="flex flex-col items-center">
-        <PhSpinner class="w-10 h-10 animate-spin text-primary mb-4" />
-        <p class="text-text-muted animate-pulse">投稿を読み込んでいます...</p>
+        <PhSpinner class="mb-4 h-10 w-10 animate-spin text-primary" />
+        <p class="animate-pulse text-text-muted">投稿を読み込んでいます...</p>
       </div>
     </div>
     
     <!-- エラー状態 -->
-    <div v-else-if="error" class="glass-card flex flex-col items-center justify-center min-h-[300px] p-8 text-center">
-      <PhWarning class="h-16 w-16 mx-auto mb-4 text-error animate-pulse" />
-      <h2 class="text-xl font-bold mb-2">投稿の読み込みに失敗しました</h2>
-      <p class="text-text-muted mb-4">{{ error }}</p>
+    <div v-else-if="error" class="glass-card flex min-h-[300px] flex-col items-center justify-center p-8 text-center">
+      <PhWarning class="mb-4 mx-auto h-16 w-16 animate-pulse text-error" />
+      <h2 class="mb-2 text-xl font-bold">投稿の読み込みに失敗しました</h2>
+      <p class="mb-4 text-text-muted">{{ error }}</p>
       <router-link to="/" class="btn btn-primary">ホームに戻る</router-link>
     </div>
     
     <!-- 投稿が見つからない -->
-    <div v-else-if="!post" class="glass-card flex flex-col items-center justify-center min-h-[300px] p-8 text-center">
-      <PhSmiley class="h-16 w-16 mx-auto mb-4 text-text-muted transform rotate-12" />
-      <h2 class="text-xl font-bold mb-2">投稿が見つかりませんでした</h2>
-      <p class="text-text-muted mb-4">お探しの投稿は削除されたか、存在しない可能性があります。</p>
+    <div v-else-if="!post" class="glass-card flex min-h-[300px] flex-col items-center justify-center p-8 text-center">
+      <PhSmiley class="mb-4 mx-auto h-16 w-16 transform rotate-12 text-text-muted" />
+      <h2 class="mb-2 text-xl font-bold">投稿が見つかりませんでした</h2>
+      <p class="mb-4 text-text-muted">お探しの投稿は削除されたか、存在しない可能性があります。</p>
       <router-link to="/" class="btn btn-primary">ホームに戻る</router-link>
     </div>
     
@@ -31,20 +31,20 @@
         <!-- ヘッダー部分 - アイキャッチと投稿情報を横並びに -->
         <div class="flex flex-col md:flex-row">
           <!-- 左側 - アイキャッチ画像 -->
-          <div v-if="post.cover_image_path" class="relative h-40 overflow-hidden bg-surface-variant md:w-1/3 md:h-[200px]">
+          <div v-if="post.cover_image_path" class="relative h-40 overflow-hidden bg-surface-variant md:h-[200px] md:w-1/3">
             <img 
               :src="getImageUrl(post.cover_image_path)" 
               :alt="post.title"
-              class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+              class="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
             />
             <!-- カテゴリを画像内に配置 -->
-            <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent">
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background from-opacity-80 to-transparent p-2">
               <div class="flex flex-wrap gap-1.5">
                 <router-link 
                   v-for="category in postCategories" 
                   :key="category.id" 
                   :to="`/categories/${category.id}`"
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/80 text-text-white transition-all hover:bg-primary"
+                  class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-primary bg-opacity-80 text-text-white transition-all hover:bg-primary"
                 >
                   {{ category.name }}
                 </router-link>
@@ -53,18 +53,18 @@
           </div>
           
           <!-- 右側 - 投稿情報 -->
-          <div class="flex flex-col justify-between flex-1 p-5 md:p-6">
+          <div class="flex flex-1 flex-col justify-between p-5 md:p-6">
             <!-- タイトル -->
-            <h1 class="text-xl font-bold mb-3 leading-tight text-heading md:text-2xl">{{ post.title }}</h1>
+            <h1 class="mb-3 text-xl font-bold leading-tight text-heading md:text-2xl">{{ post.title }}</h1>
             
             <!-- 閲覧数・更新情報 -->
-            <div class="flex items-center mb-3 text-sm text-text-muted">
-              <span class="flex items-center mr-4">
-                <PhEye class="h-4 w-4 mr-1" />
+            <div class="mb-3 flex items-center text-sm text-text-muted">
+              <span class="mr-4 flex items-center">
+                <PhEye class="mr-1 h-4 w-4" />
                 {{ post.views || 0 }}
               </span>
               <span class="flex items-center">
-                <PhClock class="h-4 w-4 mr-1" />
+                <PhClock class="mr-1 h-4 w-4" />
                 <p class="flex items-center text-xs text-text-muted">
                   {{ formatDate(post.updated_at || post.created_at) }}
                 </p>
@@ -72,15 +72,15 @@
             </div>
             
             <!-- 著者情報と操作ボタン -->
-            <div class="flex flex-col space-y-4 mb-4">
+            <div class="mb-4 flex flex-col space-y-4">
               <!-- 著者情報 -->
-              <router-link :to="`/profile/${post.author_id}`" class="flex items-center group">
-                <div class="flex items-center justify-center w-10 h-10 mr-3 overflow-hidden text-text-white bg-primary-light rounded-full border-2 border-transparent transition-all group-hover:border-primary">
+              <router-link :to="`/profile/${post.author_id}`" class="group flex items-center">
+                <div class="mr-3 flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-transparent bg-primary-light text-text-white transition-all group-hover:border-primary">
                   <img 
                     v-if="post.profiles?.avatar_data" 
                     :src="getAvatarUrl(post.profiles.avatar_data)" 
                     :alt="post.profiles?.nickname || '不明なユーザー'"
-                    class="w-full h-full object-cover rounded-full"
+                    class="h-full w-full rounded-full object-cover"
                   />
                   <span v-else>{{ getInitials(post.profiles?.nickname || '不明なユーザー') }}</span>
                 </div>
@@ -102,7 +102,7 @@
                   class="btn btn-outline-primary btn-sm"
                   :class="{ 'text-primary-light': isLiked }"
                 >
-                  <PhHeart class="h-5 w-5 mr-1.5" :weight="isLiked ? 'fill' : 'regular'" />
+                  <PhHeart class="mr-1.5 h-5 w-5" :weight="isLiked ? 'fill' : 'regular'" />
                   <span>{{ likeCount }}</span>
                 </button>
                 
@@ -111,7 +111,7 @@
                   @click="sharePost" 
                   class="btn btn-outline-info btn-sm"
                 >
-                  <PhShareNetwork class="h-5 w-5 mr-1.5" />
+                  <PhShareNetwork class="mr-1.5 h-5 w-5" />
                   <span>シェア</span>
                 </button>
                 
@@ -121,7 +121,7 @@
                     :to="`/editor/${post.id}`" 
                     class="btn btn-outline-warning btn-sm"
                   >
-                    <PhPencilSimple class="h-5 w-5 mr-1.5" />
+                    <PhPencilSimple class="mr-1.5 h-5 w-5" />
                     <span>編集</span>
                   </router-link>
                   
@@ -129,7 +129,7 @@
                     @click="showDeleteModal = true" 
                     class="btn btn-outline-error btn-sm"
                   >
-                    <PhTrash class="h-5 w-5 mr-1.5" />
+                    <PhTrash class="mr-1.5 h-5 w-5" />
                     <span>削除</span>
                   </button>
                 </template>
@@ -148,7 +148,7 @@
       
       <!-- 関連投稿セクション -->
       <div class="mt-10">
-        <h3 class="text-xl font-bold mb-6 text-heading border-b border-border-light pb-3">関連投稿</h3>
+        <h3 class="mb-6 border-b border-border-light pb-3 text-xl font-bold text-heading">関連投稿</h3>
         
         <!-- ローディング表示 -->
         <div v-if="loadingRelatedPosts" class="flex justify-center p-6">
@@ -156,12 +156,12 @@
         </div>
         
         <!-- 関連投稿がない場合 -->
-        <div v-else-if="relatedPosts.length === 0" class="text-center py-8 text-text-muted">
+        <div v-else-if="relatedPosts.length === 0" class="py-8 text-center text-text-muted">
           関連投稿はありません
         </div>
         
         <!-- 関連投稿一覧 -->
-        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-else class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           <PostCard 
             v-for="relatedPost in relatedPosts" 
             :key="relatedPost.id" 
@@ -172,7 +172,7 @@
       
       <!-- コメントセクション -->
       <div class="mt-10">
-        <h3 class="text-xl font-bold mb-4 text-heading">コメント {{ commentCount }}件</h3>
+        <h3 class="mb-4 text-xl font-bold text-heading">コメント {{ commentCount }}件</h3>
         <div class="bg-surface">
           <CommentSystem 
             :post-id="post.id" 
@@ -183,13 +183,13 @@
       </div>
       
       <!-- シェアモーダル -->
-      <div v-if="showShareModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="glass-card w-full max-w-sm p-6 rounded-lg">
-          <h3 class="text-lg font-bold mb-4 text-heading">この投稿をシェア</h3>
+      <div v-if="showShareModal" class="fixed inset-0 z-50 flex items-center justify-center bg-background bg-opacity-50">
+        <div class="glass-card w-full max-w-sm rounded-lg p-6">
+          <h3 class="mb-4 text-lg font-bold text-heading">この投稿をシェア</h3>
           
           <div class="space-y-4">
             <div>
-              <div class="flex mb-4 justify-center">
+              <div class="mb-4 flex justify-center">
                 <button 
                   @click="shareVia('twitter')" 
                   class="btn btn-info"
@@ -205,7 +205,7 @@
                   <input 
                     type="text" 
                     :value="pageUrl" 
-                    class="flex-1 px-3 py-2 rounded-l border border-border bg-surface text-text"
+                    class="flex-1 rounded-l border border-border bg-surface px-3 py-2 text-text"
                     readonly
                     ref="urlInput"
                   />
@@ -213,8 +213,8 @@
                     @click="copyPageUrl" 
                     class="btn btn-primary"
                   >
-                    <span v-if="copied"><PhCopy class="h-5 w-5 mr-1.5" />コピー済み</span>
-                    <span v-else><PhCopy class="h-5 w-5 mr-1.5" />コピー</span>
+                    <span v-if="copied"><PhCopy class="mr-1.5 h-5 w-5" />コピー済み</span>
+                    <span v-else><PhCopy class="mr-1.5 h-5 w-5" />コピー</span>
                   </button>
                 </div>
               </div>
@@ -233,9 +233,9 @@
       </div>
       
       <!-- 削除確認モーダル -->
-      <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="glass-card w-full max-w-sm p-6 rounded-lg">
-          <h3 class="text-lg font-bold mb-4 text-heading">投稿を削除しますか？</h3>
+      <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-background bg-opacity-50">
+        <div class="glass-card w-full max-w-sm rounded-lg p-6">
+          <h3 class="mb-4 text-lg font-bold text-heading">投稿を削除しますか？</h3>
           <p class="mb-6 text-text-muted">
             この操作は取り消せません。本当にこの投稿を削除しますか？
           </p>
@@ -251,7 +251,7 @@
               class="btn btn-error"
               :disabled="deleteSubmitting"
             >
-              <PhSpinner v-if="deleteSubmitting" class="h-5 w-5 mr-1.5 animate-spin" />
+              <PhSpinner v-if="deleteSubmitting" class="mr-1.5 h-5 w-5 animate-spin" />
               {{ deleteSubmitting ? '削除中...' : '削除する' }}
             </button>
           </div>

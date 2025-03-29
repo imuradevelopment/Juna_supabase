@@ -1,14 +1,14 @@
 <template>
   <router-link 
     :to="`/posts/${post.id}`" 
-    class="glass-card relative block overflow-hidden rounded-xl transition-all flex-col duration-300 hover:shadow-primary-dark/40 hover:-translate-y-[5px]"
+    class="glass-card relative block overflow-hidden flex-col rounded-xl transition-all duration-300 hover:-translate-y-[5px] hover:shadow-primary-dark/40"
   >
     <!-- アクセント装飾 - プライマリカラーのグラデーションに統一 -->
     <div class="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-primary to-primary-light opacity-70"></div>
     
     <div class="relative flex h-full flex-col">
       <!-- 画像コンテナ -->
-      <div class="relative overflow-hidden aspect-video">
+      <div class="relative aspect-video overflow-hidden">
         <img 
           v-if="post.cover_image_path" 
           :src="getImageUrl(post.cover_image_path)" 
@@ -24,7 +24,7 @@
         </div>
         
         <!-- 日付オーバーレイ - 背景色を統一 -->
-        <div class="absolute bottom-3 right-3 rounded px-2 py-1 text-xs backdrop-blur-sm bg-background/70 text-text-white">
+        <div class="absolute bottom-3 right-3 rounded px-2 py-1 bg-background/70 text-xs text-text-white backdrop-blur-sm">
           {{ formatDate(post.published_at || post.created_at) }}
         </div>
       </div>
@@ -33,27 +33,27 @@
       <div class="flex flex-1 flex-col px-5 pt-5">
         <!-- タイトル - 見出し色に統一 -->
         <h3 
-          class="mb-2 text-xl font-semibold text-heading line-clamp-2"
+          class="mb-2 line-clamp-2 text-xl font-semibold text-heading"
           v-if="post.title_highlight" 
           v-html="post.title_highlight"
         ></h3>
         <h3 
-          class="mb-2 text-xl font-semibold text-heading line-clamp-2"
+          class="mb-2 line-clamp-2 text-xl font-semibold text-heading"
           v-else
         >{{ post.title }}</h3>
         
         <!-- カテゴリバッジ表示の修正 - 表示数制限と高さ制限を追加 -->
-        <div v-if="post.categories && post.categories.length > 0" class="flex flex-wrap gap-1.5 mb-3 max-h-[60px] overflow-hidden">
+        <div v-if="post.categories && post.categories.length > 0" class="mb-3 flex max-h-[60px] flex-wrap gap-1.5 overflow-hidden">
           <span 
             v-for="category in limitedCategories" 
             :key="category.id"
-            class="text-xs px-2 py-0.5 rounded-full bg-primary/20 text-primary-light"
+            class="rounded-full px-2 py-0.5 bg-primary/20 text-xs text-primary-light"
           >
             {{ category.name }}
           </span>
           <span 
             v-if="post.categories.length > maxCategories" 
-            class="text-xs px-2 py-0.5 rounded-full bg-surface-variant text-text-muted"
+            class="rounded-full px-2 py-0.5 bg-surface-variant text-xs text-text-muted"
           >
             +{{ post.categories.length - maxCategories }}
           </span>
@@ -62,12 +62,12 @@
         <!-- 抜粋 - 二次テキスト色に統一 -->
         <p 
           v-if="post.excerpt_highlight" 
-          class="mb-4 text-sm text-text-muted line-clamp-3"
+          class="mb-4 line-clamp-3 text-sm text-text-muted"
           v-html="post.excerpt_highlight"
         ></p>
         <p 
           v-else-if="post.excerpt" 
-          class="mb-4 text-sm text-text-muted line-clamp-3"
+          class="mb-4 line-clamp-3 text-sm text-text-muted"
         >
           {{ post.excerpt }}
         </p>
@@ -75,9 +75,9 @@
         <!-- フッター部分 - 2行レイアウトに変更 -->
         <div class="mt-auto flex flex-col border-t border-border-light pt-3">
           <!-- 上段：著者情報 -->
-          <div class="flex items-center mb-2">
+          <div class="mb-2 flex items-center">
             <!-- ユーザーアバター -->
-            <div class="mr-3 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full flex-shrink-0">
+            <div class="mr-3 flex h-8 w-8 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
               <img 
                 v-if="post.profiles?.avatar_data || post.avatar_url" 
                 :src="getAvatarUrl(post.profiles?.avatar_data || post.avatar_url!)" 
@@ -93,9 +93,9 @@
             </div>
             
             <!-- 著者情報 -->
-            <div class="flex flex-col min-w-0 flex-grow">
+            <div class="flex min-w-0 flex-grow flex-col">
               <!-- ユーザー名 - 切り詰めを最大幅設定で制御 -->
-              <span class="text-sm text-text overflow-hidden text-ellipsis" :class="{'truncate': isLongUsername}">
+              <span class="overflow-hidden text-ellipsis text-sm text-text" :class="{'truncate': isLongUsername}">
                 {{ getUserName() }}
               </span>
             </div>
@@ -105,17 +105,17 @@
           <div class="flex items-center justify-end gap-4">
             <div class="flex items-center">
               <PhEye class="mr-1 h-4 w-4 text-text-muted" />
-              <span class="text-text-muted text-sm">{{ post.views || 0 }}</span>
+              <span class="text-sm text-text-muted">{{ post.views || 0 }}</span>
             </div>
             
             <div class="flex items-center">
               <PhHeart class="mr-1 h-4 w-4 text-error" />
-              <span class="text-error text-sm">{{ post.like_count || post.likes_count || 0 }}</span>
+              <span class="text-sm text-error">{{ post.like_count || post.likes_count || 0 }}</span>
             </div>
             
             <div class="flex items-center">
               <PhChatText class="mr-1 h-4 w-4 text-info" />
-              <span class="text-info text-sm">{{ post.comment_count || post.comments_count || 0 }}</span>
+              <span class="text-sm text-info">{{ post.comment_count || post.comments_count || 0 }}</span>
             </div>
           </div>
         </div>

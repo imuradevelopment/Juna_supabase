@@ -1,31 +1,31 @@
 <template>
-  <div class="max-w-3xl mx-auto py-8">
+  <div class="mx-auto max-w-3xl py-8">
     <div class="glass-card p-6">
-      <h1 class="text-2xl font-bold mb-6 text-heading">プロフィール設定</h1>
+      <h1 class="mb-6 text-2xl font-bold text-heading">プロフィール設定</h1>
       
       <!-- エラーメッセージ -->
-      <div v-if="error" class="bg-error/20 border border-error-dark text-error px-4 py-3 rounded mb-6">
+      <div v-if="error" class="mb-6 rounded border border-error-dark bg-error/20 px-4 py-3 text-error">
         {{ error }}
       </div>
       
       <!-- 成功メッセージ -->
-      <div v-if="successMessage" class="bg-success/20 border border-success-dark text-success px-4 py-3 rounded mb-6">
+      <div v-if="successMessage" class="mb-6 rounded border border-success-dark bg-success/20 px-4 py-3 text-success">
         {{ successMessage }}
       </div>
       
       <form @submit.prevent="saveProfile" class="space-y-6">
         <!-- アバター -->
         <div>
-          <label class="block text-sm font-medium mb-2 text-text">プロフィール画像</label>
-          <div class="flex flex-col items-start space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
+          <label class="mb-2 block text-sm font-medium text-text">プロフィール画像</label>
+          <div class="flex flex-col items-start space-y-3 sm:flex-row sm:space-x-4 sm:space-y-0">
             <!-- アバター表示部分 -->
             <div class="flex flex-col items-center">
-              <div class="relative w-24 h-24 rounded-full bg-primary-light flex items-center justify-center text-text-white text-3xl overflow-hidden">
+              <div class="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-primary-light text-3xl text-text-white">
                 <img 
                   v-if="avatarPreview" 
                   :src="avatarPreview" 
                   alt="アバタープレビュー" 
-                  class="absolute inset-0 w-full h-full object-cover"
+                  class="absolute inset-0 h-full w-full object-cover"
                 />
                 <span v-else-if="profileData.nickname">{{ getInitials(profileData.nickname) }}</span>
                 <span v-else>U</span>
@@ -36,9 +36,9 @@
                 v-if="avatarPreview" 
                 type="button" 
                 @click="handleRemoveAvatar"
-                class="mt-2 btn btn-outline-error btn-sm"
+                class="btn btn-outline-error btn-sm mt-2"
               >
-                <PhTrash class="h-4 w-4 mr-1" />
+                <PhTrash class="mr-1 h-4 w-4" />
                 削除
               </button>
             </div>
@@ -46,7 +46,7 @@
             <!-- アップロードボタン -->
             <div class="flex flex-col">
               <label class="btn btn-outline-secondary cursor-pointer">
-                <PhCloudArrowUp class="h-5 w-5 mr-2" />
+                <PhCloudArrowUp class="mr-2 h-5 w-5" />
                 アップロード
                 <input 
                   type="file" 
@@ -56,48 +56,48 @@
                   ref="avatarInput"
                 />
               </label>
-              <p class="text-sm text-text-muted mt-2">推奨サイズ: 200x200px (1MB以下)</p>
+              <p class="mt-2 text-sm text-text-muted">推奨サイズ: 200x200px (1MB以下)</p>
             </div>
           </div>
         </div>
         
         <!-- 表示名 -->
         <div>
-          <label for="nickname" class="block text-sm font-medium mb-1 text-text">表示名 <span class="text-error">*</span></label>
+          <label for="nickname" class="mb-1 block text-sm font-medium text-text">表示名 <span class="text-error">*</span></label>
           <input 
             id="nickname" 
             v-model="profileData.nickname" 
             type="text" 
             required
-            class="w-full px-4 py-2 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full rounded border border-border bg-surface px-4 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
         
         <!-- アカウントID -->
         <div>
-          <label for="account_id" class="block text-sm font-medium mb-1 text-text">アカウントID</label>
+          <label for="account_id" class="mb-1 block text-sm font-medium text-text">アカウントID</label>
           <div class="flex">
-            <span class="inline-flex items-center px-3 py-2 rounded-l border border-r-0 border-border bg-surface-accent text-text">@</span>
+            <span class="inline-flex items-center rounded-l border border-r-0 border-border bg-surface-accent px-3 py-2 text-text">@</span>
             <input 
               id="account_id" 
               v-model="profileData.account_id" 
               type="text" 
-              class="flex-1 px-4 py-2 rounded-r border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
+              class="flex-1 rounded-r border border-border bg-surface px-4 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="account_id"
             />
           </div>
-          <p class="text-xs text-text-muted mt-1">
+          <p class="mt-1 text-xs text-text-muted">
             半角英数字とアンダースコアのみ使用可能です
           </p>
         </div>
         
         <!-- 自己紹介 -->
         <div>
-          <label for="bio" class="block text-sm font-medium mb-1 text-text">自己紹介</label>
+          <label for="bio" class="mb-1 block text-sm font-medium text-text">自己紹介</label>
           <textarea 
             id="bio" 
             v-model="profileData.bio" 
-            class="w-full px-4 py-2 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary"
+            class="w-full rounded border border-border bg-surface px-4 py-2 text-text focus:outline-none focus:ring-2 focus:ring-primary"
             rows="4"
             placeholder="自己紹介を入力してください"
           ></textarea>
@@ -111,7 +111,7 @@
             :disabled="submitting"
           >
             <div class="flex items-center">
-              <PhSpinner v-if="submitting" class="h-5 w-5 mr-2 animate-spin" />
+              <PhSpinner v-if="submitting" class="mr-2 h-5 w-5 animate-spin" />
               {{ submitting ? '保存中...' : '保存する' }}
             </div>
           </button>

@@ -1,41 +1,41 @@
 <template>
-  <div class="mx-auto py-4 sm:py-6 md:py-8 max-w-md">
+  <div class="max-w-md mx-auto py-4 sm:py-6 md:py-8">
     <div class="glass-card p-4 sm:p-6">
       <!-- タブ切り替えボタン -->
       <div class="flex mb-4 sm:mb-6 border-b border-border">
         <button 
           @click="activeTab = 'login'"
           :class="[
-            'py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium focus:outline-none flex items-center',
+            'flex items-center py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium focus:outline-none',
             activeTab === 'login' 
               ? 'border-b-2 border-primary text-primary' 
               : 'text-text-muted hover:text-text'
           ]"
         >
-          <PhSignIn class="h-4 w-4 mr-1" />
+          <PhSignIn class="w-4 h-4 mr-1" />
           ログイン
         </button>
         <button 
           @click="activeTab = 'register'"
           :class="[
-            'py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium focus:outline-none flex items-center',
+            'flex items-center py-2 px-3 sm:px-4 text-xs sm:text-sm font-medium focus:outline-none',
             activeTab === 'register' 
               ? 'border-b-2 border-primary text-primary' 
               : 'text-text-muted hover:text-text'
           ]"
         >
-          <PhUserPlus class="h-4 w-4 mr-1" />
+          <PhUserPlus class="w-4 h-4 mr-1" />
           会員登録
         </button>
       </div>
       
       <!-- ログインフォーム -->
       <div v-if="activeTab === 'login'">
-        <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center text-heading">ログイン</h2>
+        <h2 class="text-center mb-4 sm:mb-6 text-xl sm:text-2xl font-bold text-heading">ログイン</h2>
         
         <form @submit.prevent="handleLoginSubmit" class="space-y-4 sm:space-y-6">
           <!-- アラートメッセージ -->
-          <div v-if="loginFormError" class="px-3 py-2 sm:px-4 sm:py-3 rounded bg-error-dark/30 border border-error text-error">
+          <div v-if="loginFormError" class="rounded px-3 py-2 sm:px-4 sm:py-3 border border-error bg-error-dark/30 text-error">
             {{ loginFormError }}
           </div>
           
@@ -46,7 +46,7 @@
               type="text" 
               id="identifier" 
               v-model="loginData.identifier" 
-              class="w-full px-3 py-2 sm:px-4 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              class="w-full rounded px-3 py-2 sm:px-4 border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
               required
             />
           </div>
@@ -58,7 +58,7 @@
               type="password" 
               id="password" 
               v-model="loginData.password" 
-              class="w-full px-3 py-2 sm:px-4 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              class="w-full rounded px-3 py-2 sm:px-4 border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
               required
             />
           </div>
@@ -67,10 +67,10 @@
           <div>
             <button 
               type="submit" 
-              class="btn btn-primary flex w-full justify-center items-center"
+              class="flex w-full items-center justify-center btn btn-primary"
               :disabled="loginLoading"
             >
-              <PhSpinner v-if="loginLoading" class="h-4 w-4 mr-2 sm:h-5 sm:w-5 animate-spin" />
+              <PhSpinner v-if="loginLoading" class="mr-2 w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
               {{ loginLoading ? 'ログイン中...' : 'ログイン' }}
             </button>
           </div>
@@ -84,7 +84,7 @@
         </form>
         
         <!-- 登録リンク -->
-        <div class="mt-4 sm:mt-6 text-center">
+        <div class="text-center mt-4 sm:mt-6">
           <span class="text-xs sm:text-sm text-text-muted">アカウントをお持ちでないですか？</span>
           <button @click="activeTab = 'register'" class="btn-link">会員登録</button>
         </div>
@@ -92,11 +92,11 @@
       
       <!-- 会員登録フォーム -->
       <div v-else>
-        <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center text-heading">会員登録</h2>
+        <h2 class="text-center mb-4 sm:mb-6 text-xl sm:text-2xl font-bold text-heading">会員登録</h2>
         
         <form @submit.prevent="handleRegisterSubmit" class="space-y-4 sm:space-y-6">
           <!-- アラートメッセージ -->
-          <div v-if="registerFormError" class="p-2 sm:p-3 rounded bg-error-dark/30 border border-error text-error">
+          <div v-if="registerFormError" class="rounded p-2 sm:p-3 border border-error bg-error-dark/30 text-error">
             {{ registerFormError }}
           </div>
           
@@ -107,7 +107,7 @@
               type="text" 
               id="nickname" 
               v-model="registerData.nickname" 
-              class="w-full p-2 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              class="w-full rounded p-2 border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
               required
             />
           </div>
@@ -116,12 +116,12 @@
           <div class="mb-2 sm:mb-4">
             <label for="accountId" class="block mb-1 text-xs sm:text-sm text-text">アカウントID</label>
             <div class="flex">
-              <span class="flex px-2 py-2 sm:px-3 items-center justify-center rounded-l border border-border bg-surface-accent text-text">@</span>
+              <span class="flex items-center justify-center rounded-l px-2 py-2 sm:px-3 border border-border bg-surface-accent text-text">@</span>
               <input 
                 type="text" 
                 id="accountId" 
                 v-model="registerData.accountId" 
-                class="flex-1 p-2 rounded-r border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+                class="flex-1 rounded-r p-2 border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
                 pattern="[a-zA-Z0-9_]+"
                 placeholder="英数字とアンダースコアのみ"
               />
@@ -138,7 +138,7 @@
               type="email" 
               id="email" 
               v-model="registerData.email" 
-              class="w-full p-2 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              class="w-full rounded p-2 border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
               required
             />
           </div>
@@ -150,7 +150,7 @@
               type="password" 
               id="registerPassword" 
               v-model="registerData.password" 
-              class="w-full p-2 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              class="w-full rounded p-2 border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
               required
               minlength="8"
             />
@@ -163,20 +163,20 @@
               id="passwordConfirm" 
               v-model="registerData.passwordConfirm" 
               type="password" 
-              class="w-full p-2 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
+              class="w-full rounded p-2 border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
               required
             />
           </div>
           
           <!-- 規約同意 -->
           <div class="flex items-start">
-            <div class="flex h-5 items-center">
+            <div class="flex items-center h-5">
               <input 
                 id="terms" 
                 v-model="registerData.agreeToTerms" 
                 type="checkbox" 
                 required
-                class="h-4 w-4 rounded border-border bg-surface focus:ring-primary"
+                class="w-4 h-4 rounded border-border bg-surface focus:ring-primary"
               />
             </div>
             <label for="terms" class="ml-2 text-xs sm:text-sm text-text">
@@ -191,17 +191,17 @@
           <div>
             <button 
               type="submit" 
-              class="btn btn-primary flex w-full justify-center items-center"
+              class="flex w-full items-center justify-center btn btn-primary"
               :disabled="registerLoading || !isRegisterFormValid"
             >
-              <PhSpinner v-if="registerLoading" class="h-4 w-4 mr-2 sm:h-5 sm:w-5 animate-spin" />
+              <PhSpinner v-if="registerLoading" class="mr-2 w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
               {{ registerLoading ? '登録中...' : '登録する' }}
             </button>
           </div>
         </form>
         
         <!-- ログインリンク -->
-        <div class="mt-4 sm:mt-6 text-center text-xs sm:text-sm">
+        <div class="text-center mt-4 sm:mt-6 text-xs sm:text-sm">
           <span class="text-text-muted">すでにアカウントをお持ちですか？</span>
           <button @click="activeTab = 'login'" class="btn-link">ログイン</button>
         </div>
@@ -355,9 +355,9 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px theme('colors.surface') inset !important;
-  -webkit-text-fill-color: theme('colors.text') !important;
+  -webkit-box-shadow: 0 0 0 30px rgb(var(--color-surface)) inset !important;
+  -webkit-text-fill-color: rgb(var(--color-text)) !important;
   transition: background-color 5000s ease-in-out 0s;
-  caret-color: theme('colors.text');
+  caret-color: rgb(var(--color-text));
 }
 </style> 

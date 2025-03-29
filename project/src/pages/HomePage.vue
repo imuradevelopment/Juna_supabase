@@ -3,7 +3,7 @@
     <!-- ヒーローセクション - より魅力的に -->
     <section class="glass-card relative mb-10 overflow-hidden rounded-2xl p-8 md:p-12">
       <!-- 装飾的な背景要素 -->
-      <div class="absolute top-0 right-0 h-full w-2/3 opacity-15 pointer-events-none">
+      <div class="pointer-events-none absolute top-0 right-0 h-full w-2/3 opacity-10">
         <svg class="h-full w-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
           <path fill="currentColor" class="text-primary-light" d="M44.9,-76.2C58.3,-69.3,69.8,-58.3,78.1,-45C86.5,-31.7,91.8,-15.8,90.9,-0.5C90.1,14.8,83,29.7,74.4,43.4C65.8,57.2,55.6,69.9,42.2,77.8C28.8,85.7,14.4,88.7,-0.3,89.2C-15,89.7,-30.1,87.6,-41.9,79.5C-53.8,71.4,-62.4,57.1,-70.6,42.8C-78.8,28.5,-86.5,14.2,-88.5,-1.1C-90.5,-16.5,-86.8,-33,-78.2,-46.4C-69.5,-59.8,-55.9,-70.1,-41.6,-76.5C-27.3,-82.9,-13.6,-85.5,0.9,-87C15.4,-88.5,31.5,-89,44.9,-76.2Z" transform="translate(100 100)" />
         </svg>
@@ -51,7 +51,7 @@
           <div class="my-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             <!-- 特徴1 -->
             <div class="text-center">
-              <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/20">
+              <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary bg-opacity-20">
                 <PhBookOpen :size="32" weight="duotone" class="text-primary-light" />
               </div>
               <h3 class="mb-2 text-xl font-semibold text-heading">経験の共有</h3>
@@ -60,7 +60,7 @@
             
             <!-- 特徴2 -->
             <div class="text-center">
-              <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/20">
+              <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary bg-opacity-20">
                 <PhUsersThree :size="32" weight="duotone" class="text-primary-light" />
               </div>
               <h3 class="mb-2 text-xl font-semibold text-heading">コミュニティ</h3>
@@ -69,7 +69,7 @@
             
             <!-- 特徴3 -->
             <div class="text-center">
-              <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/20">
+              <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary bg-opacity-20">
                 <PhShieldStar :size="32" weight="duotone" class="text-primary-light" />
               </div>
               <h3 class="mb-2 text-xl font-semibold text-heading">安心できる場所</h3>
@@ -77,7 +77,7 @@
             </div>
           </div>
           
-          <div class="mb-8 rounded-lg border border-primary/20 bg-primary/10 p-6">
+          <div class="mb-8 rounded-lg border border-primary border-opacity-20 bg-primary bg-opacity-10 p-6">
             <h3 class="mb-3 text-xl font-semibold text-primary-light">対象となる障害・症状</h3>
             <ul class="grid grid-cols-2 gap-x-4 gap-y-2 md:grid-cols-3">
               <li class="flex items-center text-text-white">
@@ -200,9 +200,9 @@
                 <p class="text-text-muted">軽減テキスト</p>
                 <span class="text-xs text-text-muted">.text-text-muted</span>
               </div>
-              <div class="flex flex-col bg-primary/30 p-2 rounded">
+              <div class="flex flex-col rounded bg-primary bg-opacity-30 p-2">
                 <p class="text-text-white">白テキスト</p>
-                <span class="text-xs text-text-white/70">.text-text-white</span>
+                <span class="text-xs text-text-white text-opacity-70">.text-text-white</span>
               </div>
             </div>
           </div>

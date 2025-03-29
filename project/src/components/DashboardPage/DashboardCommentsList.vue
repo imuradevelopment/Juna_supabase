@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="flex flex-col justify-between items-start mb-3 sm:flex-row sm:items-center sm:mb-4">
-      <h2 class="text-lg font-bold text-heading mb-1 sm:text-xl sm:mb-0">コメント管理</h2>
+    <div class="mb-3 flex flex-col items-start justify-between sm:mb-4 sm:flex-row sm:items-center">
+      <h2 class="mb-1 text-lg font-bold text-heading sm:mb-0 sm:text-xl">コメント管理</h2>
       <div class="text-xs text-text-muted sm:text-sm">
         全 {{ totalComments }} 件
       </div>
@@ -9,7 +9,7 @@
     
     <!-- ローディング状態 -->
     <div v-if="loading" class="flex justify-center p-4 sm:p-6">
-      <PhSpinner class="animate-spin h-6 w-6 text-primary sm:h-8 sm:w-8" />
+      <PhSpinner class="h-6 w-6 animate-spin text-primary sm:h-8 sm:w-8" />
     </div>
     
     <!-- コメントがない場合 -->
@@ -26,24 +26,24 @@
           <!-- コメント内容 -->
           <div>
             <div class="flex items-center">
-              <div class="w-5 h-5 rounded-full bg-primary-light flex items-center justify-center text-text-white overflow-hidden mr-2 sm:w-6 sm:h-6">
+              <div class="mr-2 flex h-5 w-5 items-center justify-center overflow-hidden rounded-full bg-primary-light text-text-white sm:h-6 sm:w-6">
                 <img 
                   v-if="comment.post?.author?.avatar_data" 
                   :src="getAvatarUrl(comment.post.author.avatar_data)" 
                   :alt="comment.post?.author?.nickname || ''"
-                  class="w-full h-full object-cover"
+                  class="h-full w-full object-cover"
                 />
                 <span v-else>{{ getInitials(comment.post?.author?.nickname || '') }}</span>
               </div>
               <span class="text-xs text-text sm:text-sm">{{ comment.post?.author?.nickname || '不明なユーザー' }}</span>
             </div>
             
-            <p class="whitespace-pre-wrap mb-2 text-sm text-text">{{ comment.content }}</p>
+            <p class="mb-2 whitespace-pre-wrap text-sm text-text">{{ comment.content }}</p>
             
-            <div class="flex flex-col justify-between items-start mb-1 sm:flex-row sm:items-center sm:mb-0">
+            <div class="mb-1 flex flex-col items-start justify-between sm:mb-0 sm:flex-row sm:items-center">
               <router-link 
                 :to="`/posts/${comment.post_id}`" 
-                class="text-xs text-primary hover:underline mb-1 sm:text-sm sm:mb-0"
+                class="mb-1 text-xs text-primary hover:underline sm:mb-0 sm:text-sm"
               >
                 {{ getPostTitle(comment) }}
               </router-link>
@@ -54,19 +54,19 @@
           </div>
           
           <!-- アクションボタン -->
-          <div class="flex justify-end space-x-2 mt-2 sm:mt-3">
+          <div class="mt-2 flex justify-end space-x-2 sm:mt-3">
             <button 
               @click="confirmEditComment(comment)" 
               class="btn btn-outline-warning btn-sm"
             >
-              <PhPencilSimple class="h-4 w-4 mr-1" />
+              <PhPencilSimple class="mr-1 h-4 w-4" />
               編集
             </button>
             <button 
               @click="confirmDeleteComment(comment)" 
               class="btn btn-outline-error btn-sm"
             >
-              <PhTrash class="h-4 w-4 mr-1" />
+              <PhTrash class="mr-1 h-4 w-4" />
               削除
             </button>
           </div>
@@ -74,7 +74,7 @@
       </div>
       
       <!-- ページネーション -->
-      <div v-if="totalPages > 1" class="flex justify-center mt-4 sm:mt-6">
+      <div v-if="totalPages > 1" class="mt-4 flex justify-center sm:mt-6">
         <div class="flex flex-wrap justify-center space-x-1 sm:space-x-2">
           <button 
             @click="changePage(currentPage - 1)" 
@@ -104,12 +104,12 @@
     </div>
     
     <!-- 編集モーダル -->
-    <div v-if="showEditModal" class="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-4">
-      <div class="glass-card p-4 w-full max-w-md mx-auto shadow-background/70 sm:p-6">
-        <h3 class="text-lg font-bold mb-3 text-heading sm:text-xl sm:mb-4">コメントを編集</h3>
+    <div v-if="showEditModal" class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4">
+      <div class="glass-card mx-auto w-full max-w-md p-4 shadow-background/70 sm:p-6">
+        <h3 class="mb-3 text-lg font-bold text-heading sm:mb-4 sm:text-xl">コメントを編集</h3>
         <textarea 
           v-model="editedContent" 
-          class="w-full px-3 py-2 rounded border border-border bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary mb-3 text-sm sm:mb-4"
+          class="mb-3 w-full rounded border border-border bg-surface px-3 py-2 text-sm text-text focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary sm:mb-4"
           rows="3"
         ></textarea>
         <div class="flex justify-end space-x-2 sm:space-x-3">
@@ -124,7 +124,7 @@
             class="btn btn-primary btn-sm"
             :disabled="actionSubmitting || !editedContent.trim()"
           >
-            <PhSpinner v-if="actionSubmitting" class="animate-spin h-4 w-4 mr-1" />
+            <PhSpinner v-if="actionSubmitting" class="mr-1 h-4 w-4 animate-spin" />
             {{ actionSubmitting ? '更新中...' : '更新する' }}
           </button>
         </div>
@@ -132,9 +132,9 @@
     </div>
     
     <!-- 削除確認モーダル -->
-    <div v-if="showDeleteModal" class="fixed inset-0 bg-background/80 flex items-center justify-center z-50 p-4">
-      <div class="glass-card p-4 w-full max-w-md mx-auto shadow-background/70 sm:p-6">
-        <h3 class="text-lg font-bold mb-3 text-heading sm:text-xl sm:mb-4">コメントを削除しますか？</h3>
+    <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4">
+      <div class="glass-card mx-auto w-full max-w-md p-4 shadow-background/70 sm:p-6">
+        <h3 class="mb-3 text-lg font-bold text-heading sm:mb-4 sm:text-xl">コメントを削除しますか？</h3>
         <p class="mb-4 text-sm text-text-muted sm:mb-6">この操作は取り消せません。本当にこのコメントを削除しますか？</p>
         <div class="flex justify-end space-x-2 sm:space-x-3">
           <button 
@@ -148,7 +148,7 @@
             class="btn btn-outline-error btn-sm"
             :disabled="actionSubmitting"
           >
-            <PhSpinner v-if="actionSubmitting" class="animate-spin h-4 w-4 mr-1" />
+            <PhSpinner v-if="actionSubmitting" class="mr-1 h-4 w-4 animate-spin" />
             {{ actionSubmitting ? '削除中...' : '削除する' }}
           </button>
         </div>

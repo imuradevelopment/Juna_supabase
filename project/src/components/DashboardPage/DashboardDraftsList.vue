@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex items-center justify-between mb-4">
+    <div class="mb-4 flex items-center justify-between">
       <h2 class="text-xl font-bold text-heading">下書き</h2>
       <div class="text-sm text-text-muted">
         全 {{ totalDrafts }} 件
@@ -24,32 +24,32 @@
       <div v-for="draft in drafts" :key="draft.id" class="glass-card p-4">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between">
           <div class="flex-1">
-            <h3 class="text-lg font-bold mb-1 text-heading">
+            <h3 class="mb-1 text-lg font-bold text-heading">
               {{ draft.title || '(無題)' }}
             </h3>
-            <p class="text-sm mb-2 text-text-muted">
+            <p class="mb-2 text-sm text-text-muted">
               最終更新: {{ formatDate(draft.updated_at || draft.created_at) }}
             </p>
           </div>
           
           <!-- アクションボタン -->
-          <div class="flex mt-3 space-x-2 md:mt-0">
+          <div class="mt-3 flex space-x-2 md:mt-0">
             <router-link :to="`/editor/${draft.id}`" class="btn btn-outline-warning btn-sm">
-              <PhPencilSimple class="h-4 w-4 mr-1" />
+              <PhPencilSimple class="mr-1 h-4 w-4" />
               編集
             </router-link>
             <button 
               @click="confirmPublish(draft)" 
               class="btn btn-outline-primary btn-sm"
             >
-              <PhUpload class="h-4 w-4 mr-1" />
+              <PhUpload class="mr-1 h-4 w-4" />
               公開
             </button>
             <button 
               @click="confirmDelete(draft)" 
               class="btn btn-outline-error btn-sm"
             >
-              <PhTrash class="h-4 w-4 mr-1" />
+              <PhTrash class="mr-1 h-4 w-4" />
               削除
             </button>
           </div>
@@ -57,7 +57,7 @@
       </div>
       
       <!-- ページネーション -->
-      <div v-if="totalPages > 1" class="flex justify-center mt-6">
+      <div v-if="totalPages > 1" class="mt-6 flex justify-center">
         <div class="flex space-x-2">
           <button 
             @click="changePage(currentPage - 1)" 
@@ -90,8 +90,8 @@
     
     <!-- 削除確認モーダル -->
     <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-background/50">
-      <div class="glass-card max-w-md mx-auto">
-        <h3 class="text-xl font-bold mb-4 text-heading">下書きを削除しますか？</h3>
+      <div class="glass-card mx-auto max-w-md">
+        <h3 class="mb-4 text-xl font-bold text-heading">下書きを削除しますか？</h3>
         <p class="mb-6 text-text-muted">この操作は取り消せません。本当にこの下書きを削除しますか？</p>
         <div class="flex justify-end space-x-3">
           <button @click="showDeleteModal = false" class="btn btn-outline-secondary">
@@ -102,7 +102,7 @@
             class="btn btn-error"
             :disabled="actionSubmitting"
           >
-            <PhSpinner v-if="actionSubmitting" class="inline-block h-5 w-5 mr-2 animate-spin" />
+            <PhSpinner v-if="actionSubmitting" class="mr-2 inline-block h-5 w-5 animate-spin" />
             {{ actionSubmitting ? '削除中...' : '削除する' }}
           </button>
         </div>
@@ -111,8 +111,8 @@
     
     <!-- 公開確認モーダル -->
     <div v-if="showPublishModal" class="fixed inset-0 z-50 flex items-center justify-center bg-background/50">
-      <div class="glass-card max-w-md mx-auto">
-        <h3 class="text-xl font-bold mb-4 text-heading">下書きを公開しますか？</h3>
+      <div class="glass-card mx-auto max-w-md">
+        <h3 class="mb-4 text-xl font-bold text-heading">下書きを公開しますか？</h3>
         <p class="mb-6 text-text-muted">この下書きを公開すると、すべてのユーザーが閲覧できるようになります。</p>
         <div class="flex justify-end space-x-3">
           <button @click="showPublishModal = false" class="btn btn-outline-secondary">
@@ -123,7 +123,7 @@
             class="btn btn-primary"
             :disabled="actionSubmitting"
           >
-            <PhSpinner v-if="actionSubmitting" class="inline-block h-5 w-5 mr-2 animate-spin" />
+            <PhSpinner v-if="actionSubmitting" class="mr-2 inline-block h-5 w-5 animate-spin" />
             {{ actionSubmitting ? '公開中...' : '公開する' }}
           </button>
         </div>

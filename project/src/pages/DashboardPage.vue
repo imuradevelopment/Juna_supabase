@@ -1,10 +1,10 @@
 <template>
   <div class="max-w-4xl mx-auto py-8">
-    <h1 class="text-3xl font-bold mb-8 text-heading">ダッシュボード</h1>
+    <h1 class="mb-8 text-3xl font-bold text-heading">ダッシュボード</h1>
     
     <!-- ローディング状態 -->
     <div v-if="loading" class="glass-card flex flex-col items-center justify-center p-8">
-      <PhSpinner class="w-10 h-10 mb-4 animate-spin text-primary" />
+      <PhSpinner class="mb-4 w-10 h-10 animate-spin text-primary" />
       <p class="text-text-muted">読み込み中...</p>
     </div>
     
@@ -13,11 +13,11 @@
       <!-- サイドナビゲーション -->
       <div class="md:col-span-1">
         <div class="glass-card sticky top-24 p-4 shadow-background/50">
-          <h2 class="text-xl font-bold mb-4 text-heading">メニュー</h2>
+          <h2 class="mb-4 text-xl font-bold text-heading">メニュー</h2>
           <nav class="space-y-2">
             <button 
               @click="activeTab = 'posts'" 
-              class="btn btn-ghost w-full justify-start"
+              class="btn btn-ghost flex w-full justify-start"
               :class="activeTab === 'posts' ? 'bg-primary/20 text-primary' : ''"
             >
               <PhArticle class="w-5 h-5" />
@@ -25,7 +25,7 @@
             </button>
             <button 
               @click="activeTab = 'drafts'" 
-              class="btn btn-ghost w-full justify-start"
+              class="btn btn-ghost flex w-full justify-start"
               :class="activeTab === 'drafts' ? 'bg-primary/20 text-primary' : ''"
             >
               <PhNotePencil class="w-5 h-5" />
@@ -33,7 +33,7 @@
             </button>
             <button 
               @click="activeTab = 'comments'" 
-              class="btn btn-ghost w-full justify-start"
+              class="btn btn-ghost flex w-full justify-start"
               :class="activeTab === 'comments' ? 'bg-primary/20 text-primary' : ''"
             >
               <PhChatText class="w-5 h-5" />
@@ -41,7 +41,7 @@
             </button>
             <button 
               @click="activeTab = 'likes'" 
-              class="btn btn-ghost w-full justify-start"
+              class="btn btn-ghost flex w-full justify-start"
               :class="activeTab === 'likes' ? 'bg-primary/20 text-primary' : ''"
             >
               <PhHeart class="w-5 h-5" />
@@ -49,7 +49,7 @@
             </button>
             <button 
               @click="activeTab = 'stats'" 
-              class="btn btn-ghost w-full justify-start"
+              class="btn btn-ghost flex w-full justify-start"
               :class="activeTab === 'stats' ? 'bg-primary/20 text-primary' : ''"
             >
               <PhChartBar class="w-5 h-5" />

@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-posts-list">
-    <div class="flex items-center justify-between mb-4">
+    <div class="mb-4 flex items-center justify-between">
       <h2 class="text-xl font-bold text-heading">投稿管理</h2>
       <div class="text-sm text-text-muted">
         全 {{ totalPosts }} 件
@@ -9,7 +9,7 @@
     
     <!-- ローディング状態 -->
     <div v-if="loading" class="flex justify-center p-6">
-      <PhSpinner class="w-8 h-8 animate-spin text-primary" />
+      <PhSpinner class="h-8 w-8 animate-spin text-primary" />
     </div>
     
     <!-- 投稿がない場合 -->
@@ -30,7 +30,7 @@
               </router-link>
             </h3>
             <div class="flex items-center">
-              <div class="inline-flex px-2 py-1 text-xs rounded-full bg-primary text-text-white">
+              <div class="inline-flex rounded-full px-2 py-1 bg-primary text-xs text-text-white">
                 {{ post.published ? '公開中' : '下書き' }}
               </div>
               <div class="ml-2">
@@ -40,12 +40,12 @@
             <p class="mb-2 text-sm text-text-muted">
               {{ formatDate(post.created_at) }} · {{ post.views || 0 }} 閲覧
             </p>
-            <div class="flex flex-wrap gap-1 mb-2">
+            <div class="mb-2 flex flex-wrap gap-1">
               <router-link 
                 v-for="category in post.categories" 
                 :key="category.id"
                 :to="`/categories/${category.id}`"
-                class="px-2 py-1 text-xs rounded-full bg-primary/20 text-primary"
+                class="rounded-full px-2 py-1 bg-primary/20 text-xs text-primary"
               >
                 {{ category.name }}
               </router-link>
@@ -53,16 +53,16 @@
           </div>
           
           <!-- アクションボタン -->
-          <div class="flex mt-3 space-x-2 md:mt-0">
+          <div class="mt-3 flex space-x-2 md:mt-0">
             <router-link :to="`/editor/${post.id}`" class="btn btn-outline-warning btn-sm">
-              <PhPencilSimple class="h-4 w-4 mr-1" />
+              <PhPencilSimple class="mr-1 h-4 w-4" />
               編集
             </router-link>
             <button 
               @click="confirmDeletePost(post)" 
               class="btn btn-outline-error btn-sm"
             >
-              <PhTrash class="h-4 w-4 mr-1" />
+              <PhTrash class="mr-1 h-4 w-4" />
               削除
             </button>
           </div>
@@ -70,7 +70,7 @@
       </div>
       
       <!-- ページネーション -->
-      <div v-if="totalPages > 1" class="flex justify-center mt-6">
+      <div v-if="totalPages > 1" class="mt-6 flex justify-center">
         <div class="flex space-x-2">
           <button 
             @click="changePage(currentPage - 1)" 
@@ -101,7 +101,7 @@
     
     <!-- 削除確認モーダル -->
     <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-background/80">
-      <div class="glass-card p-6 mx-auto max-w-md">
+      <div class="glass-card mx-auto max-w-md p-6">
         <h3 class="mb-4 text-xl font-bold text-heading">投稿を削除しますか？</h3>
         <p class="mb-6 text-text-muted">この操作は取り消せません。本当にこの投稿を削除しますか？</p>
         <div class="flex justify-end space-x-3">
@@ -111,7 +111,7 @@
             class="btn btn-error"
             :disabled="deleteSubmitting"
           >
-            <PhSpinner v-if="deleteSubmitting" class="w-5 h-5 mr-2 animate-spin" />
+            <PhSpinner v-if="deleteSubmitting" class="mr-2 h-5 w-5 animate-spin" />
             {{ deleteSubmitting ? '削除中...' : '削除する' }}
           </button>
         </div>

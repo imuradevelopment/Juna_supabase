@@ -2,32 +2,32 @@
   <div>
     <div class="max-w-3xl mx-auto py-8">
       <div class="post-form glass-card p-6">
-        <h1 class="text-2xl font-bold mb-6 text-heading">{{ isEditMode ? '投稿を編集' : '新しい投稿を作成' }}</h1>
+        <h1 class="mb-6 text-2xl font-bold text-heading">{{ isEditMode ? '投稿を編集' : '新しい投稿を作成' }}</h1>
         
-        <div v-if="formError" class="bg-error/20 border border-error-dark/50 text-error px-4 py-3 rounded mb-6">
+        <div v-if="formError" class="mb-6 rounded border border-error-dark border-opacity-50 bg-error bg-opacity-20 px-4 py-3 text-error">
           {{ formError }}
         </div>
         
         <form @submit.prevent="handleSubmit" @keydown.enter.prevent="preventEnterSubmit" class="space-y-6" novalidate>
           <div>
-            <label for="title" class="block text-sm font-medium mb-1 text-heading">タイトル <span class="text-error">*</span></label>
+            <label for="title" class="mb-1 block text-sm font-medium text-heading">タイトル <span class="text-error">*</span></label>
             <input
               id="title"
               v-model="formData.title"
               type="text"
-              class="w-full px-4 py-2 rounded border border-border bg-surface text-heading focus:outline-none focus:ring-2 focus:ring-primary"
+              class="w-full rounded border border-border bg-surface px-4 py-2 text-heading focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="投稿のタイトル"
               required
             />
           </div>
           
           <div>
-            <label for="excerpt" class="block text-sm font-medium mb-1 text-text-muted">概要</label>
+            <label for="excerpt" class="mb-1 block text-sm font-medium text-text-muted">概要</label>
             <textarea
               id="excerpt"
               v-model="formData.excerpt"
               rows="3"
-              class="w-full px-4 py-2 rounded border border-border bg-surface text-text-muted focus:outline-none focus:ring-2 focus:ring-primary"
+              class="w-full rounded border border-border bg-surface px-4 py-2 text-text-muted focus:outline-none focus:ring-2 focus:ring-primary"
               placeholder="投稿の短い説明（オプション）"
             ></textarea>
           </div>
@@ -43,7 +43,7 @@
           </div>
           
           <div>
-            <label for="content" class="block text-sm font-medium mb-1 text-text-muted">本文 <span class="text-error">*</span></label>
+            <label for="content" class="mb-1 block text-sm font-medium text-text-muted">本文 <span class="text-error">*</span></label>
             <RichTextEditor
               ref="richTextEditorRef"
               v-model="formData.content"
@@ -64,14 +64,14 @@
           </div>
           
           <div>
-            <label class="block text-sm font-medium mb-1 text-text-muted">公開設定</label>
+            <label class="mb-1 block text-sm font-medium text-text-muted">公開設定</label>
             <div class="flex items-center space-x-4">
               <label class="inline-flex items-center">
                 <input 
                   type="radio" 
                   v-model="formData.published" 
                   :value="true"
-                  class="w-4 h-4 text-primary focus:ring-primary"
+                  class="h-4 w-4 text-primary focus:ring-primary"
                 />
                 <span class="ml-2 text-text-muted">公開</span>
               </label>
@@ -80,7 +80,7 @@
                   type="radio" 
                   v-model="formData.published" 
                   :value="false"
-                  class="w-4 h-4 text-primary focus:ring-primary"
+                  class="h-4 w-4 text-primary focus:ring-primary"
                 />
                 <span class="ml-2 text-text-muted">下書き</span>
               </label>
@@ -94,7 +94,7 @@
               class="btn btn-primary"
               :disabled="submitting || !isFormValid || isUploading"
             >
-              <PhSpinner v-if="submitting" class="w-5 h-5 mr-2 animate-spin" />
+              <PhSpinner v-if="submitting" class="mr-2 h-5 w-5 animate-spin" />
               {{ submitting ? '保存中...' : (isEditMode ? '更新する' : '投稿する') }}
             </button>
           </div>
@@ -102,9 +102,9 @@
       </div>
     </div>
 
-    <div v-if="sessionExpiredModalOpen" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div class="glass-card p-6 max-w-md w-full rounded-lg">
-        <h3 class="text-xl font-bold mb-4 text-heading">セッションが切れました</h3>
+    <div v-if="sessionExpiredModalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-background bg-opacity-50">
+      <div class="glass-card w-full max-w-md rounded-lg p-6">
+        <h3 class="mb-4 text-xl font-bold text-heading">セッションが切れました</h3>
         <p class="mb-4 text-text">長時間の操作がなかったため、ログインセッションが切れました。内容は一時保存されていますので、再ログイン後に編集を続けることができます。</p>
         <div class="flex justify-end space-x-3">
           <button 
@@ -117,7 +117,7 @@
       </div>
     </div>
 
-    <div v-if="lastAutoSaveTime" class="fixed bottom-4 right-4 text-sm text-text-muted bg-surface-variant p-2 rounded shadow-md opacity-70">
+    <div v-if="lastAutoSaveTime" class="fixed bottom-4 right-4 rounded bg-surface-variant p-2 text-sm text-text-muted shadow-md opacity-70">
       最終自動保存: {{ lastAutoSaveTime.toLocaleTimeString() }}
     </div>
   </div>

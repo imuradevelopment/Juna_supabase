@@ -16,7 +16,7 @@
       @touchend.prevent="toggleHeading(2)"
       title="見出し2"
     >
-      <PhTextHTwo class="h-5 w-5" />
+      <PhTextHTwo class="w-5 h-5" />
       <div class="tooltip">見出し2 <kbd>{{ isMac ? 'Option' : 'Alt' }}+2</kbd></div>
     </button>
     
@@ -28,7 +28,7 @@
       @touchend.prevent="toggleHeading(3)"
       title="見出し3"
     >
-      <PhTextHThree class="h-5 w-5" />
+      <PhTextHThree class="w-5 h-5" />
       <div class="tooltip">見出し3 <kbd>{{ isMac ? 'Option' : 'Alt' }}+3</kbd></div>
     </button>
 
@@ -40,7 +40,7 @@
       @touchend.prevent="toggleBold"
       title="太字"
     >
-      <PhTextBolder class="h-5 w-5" />
+      <PhTextBolder class="w-5 h-5" />
       <div class="tooltip">太字 <kbd>{{ isMac ? '⌘' : 'Ctrl' }}+B</kbd></div>
     </button>
 
@@ -52,7 +52,7 @@
       @touchend.prevent="toggleItalic"
       title="斜体"
     >
-      <PhTextItalic class="h-5 w-5" />
+      <PhTextItalic class="w-5 h-5" />
       <div class="tooltip">斜体 <kbd>{{ isMac ? '⌘' : 'Ctrl' }}+I</kbd></div>
     </button>
 
@@ -64,7 +64,7 @@
       @touchend.prevent="toggleStrike"
       title="取り消し線"
     >
-      <PhTextStrikethrough class="h-5 w-5" />
+      <PhTextStrikethrough class="w-5 h-5" />
       <div class="tooltip">取り消し線 <kbd>{{ isMac ? 'Option' : 'Alt' }}+S</kbd></div>
     </button>
 
@@ -76,7 +76,7 @@
       @touchend.prevent="toggleBulletList"
       title="箇条書き"
     >
-      <PhListBullets class="h-5 w-5" />
+      <PhListBullets class="w-5 h-5" />
       <div class="tooltip">箇条書き <kbd>{{ isMac ? 'Option' : 'Alt' }}+8</kbd></div>
     </button>
 
@@ -88,7 +88,7 @@
       @touchend.prevent="toggleOrderedList"
       title="番号付きリスト"
     >
-      <PhListNumbers class="h-5 w-5" />
+      <PhListNumbers class="w-5 h-5" />
       <div class="tooltip">番号付きリスト <kbd>{{ isMac ? 'Option' : 'Alt' }}+7</kbd></div>
     </button>
 
@@ -100,7 +100,7 @@
       @touchend.prevent="toggleBlockquote"
       title="引用"
     >
-      <PhQuotes class="h-5 w-5" />
+      <PhQuotes class="w-5 h-5" />
       <div class="tooltip">引用 <kbd>{{ isMac ? 'Option' : 'Alt' }}+Q</kbd></div>
     </button>
 
@@ -111,7 +111,7 @@
       @touchend.prevent="setHorizontalRule"
       title="水平線"
     >
-      <PhMinus class="h-5 w-5" />
+      <PhMinus class="w-5 h-5" />
       <div class="tooltip">水平線 <kbd>{{ isMac ? 'Option' : 'Alt' }}+H</kbd></div>
     </button>
 
@@ -123,7 +123,7 @@
       @touchend.prevent="$emit('open-link-dialog')"
       title="リンク"
     >
-      <PhLink class="h-5 w-5" />
+      <PhLink class="w-5 h-5" />
       <div class="tooltip">リンク <kbd>{{ isMac ? '⌘' : 'Ctrl' }}+K</kbd></div>
     </button>
 
@@ -135,8 +135,8 @@
       title="画像"
       :disabled="uploading"
     >
-      <PhSpinner v-if="uploading" class="h-5 w-5 animate-spin" />
-      <PhImage v-else class="h-5 w-5" />
+      <PhSpinner v-if="uploading" class="w-5 h-5 animate-spin" />
+      <PhImage v-else class="w-5 h-5" />
       <div class="tooltip">画像 <kbd>{{ isMac ? 'Option' : 'Alt' }}+I</kbd></div>
     </button>
 
@@ -147,7 +147,7 @@
       @touchend.prevent="undoEdit"
       title="元に戻す"
     >
-      <PhArrowCounterClockwise class="h-5 w-5" />
+      <PhArrowCounterClockwise class="w-5 h-5" />
       <div class="tooltip">前の状態に戻す <kbd>{{ isMac ? '⌘' : 'Ctrl' }}+Z</kbd></div>
     </button>
 
@@ -158,7 +158,7 @@
       @touchend.prevent="redoEdit"
       title="やり直し"
     >
-      <PhArrowClockwise class="h-5 w-5" />
+      <PhArrowClockwise class="w-5 h-5" />
       <div class="tooltip">次の状態に進む <kbd>{{ isMac ? '⌘' : 'Ctrl' }}+Y</kbd></div>
     </button>
   </div>
@@ -609,11 +609,11 @@ function preventBlur(e: Event) {
 
 <style scoped lang="postcss">
 button {
+  position: relative;
+  z-index: 10;
   min-width: 40px;
   min-height: 40px;
   touch-action: manipulation;
-  position: relative;
-  z-index: 10;
   
   &:active {
     transform: scale(0.95);
@@ -634,35 +634,35 @@ button {
 }
 
 .tooltip {
-  visibility: hidden;
   position: absolute;
   bottom: calc(100% + 5px);
   left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(30, 30, 30, 0.9);
-  color: theme('colors.text', white);
-  text-align: center;
-  font-size: 0.75rem;
+  z-index: 100;
   padding: 4px 8px;
   border-radius: 4px;
+  background-color: rgb(var(--color-background) / 0.9);
+  color: rgb(var(--color-text-white));
+  font-size: 0.75rem;
+  text-align: center;
   white-space: nowrap;
-  z-index: 100;
   opacity: 0;
+  visibility: hidden;
   transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 5px rgb(var(--color-background) / 0.2);
   pointer-events: none;
+  transform: translateX(-50%);
 }
 
 .tooltip kbd {
-  background-color: rgba(50, 50, 50, 0.8);
-  color: white;
-  border-radius: 3px;
   padding: 1px 4px;
   margin: 0 2px;
+  border: 1px solid rgb(var(--color-border));
+  border-radius: 3px;
+  background-color: rgb(var(--color-surface-variant) / 0.8);
+  color: rgb(var(--color-text-white));
   font-size: 0.7rem;
   font-family: monospace;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
-  border: 1px solid theme('colors.border', #555);
+  box-shadow: 0 1px 1px rgb(var(--color-background) / 0.2);
 }
 
 .tooltip-container:hover .tooltip {
@@ -675,14 +675,15 @@ button {
   position: fixed;
   left: 0;
   right: 0;
+  bottom: 0;
   z-index: 100;
+  width: 100%;
   padding: 8px;
   border-radius: 0;
   user-select: none;
   touch-action: manipulation;
   will-change: transform;
   backface-visibility: hidden;
-  width: 100%;
 }
 
 /* モバイル環境でのツールチップ表示を制御 */

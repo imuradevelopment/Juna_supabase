@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex items-center justify-between mb-4">
+    <div class="mb-4 flex items-center justify-between">
       <h2 class="text-xl font-bold text-heading">統計情報</h2>
       <button 
         @click="fetchAllStats"
@@ -8,7 +8,7 @@
         :disabled="loading"
       >
         <PhArrowClockwise 
-          class="w-4 h-4"
+          class="h-4 w-4"
           :class="{ 'animate-spin': loading }"
         />
         更新
@@ -17,18 +17,18 @@
     
     <!-- ローディング状態 -->
     <div v-if="loading" class="flex justify-center p-6">
-      <PhSpinner class="w-8 h-8 animate-spin text-primary" />
+      <PhSpinner class="h-8 w-8 animate-spin text-primary" />
     </div>
     
     <!-- 統計カード -->
     <div v-else class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2">
       <!-- 投稿数 -->
       <div class="glass-card p-4">
-        <div class="flex justify-between items-center">
+        <div class="flex items-center justify-between">
           <h3 class="text-sm font-medium text-text-muted">投稿数</h3>
-          <PhArticle class="w-6 h-6 text-primary" />
+          <PhArticle class="h-6 w-6 text-primary" />
         </div>
-        <div class="mt-2 flex justify-between items-end">
+        <div class="mt-2 flex items-end justify-between">
           <div class="text-2xl font-bold text-heading">{{ stats.postCount }}</div>
           <div class="text-xs text-text-muted">直近30日: {{ stats.recentPostCount }}</div>
         </div>
@@ -36,11 +36,11 @@
       
       <!-- 総閲覧数 -->
       <div class="glass-card p-4">
-        <div class="flex justify-between items-center">
+        <div class="flex items-center justify-between">
           <h3 class="text-sm font-medium text-text-muted">総閲覧数</h3>
-          <PhEye class="w-6 h-6 text-primary" />
+          <PhEye class="h-6 w-6 text-primary" />
         </div>
-        <div class="mt-2 flex justify-between items-end">
+        <div class="mt-2 flex items-end justify-between">
           <div class="text-2xl font-bold text-heading">{{ stats.totalViews }}</div>
           <div class="text-xs text-text-muted">平均: {{ stats.averageViews }}/投稿</div>
         </div>
@@ -48,11 +48,11 @@
       
       <!-- いいね数 -->
       <div class="glass-card p-4">
-        <div class="flex justify-between items-center">
+        <div class="flex items-center justify-between">
           <h3 class="text-sm font-medium text-text-muted">総いいね数</h3>
-          <PhHeart class="w-6 h-6 text-primary" />
+          <PhHeart class="h-6 w-6 text-primary" />
         </div>
-        <div class="mt-2 flex justify-between items-end">
+        <div class="mt-2 flex items-end justify-between">
           <div class="text-2xl font-bold text-heading">{{ stats.totalLikes }}</div>
           <div class="text-xs text-text-muted">平均: {{ stats.averageLikes }}/投稿</div>
         </div>
@@ -60,11 +60,11 @@
       
       <!-- コメント数 -->
       <div class="glass-card p-4">
-        <div class="flex justify-between items-center">
+        <div class="flex items-center justify-between">
           <h3 class="text-sm font-medium text-text-muted">総コメント数</h3>
-          <PhChatText class="w-6 h-6 text-primary" />
+          <PhChatText class="h-6 w-6 text-primary" />
         </div>
-        <div class="mt-2 flex justify-between items-end">
+        <div class="mt-2 flex items-end justify-between">
           <div class="text-2xl font-bold text-heading">{{ stats.totalComments }}</div>
           <div class="text-xs text-text-muted">平均: {{ stats.averageComments }}/投稿</div>
         </div>
@@ -73,7 +73,7 @@
     
     <!-- 人気の投稿 -->
     <div class="mt-6">
-      <h3 class="text-lg font-bold text-heading mb-3">人気の投稿</h3>
+      <h3 class="mb-3 text-lg font-bold text-heading">人気の投稿</h3>
       <div v-if="popularPosts.length === 0" class="glass-card p-6 text-center">
         <p class="text-text-muted">まだ投稿はありません。</p>
       </div>
@@ -81,22 +81,22 @@
         <div 
           v-for="post in popularPosts" 
           :key="post.id" 
-          class="glass-card p-3 hover:shadow-lg transition-shadow"
+          class="glass-card p-3 transition-shadow hover:shadow-lg"
         >
           <router-link :to="`/posts/${post.id}`" class="block">
             <h4 class="font-bold text-heading">{{ post.title }}</h4>
             <div class="mt-2 flex justify-between text-xs text-text-muted">
               <div class="flex items-center space-x-4">
                 <span class="flex items-center">
-                  <PhEye class="w-4 h-4 mr-1" />
+                  <PhEye class="mr-1 h-4 w-4" />
                   {{ post.views }}
                 </span>
                 <span class="flex items-center">
-                  <PhHeart class="w-4 h-4 mr-1" />
+                  <PhHeart class="mr-1 h-4 w-4" />
                   {{ post.like_count }}
                 </span>
                 <span class="flex items-center">
-                  <PhChatText class="w-4 h-4 mr-1" />
+                  <PhChatText class="mr-1 h-4 w-4" />
                   {{ post.comment_count }}
                 </span>
               </div>

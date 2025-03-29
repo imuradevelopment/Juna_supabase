@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard-likes-list">
-    <div class="flex items-center justify-between mb-4">
+    <div class="mb-4 flex items-center justify-between">
       <h2 class="text-xl font-bold text-heading">いいね管理</h2>
       <div class="text-sm text-text-muted">
         全 {{ totalLikes }} 件
@@ -9,7 +9,7 @@
     
     <!-- ローディング状態 -->
     <div v-if="loading" class="flex justify-center p-6">
-      <PhSpinner class="w-8 h-8 animate-spin text-primary" />
+      <PhSpinner class="h-8 w-8 animate-spin text-primary" />
     </div>
     
     <!-- いいねがない場合 -->
@@ -37,12 +37,12 @@
             </p>
             <div class="flex items-center space-x-2">
               <div class="flex items-center">
-                <div class="w-6 h-6 rounded-full bg-primary-light flex items-center justify-center text-text-white overflow-hidden mr-2">
+                <div class="mr-2 flex h-6 w-6 items-center justify-center overflow-hidden rounded-full bg-primary-light text-text-white">
                   <img 
                     v-if="like.post.author?.avatar_data" 
                     :src="getProfileImageUrl(like.post.author.avatar_data)" 
                     :alt="like.post.author?.nickname || ''"
-                    class="w-full h-full object-cover"
+                    class="h-full w-full object-cover"
                   />
                   <span v-else>{{ getInitials(like.post.author?.nickname || '') }}</span>
                 </div>
@@ -52,16 +52,16 @@
           </div>
           
           <!-- アクションボタン -->
-          <div class="flex mt-3 space-x-2 md:mt-0">
+          <div class="mt-3 flex space-x-2 md:mt-0">
             <router-link :to="`/posts/${like.post.id}`" class="btn btn-outline-primary btn-sm">
-              <PhEye class="h-4 w-4 mr-1" />
+              <PhEye class="mr-1 h-4 w-4" />
               表示
             </router-link>
             <button 
               @click="removeLike(like)" 
               class="btn btn-outline-error btn-sm"
             >
-              <PhHeartBreak class="h-4 w-4 mr-1" />
+              <PhHeartBreak class="mr-1 h-4 w-4" />
               いいね解除
             </button>
           </div>
@@ -69,7 +69,7 @@
       </div>
       
       <!-- ページネーション -->
-      <div v-if="totalPages > 1" class="flex justify-center mt-6">
+      <div v-if="totalPages > 1" class="mt-6 flex justify-center">
         <div class="flex space-x-2">
           <button 
             @click="changePage(currentPage - 1)" 

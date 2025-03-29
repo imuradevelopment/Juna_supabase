@@ -1,5 +1,5 @@
 <template>
-  <div class="rounded-lg border p-5 shadow-background/20 bg-surface-variant border-border">
+  <div class="rounded-lg border border-border p-5 bg-surface-variant shadow-background/20">
     <!-- コメント投稿フォーム -->
     <div class="mb-6">
       <div v-if="!authStore.isAuthenticated" class="py-4 text-center">
@@ -15,7 +15,7 @@
         <div class="mb-3">
           <textarea 
             v-model="commentText" 
-            class="w-full rounded-lg border p-4 transition-all placeholder-text-muted focus:outline-none focus:shadow-primary/20 focus:border-primary bg-surface text-text border-border" 
+            class="w-full rounded-lg border border-border p-4 bg-surface text-text placeholder-text-muted transition-all focus:border-primary focus:outline-none focus:shadow-primary/20" 
             rows="3"
             :placeholder="parentCommentId ? '返信を入力...' : 'コメントを入力...'"
             :disabled="submitting"
@@ -29,7 +29,7 @@
             class="btn btn-primary"
             :disabled="submitting || !commentText.trim()"
           >
-            <PhSpinner v-if="submitting" class="h-5 w-5 mr-2 animate-spin" />
+            <PhSpinner v-if="submitting" class="mr-2 h-5 w-5 animate-spin" />
             {{ submitting ? '送信中...' : parentCommentId ? '返信する' : '送信する' }}
           </button>
         </div>
@@ -75,7 +75,7 @@
 
     <!-- 削除確認モーダル -->
     <div v-if="showDeleteModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/50 backdrop-blur-sm">
-      <div class="w-full max-w-sm rounded-lg p-6 bg-surface/80 border border-border-light/60 shadow-background/40">
+      <div class="w-full max-w-sm rounded-lg border border-border-light/60 p-6 bg-surface/80 shadow-background/40">
         <h3 class="mb-4 text-lg font-bold text-heading">コメントを削除しますか？</h3>
         <p class="mb-6 text-text-muted">
           この操作は取り消せません。
@@ -92,7 +92,7 @@
             class="btn btn-error"
             :disabled="deleteSubmitting"
           >
-            <PhSpinner v-if="deleteSubmitting" class="h-5 w-5 mr-2 animate-spin" />
+            <PhSpinner v-if="deleteSubmitting" class="mr-2 h-5 w-5 animate-spin" />
             {{ deleteSubmitting ? '削除中...' : '削除する' }}
           </button>
         </div>

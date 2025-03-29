@@ -4,7 +4,7 @@
     <div class="mb-4">
       <!-- コメント内容 -->
       <div class="flex-1">
-        <div class="rounded-lg border p-3 backdrop-blur-sm bg-surface/80 border-border-light/60 shadow-background/30">
+        <div class="rounded-lg border border-border-light/60 p-3 bg-surface/80 shadow-background/30 backdrop-blur-sm">
           <!-- ユーザー情報と日時 -->
           <div class="mb-2 flex items-center justify-between">
             <div class="flex items-center">
@@ -30,7 +30,7 @@
             <textarea 
               :value="editedContent" 
               @input="$emit('update:editedContent', ($event.target as HTMLTextAreaElement).value)"
-              class="w-full rounded border px-3 py-2 focus:outline-none bg-surface text-text border-border shadow-primary/20"
+              class="w-full rounded border border-border px-3 py-2 bg-surface text-text shadow-primary/20 focus:outline-none"
               rows="2"
             ></textarea>
             <div class="mt-2 flex justify-end space-x-2">
@@ -61,7 +61,7 @@
             class="btn btn-outline-primary btn-sm"
             :disabled="submitting"
           >
-            <PhChatCircle class="h-4 w-4 mr-1" />
+            <PhChatCircle class="mr-1 h-4 w-4" />
             返信
           </button>
           
@@ -70,14 +70,14 @@
               @click="$emit('edit', comment)" 
               class="btn btn-outline-warning btn-sm"
             >
-              <PhPencilSimple class="h-4 w-4 mr-1" />
+              <PhPencilSimple class="mr-1 h-4 w-4" />
               編集
             </button>
             <button 
               @click="$emit('delete', comment)" 
               class="btn btn-outline-error btn-sm"
             >
-              <PhTrash class="h-4 w-4 mr-1" />
+              <PhTrash class="mr-1 h-4 w-4" />
               削除
             </button>
           </div>
@@ -98,12 +98,12 @@
 
     <!-- 返信フォーム -->
     <div v-if="replyingToId === comment.id" class="mb-4 ml-8">
-      <div class="rounded-lg border p-4 shadow-background/20 bg-surface-variant border-border">
+      <div class="rounded-lg border border-border p-4 bg-surface-variant shadow-background/20">
         <form @submit.prevent="handleSubmitReply">
           <div class="mb-3">
             <textarea 
               v-model="replyContent" 
-              class="w-full rounded-lg border p-3 transition-all placeholder-text-muted focus:outline-none focus:shadow-primary/20 focus:border-primary bg-surface text-text border-border"
+              class="w-full rounded-lg border border-border p-3 bg-surface text-text placeholder-text-muted transition-all focus:border-primary focus:outline-none focus:shadow-primary/20"
               rows="2"
               placeholder="返信を入力..."
               :disabled="submitting"
@@ -125,7 +125,7 @@
               class="btn btn-primary btn-sm"
               :disabled="submitting || !replyContent.trim()"
             >
-              <PhSpinner v-if="submitting" class="h-4 w-4 mr-1 animate-spin" />
+              <PhSpinner v-if="submitting" class="mr-1 h-4 w-4 animate-spin" />
               {{ submitting ? '送信中...' : '返信する' }}
             </button>
           </div>
@@ -134,7 +134,7 @@
     </div>
 
     <!-- 子コメント（再帰的に表示） -->
-    <div v-if="childComments.length > 0" class="ml-8 relative">
+    <div v-if="childComments.length > 0" class="relative ml-8">
       <!-- ネストレベルが深い場合は初期状態で非表示 -->
       <div v-if="level >= MAX_VISIBLE_NEST_LEVEL && !showDeepNestedComments">
         <button 
@@ -170,8 +170,8 @@
           <!-- 最後の子コメントの場合、余分な縦線を隠す -->
           <div 
             v-if="index === childComments.length - 1" 
-            class="absolute left-0 bottom-0 w-0.5 bg-surface-variant" 
-            style="height: calc(100% - 1.5rem); top: calc(1.5rem + 2px);"
+            class="absolute left-0 bottom-0 top-[calc(1.5rem+2px)] w-0.5 bg-surface-variant" 
+            style="height: calc(100% - 1.5rem);"
           ></div>
           
           <div class="pl-6">
@@ -202,7 +202,7 @@
       
       <!-- 子コメントを非表示にするボタン（表示中の場合のみ） -->
       <div v-if="level >= MAX_VISIBLE_NEST_LEVEL && showDeepNestedComments">
-        <div class="absolute left-0 bottom-0 w-0.5 bg-surface-variant" style="height: calc(100% - 1.5rem); top: calc(2px + 1.5rem);"></div>
+        <div class="absolute left-0 bottom-0 top-[calc(2px+1.5rem)] w-0.5 bg-surface-variant" style="height: calc(100% - 1.5rem);"></div>
         <button 
           @click="showDeepNestedComments = false" 
           class="mt-2 text-sm text-text-muted hover:underline focus:outline-none"

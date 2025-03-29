@@ -3,7 +3,7 @@
   <div 
     v-if="visible" 
     ref="linkMenu"
-    class="floating-link-menu glass-card rounded p-3 shadow-lg z-30 fixed"
+    class="floating-link-menu fixed z-30 rounded p-3 glass-card shadow-lg"
     :style="menuStyle"
   >
     <div class="flex flex-col gap-2">
@@ -14,7 +14,7 @@
           v-model="url"
           type="text"
           placeholder="URLを入力"
-          class="flex-1 rounded border border-border bg-surface px-2 py-1 text-sm text-text"
+          class="flex-1 rounded border border-border px-2 py-1 bg-surface text-sm text-text"
           @keydown.enter.prevent="applyLink"
           @keydown.esc.prevent="cancel"
         />
@@ -27,14 +27,14 @@
           v-model="text"
           type="text"
           placeholder="リンクテキストを入力（省略可）"
-          class="flex-1 rounded border border-border bg-surface px-2 py-1 text-sm text-text"
+          class="flex-1 rounded border border-border px-2 py-1 bg-surface text-sm text-text"
           @keydown.enter.prevent="applyLink"
           @keydown.esc.prevent="cancel"
         />
       </div>
     </div>
     <!-- アクションボタン -->
-    <div class="flex justify-end space-x-2 mt-3">
+    <div class="flex justify-end mt-3 space-x-2">
       <button 
         @click.stop.prevent="cancel"
         class="btn btn-secondary btn-sm"
@@ -507,7 +507,7 @@ defineExpose({
 /* フローティングリンクメニューのスタイル */
 .floating-link-menu {
   transition: all 0.2s ease-out;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px rgb(var(--color-background) / 0.15);
   backdrop-filter: blur(8px);
   touch-action: manipulation;
   user-select: none;
@@ -526,7 +526,7 @@ input, button {
 
 /* フォーカス時のスタイル */
 input:focus {
-  outline: 2px solid var(--color-primary-light, #4f46e5);
+  outline: 2px solid rgb(var(--color-primary-light));
   outline-offset: 1px;
 }
 
