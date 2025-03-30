@@ -1,78 +1,75 @@
-# 見えない障害ブログプラットフォーム（Juna）
+# Nuxt Minimal Starter
 
-## 概要
+Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
-「見えない障害ブログプラットフォーム」は、見た目からは分かりにくい障害を持つ方々が、自身の体験や知識、日常の思いを安心して発信できるオンラインスペースです。
+## Setup
 
-## 特徴
+Make sure to install dependencies:
 
-- **レスポンシブデザイン:** どのデバイスからでも快適に利用可能
-- **リッチテキストエディタ:** Tiptapを活用した直感的なブログ投稿体験
-- **画像アップロード機能:** ブログ記事に画像を簡単に添付可能
-- **ユーザー認証:** セキュアなサインアップとログイン機能
-- **コミュニティ機能:** 記事投稿、コメント
+```bash
+# npm
+npm install
 
-## 技術スタック
+# pnpm
+pnpm install
 
-- **フロントエンド:**
-  - Vue 3
-  - TypeScript
-  - Tailwind CSS
-  - Vue Router
-  - Pinia (状態管理)
-  - Tiptap (リッチテキストエディタ)
-- **バックエンド/サービス:**
-  - Supabase (認証、データベース、ストレージ)
+# yarn
+yarn install
 
-## インストールとセットアップ
+# bun
+bun install
+```
 
-### 必要条件
+## Development Server
 
-- Node.js v12以上
-- Git クライアント
-- npm
+Start the development server on `http://localhost:3000`:
 
-### インストール手順
+```bash
+# npm
+npm run dev
 
-1. **リポジトリのクローン**
-   ```bash
-   git clone https://github.com/yourusername/invisible-disabilities-blog.git
-   cd accessible-blog-app
-   ```
+# pnpm
+pnpm dev
 
-2. **依存関係のインストール**
-   ```bash
-   npm install
-   ```
+# yarn
+yarn dev
 
-3. **環境変数の設定**  
-   プロジェクトルートに `.env` ファイルを作成し、`.env.example` を参考に Supabase の認証情報などを設定してください。
+# bun
+bun run dev
+```
 
-4. **開発サーバーの起動**
-   ```bash
-   npm run dev
-   ```
-   ブラウザで `http://localhost:3000` （または設定に応じたポート番号）にアクセスして動作を確認してください。
+## Production
 
-5. **ビルド**
-   ```bash
-   npm run build
-   ```
+Build the application for production:
 
-## コントリビューション
+```bash
+# npm
+npm run build
 
-貢献は大歓迎です！  
-バグ修正、新機能の提案、ドキュメント改善など、どんな改善提案もプロジェクトの向上に役立ちます。  
-プルリクエストを送る前に、Issueを立てて変更内容についてディスカッションしていただけると助かります。
+# pnpm
+pnpm build
 
-## ライセンス
+# yarn
+yarn build
 
-このプロジェクトは [MITライセンス](LICENSE) の下で公開されています。詳細は LICENSE ファイルをご参照ください。
+# bun
+bun run build
+```
 
-## コンタクト
+Locally preview production build:
 
-ご意見やご質問、フィードバックがございましたら、GitHub の Issue、またはプロジェクトに記載のメールアドレスまでご連絡ください。
+```bash
+# npm
+npm run preview
 
----
+# pnpm
+pnpm preview
 
-このプラットフォームが、見えない障害を持つ方々にとって情報発信の新たな場となり、より豊かなコミュニティ形成につながることを願っています.
+# yarn
+yarn preview
+
+# bun
+bun run preview
+```
+
+Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

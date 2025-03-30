@@ -1,244 +1,147 @@
 /** @type {import('tailwindcss').Config} */
-export default {
-  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
-  darkMode: 'media',
+module.exports = {
+  content: [
+    "./components/**/*.{js,vue,ts}",
+    "./layouts/**/*.vue",
+    "./pages/**/*.vue",
+    "./plugins/**/*.{js,ts}",
+    "./app.vue",
+  ],
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Noto Sans JP"', 'sans-serif']
+        sans: ['Noto Sans JP', 'sans-serif'],
+        roboto: ['Roboto', 'sans-serif'],
       },
       colors: {
-        primary: 'rgb(var(--color-primary) / <alpha-value>)',
-        'primary-dark': 'rgb(var(--color-primary-dark) / <alpha-value>)',
-        'primary-light': 'rgb(var(--color-primary-light) / <alpha-value>)',
-        background: 'rgb(var(--color-background) / <alpha-value>)',
-        surface: 'rgb(var(--color-surface) / <alpha-value>)',
-        'surface-variant': 'rgb(var(--color-surface-variant) / <alpha-value>)',
-        'surface-accent': 'rgb(var(--color-surface-accent) / <alpha-value>)',
-        text: 'rgb(var(--color-text) / <alpha-value>)',
-        heading: 'rgb(var(--color-heading) / <alpha-value>)',
-        'text-muted': 'rgb(var(--color-text-muted) / <alpha-value>)',
-        'text-white': 'rgb(var(--color-text-white) / <alpha-value>)',
-        border: 'rgb(var(--color-border) / <alpha-value>)',
-        'border-light': 'rgb(var(--color-border-light) / <alpha-value>)',
-        secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
-        'secondary-light': 'rgb(var(--color-secondary-light) / <alpha-value>)',
-        error: 'rgb(var(--color-error) / <alpha-value>)',
-        'error-dark': 'rgb(var(--color-error-dark) / <alpha-value>)',
-        success: 'rgb(var(--color-success) / <alpha-value>)',
-        'success-dark': 'rgb(var(--color-success-dark) / <alpha-value>)',
-        warning: 'rgb(var(--color-warning) / <alpha-value>)',
-        info: 'rgb(var(--color-info) / <alpha-value>)',
-        accent1: 'rgb(var(--color-accent1) / <alpha-value>)',
-        accent2: 'rgb(var(--color-accent2) / <alpha-value>)',
-        accent3: 'rgb(var(--color-accent3) / <alpha-value>)',
-      }
-    }
+        primary: {
+          50: '#0f0a1f',  /* アクティブアイテムの背景、フォーカス状態の背景 */
+          100: '#1a1236', /* 選択された項目の背景、アラート背景 */
+          200: '#231a4f', /* ホバー状態の背景、アクティブなナビゲーション項目 */
+          300: '#2c2167', /* バッジ、タグの背景 */
+          400: '#352980', /* プログレスバー、アイコンの塗り */
+          500: '#3f3199', /* 主要ボタン、ブランドカラー、リンク色 */
+          600: '#4938b2', /* ホバー状態のボタン、アクティブなリンク */
+          700: '#5847cb', /* フォーカス状態のボタン、クリック状態 */
+          800: '#6b5de3', /* 特に強調したいテキスト、ヘッダーアクセント */
+          900: '#8678eb', /* 特殊な強調見出し */
+          950: '#a193f2', /* 最も暗いアクセント、フッターなど */
+        },
+        secondary: {
+          50: '#062029',  /* 補助的な区画の背景 */
+          100: '#0a2e3a', /* セカンダリボタンのホバー背景 */
+          200: '#0e3b4b', /* 特集記事のアクセント、シンプルなバッジ */
+          300: '#12495d', /* プロフィールのアクセント、トグルボタン */
+          400: '#17566e', /* アイコンの塗り、進捗表示 */
+          500: '#1b647f', /* セカンダリボタン、アバター枠線 */
+          600: '#1f7290', /* セカンダリボタンのホバー状態 */
+          700: '#2380a1', /* アクティブなセカンダリボタン */
+          800: '#2a8fb2', /* セカンダリ見出し */
+          900: '#35a3c7', /* 特別なセカンダリテキスト */
+          950: '#40b7dc', /* 最も暗いセカンダリ、特殊強調 */
+        },
+        gray: {
+          50: '#131419',  /* ページ背景、モーダル背景 */
+          100: '#1a1b21', /* カード背景、コンテナ背景 */
+          200: '#24252d', /* ボーダー、区切り線、分割線 */
+          300: '#2f3039', /* 非アクティブ要素、無効化された要素 */
+          400: '#4c4d5a', /* プレースホルダーテキスト、アイコン色 */
+          500: '#6a6c7b', /* キャプション、日時表示など弱いテキスト */
+          600: '#8c8e9f', /* 標準テキスト、本文 */
+          700: '#a9acba', /* 強調テキスト、コメント投稿者名 */
+          800: '#d0d2de', /* 記事タイトル、主見出し */
+          900: '#e8eaf3', /* ページタイトル、最も重要な見出し */
+          950: '#f8faff', /* 最も暗いテキスト、特別な強調 */
+        },
+        success: {
+          50: '#072714',  /* 成功メッセージの背景 */
+          100: '#0a361b', /* 成功バナーの背景、承認済み要素 */
+          300: '#16753c', /* 公開済みアイコン、認証マーク背景 */
+          500: '#27b45a', /* 主要成功メッセージ、公開ボタン */
+          700: '#4bd77d', /* 確定済み表示、成功テキスト */
+        },
+        warning: {
+          50: '#2d1c04',  /* 警告メッセージの背景 */
+          100: '#462c08', /* 警告バナーの背景、通知カード */
+          300: '#95600f', /* 警告アイコン、注意喚起バッジ */
+          500: '#cd8c16', /* 警告ボタン、下書き表示 */
+          700: '#f3a72d', /* 重要な警告テキスト */
+        },
+        error: {
+          50: '#260808',  /* エラーメッセージの背景 */
+          100: '#4a0f0f', /* エラーバナーの背景、問題のある項目のハイライト */
+          300: '#a11b1b', /* バリデーションエラーの境界線、削除確認アイコン */
+          500: '#d82a2a', /* エラーメッセージ、削除ボタン、必須フィールド表示 */
+          700: '#ef4d4d', /* 重大なエラーテキスト、アカウント削除ボタン */
+        },
+        info: {
+          50: '#041a31',  /* 情報メッセージの背景 */
+          100: '#082b52', /* 情報バナーの背景、ヒントボックス */
+          300: '#0c59a6', /* 情報アイコンの背景、通知バッジ */
+          500: '#1b80e5', /* 情報メッセージ、ヘルプボタン */
+          700: '#4da3fa', /* 重要な情報テキスト */
+        },
+      },
+    },
   },
   plugins: [
-    function({ addBase, addComponents }) {
+    require('@tailwindcss/forms'),
+    function({ addBase }) {
       addBase({
-        ':root': {
-          /* プライマリカラー - アプリのメインカラー（ティール/ターコイズ） */
-          '--color-primary': '56 189 170',
-          /* プライマリカラーの暗い色合い - ホバー状態などに使用 */
-          '--color-primary-dark': '25 150 135',
-          /* プライマリカラーの明るい色合い - 補助的な要素に使用 */
-          '--color-primary-light': '115 210 195',
-          /* 背景色 - アプリの基本背景色（プライマリーカラー寄りの深い青緑色） */
-          '--color-background': '18 35 40',
-          /* サーフェスカラー - カード、パネルなどの背景色（青緑味を加えた色） */
-          '--color-surface': '25 40 45',
-          /* サーフェスバリアントカラー - サーフェスの代替色（わずかに緑味を含む） */
-          '--color-surface-variant': '30 45 50',
-          /* サーフェスアクセントカラー - 強調されたサーフェス要素（よりティール寄り） */
-          '--color-surface-accent': '35 55 60',
-          /* テキストカラー - 標準テキストの色（青みがかった明るい色） */
-          '--color-text': '210 230 245',
-          /* 見出しカラー - 見出しテキストの色（より明確なクリーム色） */
-          '--color-heading': '255 245 225',
-          /* 控えめなテキストカラー - 二次的なテキスト情報（グレイッシュ） */
-          '--color-text-muted': '145 160 175',
-          /* 白テキストカラー - 暗い背景上のテキスト（純粋な白） */
-          '--color-text-white': '255 255 255',
-          /* ボーダーカラー - 標準的な境界線の色 */
-          '--color-border': '55 70 90',
-          /* 明るいボーダーカラー - より軽い境界線の色 */
-          '--color-border-light': '70 85 105',
-          /* セカンダリカラー - 二次的な要素の色（青みの強い色） */
-          '--color-secondary': '120 160 195',
-          /* 明るいセカンダリカラー - 明るい二次的要素 */
-          '--color-secondary-light': '185 205 225',
-          /* エラーカラー - エラーメッセージや警告表示に使用（赤） */
-          '--color-error': '245 95 90',
-          /* 暗いエラーカラー - エラーボタンやアクションに使用 */
-          '--color-error-dark': '220 60 50',
-          /* 成功カラー - 成功メッセージや確認表示に使用（緑） */
-          '--color-success': '75 210 115',
-          /* 暗い成功カラー - 成功ボタンやアクションに使用 */
-          '--color-success-dark': '35 180 80',
-          /* 警告カラー - 注意や警告の表示に使用（黄色） */
-          '--color-warning': '255 190 60',
-          /* 情報カラー - 情報メッセージに使用（青） */
-          '--color-info': '65 145 255',
-          /* アクセントカラー1 - 補足的な強調色1（パープル/ピンク系） */
-          '--color-accent1': '180 100 190',
-          /* アクセントカラー2 - 補足的な強調色2（オレンジ系） */
-          '--color-accent2': '255 145 90',
-          /* アクセントカラー3 - 補足的な強調色3（明るい青） */
-          '--color-accent3': '90 205 220',
+        'body': {
+          backgroundColor: '#131419', // gray-50に定義した色と同じ
+          color: '#8c8e9f', // gray-600に定義した色と同じ
+        },
+        // テキスト入力、テキストエリア
+        'input[type=text], input[type=email], input[type=password], input[type=number], input[type=search], input[type=tel], input[type=url], input[type=date], input[type=datetime-local], input[type=month], input[type=week], input[type=time], textarea': {
+          backgroundColor: '#24252d', // gray-200
+          borderColor: '#2f3039', // gray-300
+          color: '#d0d2de', // gray-800
+          '&::placeholder': {
+            color: '#4c4d5a', // gray-400
+          },
+          '&:focus': {
+            borderColor: '#3f3199', // primary-500
+            boxShadow: '0 0 0 2px rgba(63, 49, 153, 0.25)' // primary-500の半透明
+          }
+        },
+        // セレクトボックス
+        'select': {
+          backgroundColor: '#24252d', // gray-200
+          borderColor: '#2f3039', // gray-300
+          color: '#d0d2de', // gray-800
+          '&:focus': {
+            borderColor: '#3f3199', // primary-500
+            boxShadow: '0 0 0 2px rgba(63, 49, 153, 0.25)' // primary-500の半透明
+          }
+        },
+        // form-checkbox, form-radioクラスのスタイル（@tailwindcss/forms用）
+        '.form-checkbox, .form-radio, input[type=checkbox], input[type=radio]': {
+          backgroundColor: '#24252d', // gray-200
+          borderColor: '#2f3039', // gray-300
+          color: '#3f3199', // primary-500（チェック時の色）
+          '&:focus': {
+            outline: 'none',
+            boxShadow: '0 0 0 2px rgba(63, 49, 153, 0.25)' // primary-500の半透明
+          }
+        },
+        // 無効状態のフォーム要素
+        'input:disabled, select:disabled, textarea:disabled, button:disabled': {
+          backgroundColor: '#1a1b21', // gray-100
+          borderColor: '#24252d', // gray-200
+          color: '#4c4d5a', // gray-400
+          opacity: 0.7,
+          cursor: 'not-allowed'
+        },
+        // エラー状態のフォーム要素
+        '.error-input, .has-error': {
+          borderColor: '#d82a2a', // error-500
+          '&:focus': {
+            borderColor: '#d82a2a', // error-500
+            boxShadow: '0 0 0 2px rgba(216, 42, 42, 0.25)' // error-500の半透明
+          }
         }
-      });
-      
-      addComponents({
-        '.glass-card': {
-          '@apply rounded-lg border border-border-light/60 shadow p-3 bg-surface/80 backdrop-blur-md shadow-background/30': {},
-        },
-        
-        '.btn': {
-          '@apply rounded font-medium transition-all px-3 py-1.5 text-sm min-h-[44px] flex items-center justify-center gap-2': {},
-        },
-        
-        '.btn-primary': {
-          '@apply bg-primary/80 text-text-white shadow-primary-dark/20 border border-primary-dark/20 hover:bg-primary hover:shadow-lg hover:shadow-primary-dark/30 disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-        
-        '.btn-secondary': {
-          '@apply bg-secondary/70 text-text-white shadow-secondary/20 border border-secondary/20 hover:bg-secondary hover:shadow-lg hover:shadow-secondary/30 disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-
-        '.btn-error': {
-          '@apply bg-error/80 text-text-white shadow-error-dark/20 border border-error-dark/20 hover:bg-error hover:shadow-lg hover:shadow-error-dark/30 disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-
-        '.btn-success': {
-          '@apply bg-success/80 text-text-white shadow-success-dark/20 border border-success-dark/20 hover:bg-success hover:shadow-lg hover:shadow-success-dark/30 disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-
-        '.btn-warning': {
-          '@apply bg-warning/80 text-text-white shadow-warning/20 border border-warning/20 hover:bg-warning hover:shadow-lg hover:shadow-warning/30 disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-
-        '.btn-info': {
-          '@apply bg-info/80 text-text-white shadow-info/20 border border-info/20 hover:bg-info hover:shadow-lg hover:shadow-info/30 disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-
-        '.btn-accent1': {
-          '@apply bg-accent1/80 text-text-white shadow-accent1/20 border border-accent1/20 hover:bg-accent1 hover:shadow-lg hover:shadow-accent1/30 disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-
-        '.btn-accent2': {
-          '@apply bg-accent2/80 text-text-white shadow-accent2/20 border border-accent2/20 hover:bg-accent2 hover:shadow-lg hover:shadow-accent2/30 disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-
-        '.btn-accent3': {
-          '@apply bg-accent3/80 text-text-white shadow-accent3/20 border border-accent3/20 hover:bg-accent3 hover:shadow-lg hover:shadow-accent3/30 disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-        
-        '.btn-outline-primary': {
-          '@apply bg-transparent border border-primary/70 text-primary/90 hover:bg-primary/20 hover:border-primary hover:text-primary disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-        
-        '.btn-outline-secondary': {
-          '@apply bg-transparent border border-secondary/70 text-secondary/90 hover:bg-secondary/20 hover:border-secondary hover:text-secondary disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-
-        '.btn-outline-error': {
-          '@apply bg-transparent border border-error/70 text-error/90 hover:bg-error/20 hover:border-error hover:text-error disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-
-        '.btn-outline-success': {
-          '@apply bg-transparent border border-success/70 text-success/90 hover:bg-success/20 hover:border-success hover:text-success disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-
-        '.btn-outline-warning': {
-          '@apply bg-transparent border border-warning/70 text-warning/90 hover:bg-warning/20 hover:border-warning hover:text-warning disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-
-        '.btn-outline-info': {
-          '@apply bg-transparent border border-info/70 text-info/90 hover:bg-info/20 hover:border-info hover:text-info disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-        
-        '.btn-outline-accent1': {
-          '@apply bg-transparent border border-accent1/70 text-accent1/90 hover:bg-accent1/20 hover:border-accent1 hover:text-accent1 disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-        
-        '.btn-outline-accent2': {
-          '@apply bg-transparent border border-accent2/70 text-accent2/90 hover:bg-accent2/20 hover:border-accent2 hover:text-accent2 disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-        
-        '.btn-outline-accent3': {
-          '@apply bg-transparent border border-accent3/70 text-accent3/90 hover:bg-accent3/20 hover:border-accent3 hover:text-accent3 disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-        
-        '.btn-ghost': {
-          '@apply bg-transparent text-text-white hover:bg-primary/20 hover:text-text-white disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-        
-        '.btn-link': {
-          '@apply bg-transparent text-primary/90 hover:text-primary p-0 min-h-0 h-auto disabled:opacity-70 disabled:cursor-not-allowed': {},
-        },
-        
-        '.btn-sm': {
-          '@apply px-2 py-1 text-xs min-h-[32px]': {},
-        },
-        
-        '.btn-lg': {
-          '@apply px-4 py-2 text-base min-h-[52px]': {},
-        },
-        
-        '.btn-icon': {
-          '@apply p-2 aspect-square flex items-center justify-center': {},
-        },
-        
-        '.btn-icon-primary': {
-          '@apply btn-icon text-primary/90 hover:bg-primary/20 hover:text-primary rounded': {},
-        },
-        
-        '.btn-icon-secondary': {
-          '@apply btn-icon text-secondary/90 hover:bg-secondary/20 hover:text-secondary rounded': {},
-        },
-        
-        '.btn-icon-text': {
-          '@apply btn-icon text-text/90 hover:bg-surface-accent/40 hover:text-text rounded': {},
-        },
-        
-        '.btn-icon-error': {
-          '@apply btn-icon text-error/90 hover:bg-error/20 hover:text-error rounded': {},
-        },
-        
-        '.btn-icon-success': {
-          '@apply btn-icon text-success/90 hover:bg-success/20 hover:text-success rounded': {},
-        },
-        
-        '.btn-icon-warning': {
-          '@apply btn-icon text-warning/90 hover:bg-warning/20 hover:text-warning rounded': {},
-        },
-        
-        '.btn-icon-info': {
-          '@apply btn-icon text-info/90 hover:bg-info/20 hover:text-info rounded': {},
-        },
-        
-        '.btn-icon-sm': {
-          '@apply p-1.5 text-sm': {},
-        },
-        
-        '.btn-icon-lg': {
-          '@apply p-2.5 text-lg': {},
-        },
-        
-        '.btn-icon-accent1': {
-          '@apply btn-icon text-accent1/90 hover:bg-accent1/20 hover:text-accent1 rounded': {},
-        },
-        
-        '.btn-icon-accent2': {
-          '@apply btn-icon text-accent2/90 hover:bg-accent2/20 hover:text-accent2 rounded': {},
-        },
-        
-        '.btn-icon-accent3': {
-          '@apply btn-icon text-accent3/90 hover:bg-accent3/20 hover:text-accent3 rounded': {},
-        },
-      });
+      })
     }
-  ]
+  ],
 } 
