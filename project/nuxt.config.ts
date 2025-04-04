@@ -10,6 +10,13 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss'
   ],
   
+  // cookieモジュールの最適化設定を追加
+  vite: {
+    optimizeDeps: {
+      include: ['cookie']
+    }
+  },
+  
   // グローバルCSS
   css: ['~/assets/css/tiptap.css'],
   
