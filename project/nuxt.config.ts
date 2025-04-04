@@ -10,6 +10,13 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss'
   ],
   
+  // cookieモジュールの最適化設定を追加
+  vite: {
+    optimizeDeps: {
+      include: ['cookie']
+    }
+  },
+  
   // グローバルCSS
   css: ['~/assets/css/tiptap.css'],
   
@@ -68,7 +75,11 @@ export default defineNuxtConfig({
     // アイコンサイズのデフォルト設定
     size: '24px',
     // SVGのクラス名
-    class: 'icon'
+    class: 'icon',
+    // エイリアスの設定
+    aliases: {
+      'NuxtIcon': 'Icon'
+    }
   },
   
   // Supabase設定
