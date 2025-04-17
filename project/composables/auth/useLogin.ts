@@ -114,13 +114,15 @@ export const useLogin = () => {
       }
 
       // メールアドレスとパスワードで Supabase Auth にサインイン
-      if (!emailToLogin) { // emailToLoginがnullまたは空文字の場合のエラーハンドリング
+      if (!emailToLogin) {
         throw new Error('ログインに使用するメールアドレスを取得できませんでした。');
       }
+      console.log(`[useLogin] Attempting signInWithPassword for email: ${emailToLogin.substring(0, 3)}...`); // ログ追加
       const { data: signInData, error: signInError } = await $supabaseClient.auth.signInWithPassword({
         email: emailToLogin,
         password: credentials.password,
       });
+      console.log(`[useLogin] signInWithPassword completed. Error: ${signInError ? signInError.message : 'null'}`); // ログ追加
 
       if (signInError) {
         // console.error('Supabase signInWithPassword error:', signInError); // 形式変更

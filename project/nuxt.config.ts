@@ -68,18 +68,9 @@ export default defineNuxtConfig({
     }
   },
   
-  // Nuxt Icon設定
+  // Nuxt Icon設定 (公式ドキュメントに基づき修正)
   icon: {
-    // SVGモードを使用
-    mode: 'svg',
-    // アイコンサイズのデフォルト設定
-    size: '24px',
-    // SVGのクラス名
-    class: 'icon',
-    // エイリアスの設定
-    aliases: {
-      'NuxtIcon': 'Icon'
-    }
+    componentName: 'NuxtIcon'
   },
   
   // Supabase設定

@@ -8,17 +8,22 @@
       - plugins/supabase.server.ts
       - composables/auth/useRegister.ts
       - composables/auth/useLogin.ts
+      - server/api/profile/update.ts
+      - composables/profile/useProfile.ts
   types/index.ts:
     状態: 生成完了
     依存先相対パス: []
     依存元相対パス:
       - composables/auth/useRegister.ts
       - composables/auth/useLogin.ts
+      - server/api/profile/update.ts
+      - composables/profile/useProfile.ts
   依存先ユニット: []
   依存元ユニット:
     - ユーザー登録
     - ユーザーログイン
     - プラグイン # プラグインユニットも参照
+    - プロフィールAPI # 新しく追加
   状態: 生成完了
   ユニット生成順: 0 # 他より先に定義
 
@@ -28,17 +33,22 @@
     状態: 生成完了
     依存先相対パス:
       - types/database.ts
-    依存元相対パス: [] # 依存元は明示しない (Nuxtが自動ロード)
+      # Nuxt composable (useSupabaseUser) への機能的依存を追加
+    依存元相対パス: 
+      - layouts/default.vue # onAuthStateChange で user 状態を更新し、ヘッダーに影響
+      # 他、useSupabaseUser を利用する全てのコンポーネント/ページが間接的に依存
   plugins/supabase.server.ts:
     状態: 生成完了
     依存先相対パス:
       - types/database.ts
-    依存元相対パス: [] # 依存元は明示しない (Nuxtが自動ロード)
+    依存元相対パス:
+      - server/api/profile/update.ts # サーバーサイドでサービスロールキーを使用
   依存先ユニット:
     - 型定義
   依存元ユニット:
     - ユーザー登録 # composable経由で間接的に利用
     - ユーザーログイン # composable経由で間接的に利用
+    - プロフィールAPI # serverSupabaseServiceRoleを使用
   状態: 生成完了
   ユニット生成順: 0 # 型定義の後 (指示により 0 に変更)
 
@@ -175,3 +185,68 @@
     - レイアウト
   状態: 生成完了
   ユニット生成順: 5
+
+# 新しく追加したユニット
+プロフィールAPI:
+  server/api/profile/update.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - types/database.ts
+      - types/index.ts
+      - plugins/supabase.server.ts # serverSupabaseServiceRoleを使用
+    依存元相対パス:
+      - composables/profile/useProfile.ts
+  依存先ユニット:
+    - 型定義
+    - プラグイン
+  依存元ユニット:
+    - プロフィール表示・編集
+  状態: 生成完了
+  ユニット生成順: 5.5  # ログインの次、プロフィール表示・編集の前
+
+プロフィール表示・編集:
+  composables/profile/useProfile.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - types/database.ts
+      - types/index.ts
+      - server/api/profile/update.ts # APIエンドポイントを利用
+    依存元相対パス:
+      - pages/profile/index.vue
+      - pages/profile/edit.vue
+  pages/profile/index.vue:
+    状態: 生成完了
+    依存先相対パス:
+      - composables/profile/useProfile.ts
+      - layouts/default.vue
+    依存元相対パス:
+      - tests/profile/profile.spec.ts
+      - pages/profile/edit.vue # 編集ページからの戻り遷移
+  pages/profile/edit.vue:
+    状態: 生成完了
+    依存先相対パス:
+      - composables/profile/useProfile.ts
+      - types/index.ts # ProfileUpdatePayload を使用
+      - layouts/default.vue
+    依存元相対パス:
+      - tests/profile/profile.spec.ts
+      - pages/profile/index.vue # 編集リンクからの遷移
+  tests/profile/profile.spec.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - pages/profile/index.vue
+      - pages/profile/edit.vue
+      - pages/register.vue # beforeEach で登録するため
+      - pages/login.vue    # beforeEach でログインするため
+      - layouts/default.vue
+    依存元相対パス: []
+  依存先ユニット:
+    - レイアウト
+    - 型定義
+    - ユーザー登録 # テストの前提
+    - ユーザーログイン # テストの前提
+    - プロフィールAPI # updateProfile関数で使用
+    - プラグイン # composable経由
+  依存元ユニット: [] # 現状、他から直接依存されていない
+  状態: 生成完了
+  ユニット生成順: 6 # ログインの次

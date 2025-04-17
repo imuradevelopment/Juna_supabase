@@ -78,16 +78,29 @@ const { loginUser, loading } = useLogin();
 const handleLogin = async () => {
   loginError.value = null;
   validationErrors.value = {};
+  console.log('[handleLogin] Attempting login with:', identifier.value);
 
+  console.log('[handleLogin] Calling loginUser...');
   const result = await loginUser({
     identifier: identifier.value,
     password: password.value,
   });
+  console.log('[handleLogin] loginUser call finished.');
+
+  console.log('[handleLogin] loginUser result:', JSON.stringify(result));
 
   if (result.success) {
-    // ログイン成功時はホームページにリダイレクト
-    await navigateTo('/');
+    console.log('[handleLogin] Login successful. User ID:', result.data.userId);
+    console.log('[handleLogin] Navigating to / ...');
+    try {
+      await navigateTo('/');
+      console.log('[handleLogin] Navigation to / should have started.');
+    } catch (navError) {
+        console.error('[handleLogin] Navigation error:', navError);
+        loginError.value = 'ホームページへの遷移中にエラーが発生しました。';
+    }
   } else {
+    console.log('[handleLogin] Login failed. Error type:', result.error.type);
     switch (result.error.type) {
       case 'validation':
         validationErrors.value = result.error.errors;
@@ -100,11 +113,10 @@ const handleLogin = async () => {
         break;
       default:
         loginError.value = 'ログイン中に予期せぬエラーが発生しました。';
-        const unknownError = result.error as { error?: Error }; // 型アサーションで安全にアクセス
+        const unknownError = result.error as { error?: Error };
         console.error('未ハンドルのログインエラータイプ:', unknownError?.error?.stack || unknownError?.error || unknownError);
     }
   }
-  // エラーメッセージ表示のためにDOM更新を待つ
   await nextTick();
 };
 </script>

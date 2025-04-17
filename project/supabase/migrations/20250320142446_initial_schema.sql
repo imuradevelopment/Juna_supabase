@@ -137,7 +137,9 @@ CREATE POLICY "プロフィールは誰でも参照可能"
   ON profiles FOR SELECT USING (true);
 
 CREATE POLICY "ユーザーは自分のプロフィールのみ更新可能" 
-  ON profiles FOR UPDATE USING (auth.uid() = id);
+  ON profiles FOR UPDATE 
+  TO authenticated 
+  USING (auth.uid() = id);
 
 CREATE POLICY "認証済みユーザーのみプロフィール作成可能" 
   ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
@@ -169,6 +171,7 @@ CREATE POLICY "認証済みユーザーはカテゴリを作成可能"
 
 CREATE POLICY "作成者はカテゴリを更新可能" 
   ON categories FOR UPDATE 
+  TO authenticated
   USING (creator_id = auth.uid());
 
 CREATE POLICY "作成者はカテゴリを削除可能" 
@@ -213,7 +216,9 @@ CREATE POLICY "認証済みユーザーのみ投稿作成可能"
   ON posts FOR INSERT WITH CHECK (auth.uid() = author_id);
 
 CREATE POLICY "作者のみ投稿更新可能" 
-  ON posts FOR UPDATE USING (auth.uid() = author_id);
+  ON posts FOR UPDATE 
+  TO authenticated 
+  USING (auth.uid() = author_id);
 
 CREATE POLICY "作者のみ投稿削除可能" 
   ON posts FOR DELETE USING (auth.uid() = author_id);
@@ -262,7 +267,9 @@ CREATE POLICY "認証済みユーザーのみ投稿画像追加可能"
   ON post_images FOR INSERT WITH CHECK (auth.uid() = author_id);
 
 CREATE POLICY "作者のみ投稿画像更新可能" 
-  ON post_images FOR UPDATE USING (auth.uid() = author_id);
+  ON post_images FOR UPDATE 
+  TO authenticated
+  USING (auth.uid() = author_id);
 
 CREATE POLICY "作者のみ投稿画像削除可能" 
   ON post_images FOR DELETE USING (auth.uid() = author_id);
@@ -309,7 +316,9 @@ CREATE POLICY "認証済みユーザーのみコメント可能"
   );
 
 CREATE POLICY "自分のコメントのみ更新可能" 
-  ON comments FOR UPDATE USING (auth.uid() = author_id);
+  ON comments FOR UPDATE 
+  TO authenticated 
+  USING (auth.uid() = author_id);
 
 CREATE POLICY "自分のコメントのみ削除可能" 
   ON comments FOR DELETE USING (
