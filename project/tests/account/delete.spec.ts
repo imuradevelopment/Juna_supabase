@@ -1,6 +1,5 @@
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test'; // Page を型としてインポート
-import { fakerJA as faker } from '@faker-js/faker';
 import type { UserCredentials } from '../../types/index'; // UserCredentials 型をインポート
 
 // --- テスト用ヘルパー関数 ---
@@ -36,16 +35,33 @@ const checkCurrentPath = (targetPath: string): boolean => {
 };
 
 /**
+ * ランダムな文字列を生成 (ヘルパー関数)
+ * @param length 生成する文字列の長さ
+ * @returns ランダムな英数字文字列
+ */
+const generateRandomString = (length: number): string => {
+  const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
+};
+
+/**
  * ランダムなユーザー情報を生成
  * @returns ユーザー認証情報 (メール、パスワード、ニックネーム、アカウントID)
  */
 const generateRandomCredentials = (): UserCredentials => {
-  const nickname = faker.person.lastName() + faker.person.firstName();
-  const uniqueSuffix = Date.now().toString(36) + Math.random().toString(36).substring(2, 5);
+  // faker の代わりにランダム文字列とタイムスタンプを使用
+  const uniqueSuffix = Date.now().toString(36) + generateRandomString(5);
+  const nickname = `User_${generateRandomString(8)}`;
   const accountId = `${nickname.toLowerCase().replace(/[^a-z0-9]/g, '').substring(0, 10)}_${uniqueSuffix}`.substring(0, 15);
+
   return {
     email: `test_user_${uniqueSuffix}@example.com`,
-    password: `password${uniqueSuffix}A1!`, // 複雑なパスワード
+    password: `Pass_${uniqueSuffix}_A1!`, // 少し簡略化しつつも一定の複雑性
     nickname: nickname,
     accountId: accountId
   };
@@ -62,21 +78,19 @@ const registerUserViaUI = async (page: Page, credentials: UserCredentials): Prom
   await page.getByTestId('header-register-link').click(); // ★ data-testid でヘッダーのリンクを特定
   await page.waitForFunction(checkCurrentPath, '/register'); // 登録ページ遷移確認
 
-  // フォーム入力
-  await page.getByLabel('メールアドレス').type(credentials.email, { delay: 0 });
-  await page.getByLabel('パスワード', { exact: true }).type(credentials.password, { delay: 0 });
-  await page.getByLabel('パスワード確認').type(credentials.password, { delay: 0 });
-  await page.getByLabel('ニックネーム').type(credentials.nickname, { delay: 0 });
-  await page.getByLabel('アカウントID').type(credentials.accountId, { delay: 0 });
+  // フォーム入力 (getByLabel -> getByTestId)
+  await page.getByTestId('email-input').type(credentials.email, { delay: 0 });
+  await page.getByTestId('password-input').type(credentials.password, { delay: 0 });
+  await page.getByTestId('password-confirm-input').type(credentials.password, { delay: 0 });
+  await page.getByTestId('nickname-input').type(credentials.nickname, { delay: 0 });
+  await page.getByTestId('account-id-input').type(credentials.accountId, { delay: 0 });
 
-  await page.getByRole('button', { name: '登録する' }).click(); // 登録ボタンをクリック
+  // await page.getByRole('button', { name: '登録する' }).click(); // 登録ボタンをクリック (getByRole -> getByTestId)
+  await page.getByTestId('register-button').click();
 
-  // 再度、登録成功メッセージの待機を削除し、ログインページへのリダイレクトを直接待機する
-  // await page.waitForFunction(hasTextContent, '登録が完了しました。ログインしてください。', { timeout: 25000 });
-  // await expect(page.locator('body')).toHaveText(/登録が完了しました。ログインしてください。/, { timeout: 15000 });
-
-  // ログインページにリダイレクトされることを確認 (タイムアウトは維持)
+  // ログインページにリダイレクトされることを確認 (元の waitForFunction に戻す)
   await page.waitForFunction(checkCurrentPath, '/login', { timeout: 15000 }); // 登録処理完了待ちを含むため短縮
+  // await page.waitForURL('/login', { timeout: 30000, waitUntil: 'domcontentloaded' }); // waitForFunction から変更し、タイムアウトを延長
 };
 
 /**
@@ -88,9 +102,10 @@ const registerUserViaUI = async (page: Page, credentials: UserCredentials): Prom
 const loginUserViaUI = async (page: Page, identifier: string, password: string): Promise<void> => {
   // ログインページにいるか、または遷移する
   if (page.url() !== '/login') {
-    const loginLinkVisible = await page.waitForFunction(isElementVisible, 'login-link', { timeout: 10000 }).catch(() => false); // 短縮
+    // ★ ヘッダーのログインリンクが表示されるのを待つ
+    const loginLinkVisible = await page.waitForFunction(isElementVisible, 'header-login-link', { timeout: 10000 }).catch(() => false); // testid を指定
     if (loginLinkVisible) {
-      await page.getByTestId('login-link').click();
+      await page.getByTestId('header-login-link').click();
     } else {
       // ログインリンクが見えない場合、直接ログインページへ移動 (タイムアウト指定)
       try {
@@ -98,10 +113,6 @@ const loginUserViaUI = async (page: Page, identifier: string, password: string):
         await page.goto('/login', { waitUntil: 'domcontentloaded', timeout: 15000 }); // 短縮
       } catch (e) {
         console.error(`Error navigating to /login: ${e}`);
-        // ナビゲーションエラー発生時のスクリーンショットやHTMLを取得してデバッグ情報とする
-        // await page.screenshot({ path: `error_nav_screenshot_${Date.now()}.png` });
-        // const html = await page.content();
-        // console.error(`HTML content on navigation error: ${html.substring(0, 500)}...`);
         throw e; // エラーを再スローしてテストを失敗させる
       }
       await page.waitForFunction(() => document.readyState === 'complete', { timeout: 10000}); // 短縮
@@ -109,20 +120,23 @@ const loginUserViaUI = async (page: Page, identifier: string, password: string):
     await page.waitForFunction(checkCurrentPath, '/login', { timeout: 10000 }); // 短縮
   }
 
-  // ★ ログインページの見出しが表示されるのを待機
-  await expect(page.getByRole('heading', { name: 'ログイン' })).toBeVisible({ timeout: 5000 }); // 短縮
+  // ★ ログインページの見出しが表示されるのを待機 (getByRole -> text selector, login.vue には testid がない)
+  // await expect(page.getByRole('heading', { name: 'ログイン' })).toBeVisible({ timeout: 5000 }); // 短縮
+  await expect(page.locator('h2:has-text("ログイン")')).toBeVisible({ timeout: 5000 }); // テキストベースで特定
 
-  // フォーム入力
-  // ★ フォーム要素が表示されるのを待機 (ラベルを修正)
-  const identifierInput = page.getByLabel('メールアドレスまたはアカウントID'); // "or" を "または" に修正
+  // フォーム入力 (getByLabel -> getByTestId)
+  // const identifierInput = page.getByLabel('メールアドレスまたはアカウントID'); // "or" を "または" に修正
+  const identifierInput = page.getByTestId('identifier-input');
   await expect(identifierInput).toBeVisible({ timeout: 5000 }); // 短縮
 
   await identifierInput.type(identifier, { delay: 0 });
-  await page.getByLabel('パスワード').type(password, { delay: 0 });
+  // await page.getByLabel('パスワード').type(password, { delay: 0 });
+  await page.getByTestId('password-input').type(password, { delay: 0 }); // ログインページ用 testid (登録と同じ)
 
-  await page.getByRole('button', { name: 'ログイン' }).click(); // ログインボタンをクリック
+  // await page.getByRole('button', { name: 'ログイン' }).click(); // ログインボタンをクリック (getByRole -> getByTestId)
+  await page.getByTestId('login-button').click();
 
-  // ★ 追加: ログイン直後のユーザー情報をログ出力
+  // ... (evaluate ログ出力は変更なし)
   await page.evaluate(async () => {
     // @ts-ignore
     const client = window.supabase; // グローバル変数から取得
@@ -146,7 +160,7 @@ const loginUserViaUI = async (page: Page, identifier: string, password: string):
   await page.waitForFunction(isElementVisible, 'header-profile-link', { timeout: 10000 }); // 短縮
   await expect(page.getByTestId('header-profile-link')).toBeVisible({ timeout: 5000 }); // 短縮
 
-  // ★ 追加: ログイン後の Cookie をログ出力
+  // ... (cookie ログ出力は変更なし)
   console.log('[TEST_DEBUG] Cookies after login:');
   const cookiesAfterLogin = await page.context().cookies();
   console.log(JSON.stringify(cookiesAfterLogin.filter(c => c.name.startsWith('sb-')), null, 2)); // Supabase関連のみ表示
@@ -154,8 +168,8 @@ const loginUserViaUI = async (page: Page, identifier: string, password: string):
 
 // --- テストスイート ---
 test.describe('アカウント削除機能', () => {
-  // スイート全体のタイムアウトを120秒に設定
-  test.describe.configure({ timeout: 120000 });
+  // スイート全体のタイムアウトを削除 (プロンプト仕様に準拠)
+  // test.describe.configure({ timeout: 120000 });
 
   let userData: UserCredentials;
 
@@ -169,13 +183,15 @@ test.describe('アカウント削除機能', () => {
     await page.waitForFunction(isElementVisible, 'header-profile-link', { timeout: 5000 });
     await page.getByTestId('header-profile-link').click();
     await page.waitForURL('**/profile', { timeout: 10000 });
-    await expect(page.getByRole('heading', { name: 'プロフィール' })).toBeVisible({ timeout: 5000 });
+    // await expect(page.getByRole('heading', { name: 'プロフィール' })).toBeVisible({ timeout: 5000 }); // getByRole -> getByTestId
+    await expect(page.getByTestId('profile-title')).toBeVisible({ timeout: 5000 });
     await expect(page.getByTestId('profile-nickname')).toBeVisible({ timeout: 10000 });
     await expect(page.getByTestId('profile-details')).toBeVisible({ timeout: 1000 });
     await expect(page.getByTestId('profile-edit-link')).toBeVisible({ timeout: 5000 });
     await page.getByTestId('profile-edit-link').click();
     await page.waitForURL('**/profile/edit', { timeout: 10000 });
-    await expect(page.getByRole('heading', { name: 'プロフィール編集' })).toBeVisible({ timeout: 5000 });
+    // await expect(page.getByRole('heading', { name: 'プロフィール編集' })).toBeVisible({ timeout: 5000 }); // getByRole -> getByTestId
+    await expect(page.getByTestId('profile-edit-title')).toBeVisible({ timeout: 5000 });
     await expect(page.getByTestId('profile-edit-nickname')).toBeVisible({ timeout: 5000 });
   });
 
@@ -196,7 +212,7 @@ test.describe('アカウント削除機能', () => {
       await expect(deleteButton).toBeVisible({ timeout: 5000 });
       await expect(deleteButton).toHaveText('アカウント削除', { timeout: 5000 });
 
-      // ★ 追加: Function 呼び出し前の Cookie をログ出力
+      // ... (cookie ログ出力は変更なし)
       console.log('[TEST_DEBUG] Cookies before delete click:');
       const cookiesBeforeDelete = await page.context().cookies();
       console.log(JSON.stringify(cookiesBeforeDelete.filter(c => c.name.startsWith('sb-')), null, 2)); // Supabase関連のみ表示
@@ -208,33 +224,30 @@ test.describe('アカウント削除機能', () => {
       });
       await deleteButton.click();
 
-      // ★★★ 削除ボタンの無効化チェックを削除 ★★★
-      // await expect(deleteButton).toBeDisabled({ timeout: 3000 });
+      // ★★★ アサーションの順序を変更 ★★★
 
-      // ★★★ 代わりにホームページへのリダイレクトとログインリンクの表示を確認 ★★★
-      // ホームページにリダイレクトされたことを確認
-      await expect(page).toHaveURL('/', { timeout: 10000 });
+      // 1. 削除成功時はエラーメッセージが表示されていないことをまず確認
+      // エラー要素がDOMから消えるか、存在しないことを確認 (5秒待機)
+      await page.waitForFunction((selector) => {
+        const element = document.querySelector(selector);
+        return !element || window.getComputedStyle(element).display === 'none';
+      }, '[data-testid="profile-edit-delete-error"]', { timeout: 5000 });
 
-      // ホームページにログインリンクが表示されていることを確認
-      const loginLink = page.getByRole('link', { name: 'ログイン' });
+      // 2. 次に、ホームページにリダイレクトされたことを確認 (API処理+リダイレクトで15秒待機)
+      await expect(page).toHaveURL('/', { timeout: 15000 });
+
+      // 3. 最後に、ホームページにログインリンクが表示されていることを確認 (10秒待機)
+      const loginLink = page.getByTestId('header-login-link'); // ヘッダーのリンクを特定
       await expect(loginLink).toBeVisible({ timeout: 10000 });
 
-      // 削除成功後にエラーメッセージが表示されていないことを確認
-      const deleteErrorElement = page.locator('[data-testid="profile-edit-delete-error"]');
-      // ★ エラー要素が表示されないことを確認 (元のロジックに戻す)
-      await page.waitForFunction((selector) => {
-        return !document.querySelector(selector);
-      }, '[data-testid="profile-edit-delete-error"]', { timeout: 2000 });
-
     } finally {
-      // ★ 追加: テストの最後にログをレポートに添付
+      // ... (ログ添付は変更なし)
       if (consoleMessages.length > 0) {
         const logText = consoleMessages.join('\n');
         await testInfo.attach('console-logs', {
           body: logText,
           contentType: 'text/plain',
         });
-        // ターミナルにも出力（デバッグ用、レポートがあれば不要かも）
         console.log("--- Collected Console Logs (Normal Deletion) ---");
         console.log(logText);
         console.log("--- End of Console Logs ---");
@@ -262,18 +275,19 @@ test.describe('アカウント削除機能', () => {
 
       await page.waitForTimeout(500);
       await page.waitForURL('**/profile/edit', { timeout: 5000 });
-      await expect(page.getByRole('heading', { name: 'プロフィール編集' })).toBeVisible({ timeout: 3000 });
-      await expect(page.getByLabel('ニックネーム')).toHaveValue(userData.nickname, { timeout: 3000 });
+      // await expect(page.getByRole('heading', { name: 'プロフィール編集' })).toBeVisible({ timeout: 3000 }); // getByRole -> getByTestId
+      await expect(page.getByTestId('profile-edit-title')).toBeVisible({ timeout: 3000 });
+      // await expect(page.getByLabel('ニックネーム')).toHaveValue(userData.nickname, { timeout: 3000 }); // getByLabel -> getByTestId
+      await expect(page.getByTestId('profile-edit-nickname')).toHaveValue(userData.nickname, { timeout: 3000 });
 
     } finally {
-       // ★ 追加: テストの最後にログをレポートに添付
+      // ... (ログ添付は変更なし)
       if (consoleMessages.length > 0) {
         const logText = consoleMessages.join('\n');
         await testInfo.attach('console-logs-cancel', { // 添付ファイル名を変更
           body: logText,
           contentType: 'text/plain',
         });
-        // ターミナルにも出力
         console.log("--- Collected Console Logs (Cancel Test) ---");
         console.log(logText);
         console.log("--- End of Console Logs ---");

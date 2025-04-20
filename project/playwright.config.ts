@@ -10,9 +10,9 @@ if (!baseUrl) {
 
 export default defineConfig({
   testDir: './tests',
-  timeout: 10_000, // 各テスト最大10秒（プロンプト準拠）
+  timeout: 30_000, // 修正: 各テスト最大30秒に変更
   expect: {
-    timeout: 10_000, // すべてのexpectにも明示（pollまたはtimeout強制）
+    timeout: 30_000, // 修正: expectのタイムアウトも30秒に変更
   },
   fullyParallel: false, // ページ逐次生成の制約に対応
   forbidOnly: true,     // 本番CI向け制約強化

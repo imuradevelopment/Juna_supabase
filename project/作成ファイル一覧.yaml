@@ -4,53 +4,61 @@
     状態: 生成完了
     依存先相対パス: []
     依存元相対パス:
-      - plugins/supabase.client.ts
-      - plugins/supabase.server.ts
+      - server/api/profile/update.post.ts
+      - composables/profile/useProfile.ts
       - composables/auth/useRegister.ts
       - composables/auth/useLogin.ts
-      - server/api/profile/update.ts
-      - composables/profile/useProfile.ts
+      - composables/account/useAccount.ts
+      - composables/useSupabaseClient.ts
+      - server/utils/supabaseServiceRole.ts
   types/index.ts:
     状態: 生成完了
     依存先相対パス: []
     依存元相対パス:
+      - server/api/profile/update.post.ts
+      - composables/profile/useProfile.ts
       - composables/auth/useRegister.ts
       - composables/auth/useLogin.ts
-      - server/api/profile/update.ts
-      - composables/profile/useProfile.ts
+      - composables/auth/useAccountUtils.ts
+      - composables/account/useAccount.ts
+      - pages/profile/edit.vue # ProfileUpdatePayload
+      - composables/account/useAccount.ts
   依存先ユニット: []
   依存元ユニット:
+    - プロフィールAPI
+    - プロフィール表示・編集
+
     - ユーザー登録
     - ユーザーログイン
-    - プラグイン # プラグインユニットも参照
-    - プロフィールAPI # 新しく追加
+    - アカウント削除
   状態: 生成完了
-  ユニット生成順: 0 # 他より先に定義
+  ユニット生成順: 0
 
-# プラグインユニット (型定義に依存)
+# --- ここから挿入 ---
 プラグイン:
-  plugins/supabase.client.ts:
+  plugins/supabase.ts:
     状態: 生成完了
-    依存先相対パス:
-      - types/database.ts
-      # Nuxt composable (useSupabaseUser) への機能的依存を追加
-    依存元相対パス: 
-      - layouts/default.vue # onAuthStateChange で user 状態を更新し、ヘッダーに影響
-      # 他、useSupabaseUser を利用する全てのコンポーネント/ページが間接的に依存
-  plugins/supabase.server.ts:
-    状態: 生成完了
-    依存先相対パス:
-      - types/database.ts
+    依存先相対パス: []
     依存元相対パス:
-      - server/api/profile/update.ts # サーバーサイドでサービスロールキーを使用
-  依存先ユニット:
-    - 型定義
+      - composables/profile/useProfile.ts
+      - composables/auth/useRegister.ts
+      - composables/auth/useLogin.ts
+      - composables/auth/useAccountUtils.ts
+      - composables/account/useAccount.ts
+      - composables/useSupabaseClient.ts
+      - tests/auth/register.spec.ts
+      - tests/auth/login.spec.ts
+      - tests/profile/edit.spec.ts
+      - tests/account/delete.spec.ts
+      - layouts/default.vue
+  依存先ユニット: []
   依存元ユニット:
-    - ユーザー登録 # composable経由で間接的に利用
-    - ユーザーログイン # composable経由で間接的に利用
-    - プロフィールAPI # serverSupabaseServiceRoleを使用
+    - プロフィール表示・編集
+    - ユーザー登録
+    - ユーザーログイン
+    - アカウント削除
   状態: 生成完了
-  ユニット生成順: 0 # 型定義の後 (指示により 0 に変更)
+  ユニット生成順: 0.5
 
 アプリケーション:
   app.vue:
@@ -68,19 +76,24 @@
   layouts/default.vue:
     状態: 生成完了
     依存先相対パス:
-      - pages/register.vue
-      - pages/login.vue
+      - pages/register.vue # Navigational
+      - pages/login.vue # Navigational
+      - composables/useSupabaseUser.ts
     依存元相対パス:
       - app.vue
       - tests/index.spec.ts
       - tests/auth/login.spec.ts
       - tests/auth/register.spec.ts
+      - tests/profile/profile.spec.ts
+      - tests/account/delete.spec.ts
   依存先ユニット: []
   依存元ユニット:
     - アプリケーション
     - ホームページ
     - ユーザー登録
     - ユーザーログイン
+    - プロフィール表示・編集
+    - アカウント削除
   状態: 生成完了
   ユニット生成順: 2
 
@@ -108,35 +121,43 @@
     依存先相対パス:
       - pages/register.vue
       - layouts/default.vue
-      - supabase/functions/register-user/register-user-function.ts # 機能的依存: setupDuplicateData で fetch 経由で呼び出し
+      - supabase/functions/register-user/register-user-function.ts # 機能依存: ユーザー登録関数
     依存元相対パス: []
   composables/auth/useRegister.ts:
     状態: 生成完了
     依存先相対パス:
-      - types/database.ts
       - types/index.ts
-      - supabase/functions/register-user/register-user-function.ts # 機能的依存: invoke で呼び出し
+      - supabase/functions/register-user/register-user-function.ts # 機能依存: ユーザー登録関数呼び出し
+      - composables/useSupabaseClient.ts
     依存元相対パス:
       - pages/register.vue
   pages/register.vue:
     状態: 生成完了
     依存先相対パス:
       - composables/auth/useRegister.ts
+      - layouts/default.vue
     依存元相対パス:
       - tests/auth/register.spec.ts
       - layouts/default.vue
+      - tests/auth/login.spec.ts # beforeEach
+      - tests/profile/profile.spec.ts # beforeEach
+      - tests/account/delete.spec.ts # beforeEach
   supabase/functions/register-user/register-user-function.ts:
     状態: 生成完了
     依存先相対パス: []
     依存元相対パス:
       - composables/auth/useRegister.ts
+      - tests/auth/register.spec.ts
+      - tests/auth/login.spec.ts
   依存先ユニット:
     - レイアウト
     - 型定義
-    - プラグイン # composable経由
+
   依存元ユニット:
     - レイアウト
-    - ユーザーログイン # loginテストのbeforeEachで利用するため
+    - ユーザーログイン
+    - プロフィール表示・編集
+    - アカウント削除
   状態: 生成完了
   ユニット生成順: 4
 
@@ -145,64 +166,58 @@
     状態: 生成完了
     依存先相対パス:
       - composables/auth/useLogin.ts
+      - layouts/default.vue
+      - composables/useSupabaseUser.ts
     依存元相対パス:
       - tests/auth/login.spec.ts
       - layouts/default.vue
+      - tests/profile/profile.spec.ts # beforeEach
+      - tests/account/delete.spec.ts # beforeEach
   composables/auth/useLogin.ts:
     状態: 生成完了
     依存先相対パス:
-      - types/database.ts
       - types/index.ts
       - composables/auth/useAccountUtils.ts
+      - composables/useSupabaseClient.ts
     依存元相対パス:
       - pages/login.vue
-  composables/auth/useAccountUtils.ts:
-    状態: 生成完了
-    依存先相対パス:
-      - types/index.ts
-      - supabase/functions/login-with-account/login-with-account-function.ts
-    依存元相対パス:
-      - composables/auth/useLogin.ts
+      - supabase/functions/register-user/register-user-function.ts # 機能依存: テスト前処理用ユーザー登録
   tests/auth/login.spec.ts:
     状態: 生成完了
     依存先相対パス:
       - pages/login.vue
+      - pages/register.vue # beforeEach で利用
       - layouts/default.vue
-      - pages/register.vue # beforeEach で登録処理を行うため
-      - supabase/functions/register-user/register-user-function.ts # 機能的依存: beforeEach の登録処理で間接的に利用
+      - supabase/functions/register-user/register-user-function.ts # beforeEach で利用
     依存元相対パス: []
-  supabase/functions/login-with-account/login-with-account-function.ts:
-    状態: 生成完了
-    依存先相対パス: []
-    依存元相対パス:
-      - composables/auth/useAccountUtils.ts
   依存先ユニット:
     - レイアウト
     - 型定義
-    - ユーザー登録 # beforeEach で登録するため
-    - プラグイン # composable経由
+    - ユーザー登録
+
   依存元ユニット:
     - レイアウト
+    - プロフィール表示・編集
+    - アカウント削除
   状態: 生成完了
   ユニット生成順: 5
 
-# 新しく追加したユニット
 プロフィールAPI:
-  server/api/profile/update.ts:
+  server/api/profile/update.post.ts:
     状態: 生成完了
     依存先相対パス:
       - types/database.ts
       - types/index.ts
-      - plugins/supabase.server.ts # serverSupabaseServiceRoleを使用
+      - server/utils/supabaseServiceRole.ts
     依存元相対パス:
       - composables/profile/useProfile.ts
   依存先ユニット:
     - 型定義
-    - プラグイン
+
   依存元ユニット:
     - プロフィール表示・編集
   状態: 生成完了
-  ユニット生成順: 5.5  # ログインの次、プロフィール表示・編集の前
+  ユニット生成順: 5.5
 
 プロフィール表示・編集:
   composables/profile/useProfile.ts:
@@ -210,7 +225,8 @@
     依存先相対パス:
       - types/database.ts
       - types/index.ts
-      - server/api/profile/update.ts # APIエンドポイントを利用
+      - composables/useSupabaseClient.ts
+      - composables/useSupabaseUser.ts
     依存元相対パス:
       - pages/profile/index.vue
       - pages/profile/edit.vue
@@ -219,82 +235,124 @@
     依存先相対パス:
       - composables/profile/useProfile.ts
       - layouts/default.vue
+      - pages/profile/edit.vue # Navigational
+      - composables/useSupabaseUser.ts
     依存元相対パス:
       - tests/profile/profile.spec.ts
-      - pages/profile/edit.vue # 編集ページからの戻り遷移
+      - pages/profile/edit.vue # Navigational
   pages/profile/edit.vue:
     状態: 生成完了
     依存先相対パス:
       - composables/profile/useProfile.ts
-      - types/index.ts # ProfileUpdatePayload を使用
+      - types/index.ts
       - layouts/default.vue
+      - composables/account/useAccount.ts
+      - composables/useSupabaseClient.ts
+      - composables/useSupabaseUser.ts
+      - pages/profile/index.vue # Navigational
     依存元相対パス:
       - tests/profile/profile.spec.ts
-      - pages/profile/index.vue # 編集リンクからの遷移
+      - pages/profile/index.vue
   tests/profile/profile.spec.ts:
     状態: 生成完了
     依存先相対パス:
       - pages/profile/index.vue
       - pages/profile/edit.vue
-      - pages/register.vue # beforeEach で登録するため
-      - pages/login.vue    # beforeEach でログインするため
+      - pages/register.vue # beforeEach
+      - pages/login.vue # beforeEach
       - layouts/default.vue
-    依存元相対パス: []
-  依存先ユニット:
-    - レイアウト
-    - 型定義
-    - ユーザー登録 # テストの前提
-    - ユーザーログイン # テストの前提
-    - プロフィールAPI # updateProfile関数で使用
-    - プラグイン # composable経由
-  依存元ユニット: [] # 現状、他から直接依存されていない
-  状態: 生成完了
-  ユニット生成順: 6 # ログインの次
-
-# 新しく追加: 認証基盤ユニット (標準 supabase-js を利用)
-認証基盤:
-  composables/useSupabaseAuth.ts:
-    状態: 生成完了 # ファイルは作成したが、テストはまだ -> 生成完了
-    依存先相対パス: [] # supabase-js ライブラリには依存するが、プロジェクト内ファイルには依存しない
+      - composables/useSupabaseClient.ts
     依存元相対パス:
-      - composables/account/useDeleteAccount.ts # まずはアカウント削除から利用
+      - composables/account/useAccount.ts
       # 他の認証関連 Composable (useRegister, useLogin) も将来的に依存する可能性
-  依存先ユニット: [] # Nuxt の useRuntimeConfig や supabase-js に依存
-  依存元ユニット:
-    - アカウント削除 # まずはアカウント削除から利用
-    # 他の認証関連ユニットも将来的に依存
-  状態: 生成完了 # 生成中 -> 生成完了
-  ユニット生成順: 1 # プラグインの後、他の機能ユニットの前あたりに配置
-
-# 新しく追加: アカウント削除ユニット (プロフィール機能群の CRUD 完了のため)
-アカウント削除:
-  composables/account/useDeleteAccount.ts:
-    状態: 生成完了 # ファイルは修正したが、テストはまだ -> 生成完了
+  composables/useSupabaseClient.ts:
+    状態: 生成完了
     依存先相対パス:
-      - types/index.ts # Error Handling用
-      - supabase/functions/delete-user/delete-user-function.ts # 機能的依存: invoke で呼び出し
-      - composables/useSupabaseAuth.ts # ★ 依存先に追加
+      - types/database.ts
+      # - types/index.ts # 削除: プラグインから取得するため不要に
+      # - server/utils/supabaseServiceRole.ts # 削除: クライアント作成ロジックがないため不要に
     依存元相対パス:
-      - pages/profile/edit.vue # 削除ボタンから呼び出す想定
-  tests/account/delete.spec.ts:
-    状態: 生成完了 # 未生成 -> 生成完了
+      - composables/useSupabaseUser.ts
+      - composables/auth/useRegister.ts
+      - composables/auth/useLogin.ts
+      - composables/profile/useProfile.ts
+      - composables/account/useAccount.ts
+      - pages/auth/confirm.vue
+  composables/useSupabaseUser.ts:
+    状態: 生成完了
     依存先相対パス:
-      - pages/profile/edit.vue # 削除ボタンを含むページ
-      - pages/register.vue     # テスト前のユーザー登録用
-      - pages/login.vue        # テスト前のログイン用
-      - layouts/default.vue
-    依存元相対パス: []
-  supabase/functions/delete-user/delete-user-function.ts: # ★ Edge Function をユニットに追加
+      # - plugins/supabase.ts # 削除
+    依存元相対パス:
+      - pages/profile/edit.vue
+      - pages/profile/index.vue
+      - layouts/default.vue # 追加: レイアウトでも利用
+  server/utils/supabaseServerClient.ts:
     状態: 生成完了
     依存先相対パス: []
     依存元相対パス:
-      - composables/account/useDeleteAccount.ts
+      - server/api/profile/update.post.ts
+      - server/api/account.delete.ts
+  server/utils/supabaseServiceRole.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - types/database.ts
+    依存元相対パス:
+      - server/api/profile/update.post.ts
+      - server/api/account.delete.ts
   依存先ユニット:
     - 型定義
-    - 認証基盤 # ★ 依存先をプラグインから認証基盤に変更
-    - ユーザー登録 # テストの前提
-    - ユーザーログイン # テストの前提
-    - プロフィール表示・編集 # 削除UIの配置先ページ
-  依存元ユニット: [] # 他から直接依存されることは少ない想定
-  状態: 生成完了 # 未生成 -> 生成完了
-  ユニット生成順: 7 # プロフィール表示・編集の後
+    - プラグイン # 追加
+
+    - ユーザー登録
+    - ユーザーログイン
+    - プロフィールAPI
+    - プロフィール表示・編集
+    - アカウント削除
+    - レイアウト
+  状態: 生成完了
+  ユニット生成順: 6
+
+アカウント削除:
+  composables/account/useAccount.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - types/index.ts
+      - server/api/account.delete.ts # 機能依存: アカウント削除APIエンドポイント
+      - composables/useSupabaseClient.ts
+      - composables/useSupabaseUser.ts
+    依存元相対パス:
+      - pages/profile/edit.vue
+  tests/account/delete.spec.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - pages/profile/edit.vue
+      - pages/register.vue
+      - pages/login.vue
+      - layouts/default.vue
+  依存先ユニット:
+    - 型定義
+    # - プラグイン # 削除
+
+    - ユーザー登録
+    - ユーザーログイン
+    - プロフィール表示・編集
+    - アカウント削除API
+  依存元ユニット: []
+  状態: 生成完了
+  ユニット生成順: 7
+
+アカウント削除API:
+  server/api/account.delete.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - server/utils/supabaseServerClient.ts
+      - supabase/functions/delete-user/delete-user-function.ts
+    依存元相対パス:
+      - composables/account/useAccount.ts
+  依存先ユニット:
+
+    - supabase/functions/delete-user
+  依存元ユニット:
+    - アカウント削除
+  状態: 生成完了
+  ユニット生成順: 6.5

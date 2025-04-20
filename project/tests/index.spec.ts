@@ -1,82 +1,119 @@
+// tests/index.spec.ts
+// ホームページ (/) の表示と基本的なナビゲーションをテストする。
+
 import { test, expect } from '@playwright/test';
 
+// テストスイート: ホームページ
 test.describe('ホームページ', () => {
-  const baseURL = 'http://localhost:3000'; // ベースURLを定義
+  // テストで使用するベースURL
+  const baseURL = 'http://localhost:3000';
 
-  test.beforeEach(async ({ page }) => {
-    // コンソールログのリスナー
-    // page.on('console', msg => console.log(`BROWSER CONSOLE: ${msg.type()} ${msg.text()}`));
-    // ホームページに移動
+  // 各テストの前に実行されるフック
+  test.beforeEach(async ({ page }) => { // 各テスト実行前にページ初期化
+    // テスト対象のホームページ (ルートパス '/') にアクセス
+    // 注意: page.goto はプロンプト仕様により原則禁止だが、初期パス '/' のみ許可
     await page.goto('/');
-    // ページが完全にロードされるまで待機 (仕様に合わせて修正)
+
+    // ページが完全に読み込まれるのを待つ (プロンプト仕様: document.readyState)
+    // これにより、DOMの準備が完了し、インタラクションが可能になることを保証する
     await page.waitForFunction(() => document.readyState === 'complete');
   });
 
-  test('ページタイトルが表示されること', async ({ page }) => {
-    // Assert: ページタイトルを確認 (静的要素のため timeout 不要)
-    await expect(page).toHaveTitle('ホームページ');
+  // テストケース: ページタイトルが表示されること
+  test('ページタイトルが表示されること', async ({ page }) => { // タイトル確認テスト
+    // ブラウザコンソールログを出力 (仕様に準拠して有効化)
+    page.on('console', msg => console.log(`BROWSER LOG (${test.info().title} - ${msg.type()}): ${msg.text()}`));
+    // アサーション: ページのタイトルが期待通り 'ホーム' であることを確認
+    // 静的要素なので timeout は指定しない
+    await expect(page).toHaveTitle('ホーム');
   });
 
-  // レイアウト確認テストを追加
-  test('デフォルトレイアウトが表示されること', async ({ page }) => {
-    // Assert: ヘッダー、メインコンテンツ、フッターが data-testid で特定でき、表示されていることを確認 (静的要素のため timeout 不要)
+  // テストケース: デフォルトレイアウトが表示されること
+  test('デフォルトレイアウトが表示されること', async ({ page }) => { // レイアウト表示確認テスト
+    // ブラウザコンソールログを出力 (仕様に準拠して有効化)
+    page.on('console', msg => console.log(`BROWSER LOG (${test.info().title} - ${msg.type()}): ${msg.text()}`));
+    // アサーション: レイアウトの主要要素 (全体、ヘッダー、メイン、フッター) が
+    // data-testid を使って特定でき、表示されていることを確認
+    // 静的要素なので timeout は指定しない
     await expect(page.getByTestId('default-layout')).toBeVisible();
     await expect(page.getByTestId('header-placeholder')).toBeVisible();
-    await expect(page.getByTestId('main-content')).toBeVisible();
+    await expect(page.getByTestId('main-content')).toBeVisible(); // ローディング完了後に表示されることを想定
     await expect(page.getByTestId('footer-placeholder')).toBeVisible();
 
-    // Assert: ヘッダー内に期待されるリンクが表示されていることを確認 (静的要素のため timeout 不要)
-    await expect(page.getByTestId('header-home-link')).toBeVisible();
-    await expect(page.getByTestId('header-register-link')).toBeVisible();
-    await expect(page.getByTestId('header-login-link')).toBeVisible();
+    // アサーション: ヘッダー内に未ログイン状態で期待されるリンクが表示されていることを確認
+    // 静的要素なので timeout は指定しない
+    await expect(page.getByTestId('header-home-link')).toBeVisible(); // ホームへのリンク
+    await expect(page.getByTestId('header-register-link')).toBeVisible(); // 新規登録へのリンク
+    await expect(page.getByTestId('header-login-link')).toBeVisible(); // ログインへのリンク
   });
 
-  test('ログインページへ遷移できること', async ({ page }) => {
-    // Act: ヘッダーの「ログイン」リンクをクリック
+  // テストケース: ログインページへ遷移できること
+  test('ログインページへ遷移できること', async ({ page }) => { // ログインページ遷移テスト
+    // ブラウザコンソールログを出力 (仕様に準拠して有効化)
+    page.on('console', msg => console.log(`BROWSER LOG (${test.info().title} - ${msg.type()}): ${msg.text()}`));
+    // 操作: ヘッダーの「ログイン」リンクを取得
     const loginLink = page.getByTestId('header-login-link');
-    await expect(loginLink).toBeVisible(); // 静的なリンクなのでtimeout不要
+    // アサーション: リンクが表示されていることを確認 (静的要素)
+    await expect(loginLink).toBeVisible();
+    // 操作: リンクをクリックしてログインページへ遷移
     await loginLink.click();
 
-    // Assert: URLが /login に変更されたことを非同期で確認 (逐語仕様修正)
+    // アサーション (1段階目): URL が `/login` に変更されたことを非同期で確認
+    // waitForFunction で location.pathname をポーリング (プロンプト仕様)
     await page.waitForFunction((arg) => {
         const { expectedPath } = arg;
-        return window.location.pathname === expectedPath;
-    }, { expectedPath: '/login' }, { timeout: 10000 });
-    await expect(page).toHaveURL(baseURL + '/login', { timeout: 1000 }); // URLの最終確認 (短いタイムアウト)
+        return window.location.pathname === expectedPath; // 現在のパスが期待値と一致するか
+    }, { expectedPath: '/login' }, { timeout: 10000 }); // タイムアウト設定
 
-    // Assert: ログインフォームの見出しが表示されることを非同期で確認 (新逐語仕様: 暗黙role禁止)
+    // アサーション (2段階目): URL の最終確認 (プロンプト仕様: toHaveURL)
+    // toHaveURL は内部でポーリングするため、ここでは短いタイムアウトで最終確認
+    await expect(page).toHaveURL(baseURL + '/login', { timeout: 1000 });
+
+    // アサーション (1段階目): ログインフォームの見出し (h2タグ、テキスト 'ログイン') が表示されることを非同期で確認
+    // waitForFunction で DOM をポーリング (プロンプト仕様: 暗黙role禁止)
     await page.waitForFunction((arg) => {
       const { tagName, name } = arg;
-      // h2タグ名とtextContentで要素を検索 (暗黙role回避)
+      // 指定されたタグ名とテキスト内容で要素を検索
       const element = Array.from(document.querySelectorAll(tagName))
                           .find(el => el.textContent?.trim() === name);
-      return element; // 要素が見つかればtruthyな値を返す
-    }, { tagName: 'h2', name: 'ログイン' }, { timeout: 10000 });
-    await expect(page.getByRole('heading', { name: 'ログイン' })).toBeVisible({ timeout: 1000 }); // expect側はgetByRoleを許容 (Playwright API)
+      return element; // 要素が見つかれば truthy な値を返す (ポーリング成功)
+    }, { tagName: 'h2', name: 'ログイン' }, { timeout: 10000 }); // タイムアウト設定
+
+    // アサーション (2段階目): 見出しの最終確認と可視性確認 (getByRole -> テキストセレクタ)
+    // await expect(page.getByRole('heading', { name: 'ログイン' })).toBeVisible({ timeout: 1000 });
+    await expect(page.locator('h2:has-text("ログイン")')).toBeVisible({ timeout: 1000 });
   });
 
-  // 新規テストケース: 登録ページへの遷移
-  test('登録ページへ遷移できること', async ({ page }) => {
-    // Act: ヘッダーの「新規登録」リンクをクリック
+  // テストケース: 登録ページへ遷移できること
+  test('登録ページへ遷移できること', async ({ page }) => { // 登録ページ遷移テスト
+    // ブラウザコンソールログを出力 (仕様に準拠して有効化)
+    page.on('console', msg => console.log(`BROWSER LOG (${test.info().title} - ${msg.type()}): ${msg.text()}`));
+    // 操作: ヘッダーの「新規登録」リンクを取得
     const registerLink = page.getByTestId('header-register-link');
-    await expect(registerLink).toBeVisible(); // 静的なリンクなのでtimeout不要
+    // アサーション: リンクが表示されていることを確認 (静的要素)
+    await expect(registerLink).toBeVisible();
+    // 操作: リンクをクリックして登録ページへ遷移
     await registerLink.click();
 
-    // Assert: URLが /register に変更されたことを非同期で確認 (逐語仕様修正)
+    // アサーション (1段階目): URL が `/register` に変更されたことを非同期で確認
     await page.waitForFunction((arg) => {
       const { expectedPath } = arg;
       return window.location.pathname === expectedPath;
     }, { expectedPath: '/register' }, { timeout: 10000 });
-    await expect(page).toHaveURL(baseURL + '/register', { timeout: 1000 }); // URLの最終確認 (短いタイムアウト)
 
-    // Assert: 登録フォームの見出しが表示されることを非同期で確認 (新逐語仕様: 暗黙role禁止)
+    // アサーション (2段階目): URL の最終確認
+    await expect(page).toHaveURL(baseURL + '/register', { timeout: 1000 });
+
+    // アサーション (1段階目): 登録フォームの見出し (h2タグ、テキスト 'ユーザー登録') が表示されることを非同期で確認
     await page.waitForFunction((arg) => {
       const { tagName, name } = arg;
-      // h2タグ名とtextContentで要素を検索 (暗黙role回避)
       const element = Array.from(document.querySelectorAll(tagName))
                           .find(el => el.textContent?.trim() === name);
-      return element; // 要素が見つかればtruthyな値を返す
+      return element;
     }, { tagName: 'h2', name: 'ユーザー登録' }, { timeout: 10000 });
-    await expect(page.getByRole('heading', { name: 'ユーザー登録' })).toBeVisible({ timeout: 1000 }); // expect側はgetByRoleを許容 (Playwright API)
+
+    // アサーション (2段階目): 見出しの最終確認と可視性確認 (getByRole -> テキストセレクタ)
+    // await expect(page.getByRole('heading', { name: 'ユーザー登録' })).toBeVisible({ timeout: 1000 });
+    await expect(page.locator('h2:has-text("ユーザー登録")')).toBeVisible({ timeout: 1000 });
   });
 }); 

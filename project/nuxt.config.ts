@@ -1,4 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
+// ★★★ デバッグログ追加: ビルド時の環境変数読み込み確認 ★★★
+console.log('[nuxt.config.ts] Reading env vars for runtimeConfig:');
+console.log('[nuxt.config.ts] SUPABASE_URL:', process.env.SUPABASE_URL ? 'Loaded' : 'Missing');
+console.log('[nuxt.config.ts] SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY ? 'Loaded' : 'Missing');
+console.log('[nuxt.config.ts] SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Loaded' : 'Missing');
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
@@ -6,7 +13,6 @@ export default defineNuxtConfig({
     '@nuxt/fonts', 
     '@nuxt/icon', 
     '@nuxt/image', 
-    '@nuxtjs/supabase',
     '@nuxtjs/tailwindcss'
   ],
   
@@ -71,16 +77,6 @@ export default defineNuxtConfig({
   // Nuxt Icon設定 (公式ドキュメントに基づき修正)
   icon: {
     componentName: 'NuxtIcon'
-  },
-  
-  // Supabase設定
-  supabase: {
-    redirect: false,
-    redirectOptions: {
-      login: '/login',
-      callback: '/confirm',
-      exclude: ['/*']
-    }
   },
   
   runtimeConfig: {

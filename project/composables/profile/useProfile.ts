@@ -1,6 +1,8 @@
 import { ref, watch } from 'vue';
+import type { Ref } from 'vue';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database, Tables, TablesInsert, TablesUpdate } from '~/types/database';
-import type { ProfileData, ProfileUpdatePayload } from '~/types';
+import type { ProfileData, ProfileUpdatePayload, CustomError } from '~/types';
 
 // グローバルなプロフィール状態 (useState を使ってコンポーザブル間で共有)
 // Nuxt 3 の useState はサーバーサイドとクライアントサイドで状態を共有するのに役立つ
@@ -15,10 +17,11 @@ export function useProfile() {
   // Nuxt 3 の useState を使用して、コンポーザブル間で共有される状態を定義
   const profileGlobal = useState<ProfileData | null>('profile', () => null);
   const loadingGlobal = useState<boolean>('profile-loading', () => false);
-  const errorGlobal = useState<Error | null>('profile-error', () => null);
+  const errorGlobal = useState<CustomError | null>('profile-error', () => null);
 
-  // Supabase クライアントとユーザー情報を取得
-  const supabase = useSupabaseClient<Database>();
+  // Supabase クライアントの型定義を修正し、null を許容
+  // useSupabaseClient からジェネリック型引数を削除
+  const supabase: SupabaseClient<Database> | null = useSupabaseClient();
   const user = useSupabaseUser();
   // ログインユーザーのIDをリアクティブな参照として保持
   const userId = ref<string | null>(user.value?.id ?? null);
@@ -42,32 +45,33 @@ export function useProfile() {
   // 取得処理中は loadingGlobal を true に設定し、結果またはエラーに応じて
   // profileGlobal または errorGlobal を更新する。
   const fetchProfile = async (): Promise<void> => {
-    // ユーザーIDがなければ処理中断
     if (!userId.value) {
-      errorGlobal.value = new Error('ログインしていません。');
+      errorGlobal.value = { name: 'AuthError', message: 'ログインしていません。', errorCode: 'user_not_logged_in' };
       profileGlobal.value = null;
       return;
     }
 
-    // 状態の初期化
     loadingGlobal.value = true;
     errorGlobal.value = null;
     profileGlobal.value = null;
 
     try {
-      // Supabase profiles テーブルからユーザーIDに一致するレコードを取得
+      // Supabase クライアントのチェック (型ガードとして機能)
+      if (!supabase) {
+        throw { name: 'InitializationError', message: 'Supabase client is not available.', errorCode: 'supabase_client_unavailable' };
+      }
+      // `as any` を削除し、型付きクライアントを使用
       const { data, error, status } = await supabase
         .from('profiles')
-        .select('*') // 全カラムを取得
-        .eq('id', userId.value) // 主キーで検索
-        .single(); // 結果は単一レコードのはず
+        .select('id, nickname, account_id, bio, avatar_data')
+        .eq('id', userId.value)
+        .single();
 
-      // 406エラー (Not Acceptable) は .single() でデータが見つからなかった場合なので除外
       if (error && status !== 406) {
-        throw error; // その他のDBエラーはスロー
+        // Supabaseのエラー型を考慮
+        throw { name: error.code || 'SupabaseFetchError', message: error.message, details: error.details, hint: error.hint, errorCode: 'profile_fetch_db_error', cause: error };
       }
 
-      // データが存在すれば、グローバル状態に整形して格納
       if (data) {
         profileGlobal.value = {
           id: data.id,
@@ -80,13 +84,22 @@ export function useProfile() {
         // データが存在しない場合はnull (プロフィール未作成など)
         profileGlobal.value = null;
       }
-    } catch (err: any) {
-      // エラーハンドリング：エラーメッセージをグローバル状態に格納
-      console.error('[useProfile][fetchProfile] プロフィール取得エラー:', err.stack || err);
-      errorGlobal.value = new Error(`プロフィールの取得に失敗しました。詳細はコンソールを確認してください。`);
+    // unknown を使用し、型ガードを行う
+    } catch (err: unknown) {
+      let customError: CustomError;
+      if (err && typeof err === 'object') {
+        const name = 'name' in err && typeof err.name === 'string' ? err.name : 'FetchError';
+        const message = 'message' in err && typeof err.message === 'string' ? err.message : 'プロフィールの取得中に不明なエラーが発生しました。';
+        const errorCode = 'errorCode' in err && typeof err.errorCode === 'string' ? err.errorCode : 'profile_fetch_failed';
+        customError = { name, message, errorCode, cause: err };
+      } else {
+        customError = { name: 'UnknownError', message: 'プロフィールの取得中に予期せぬエラーが発生しました。', errorCode: 'profile_fetch_unknown', cause: err };
+      }
+
+      console.error('[useProfile][fetchProfile] プロフィール取得エラー:', customError.cause || err, customError.message);
+      errorGlobal.value = customError;
       profileGlobal.value = null; // エラー時はプロファイルもnullに
     } finally {
-      // 処理完了後、ローディング状態を解除
       loadingGlobal.value = false;
     }
   };
@@ -96,24 +109,30 @@ export function useProfile() {
   // @param updates 更新するデータ (ニックネーム、自己紹介)
   // @returns 更新処理が成功した場合は true、失敗した場合は false
   const updateProfile = async (updates: ProfileUpdatePayload): Promise<boolean> => {
-    // 1. 事前チェック
     const currentUser = useSupabaseUser();
     const currentAuthUserId = currentUser.value?.id;
 
-    // 認証されていない場合はエラーを記録して中断
     if (!currentAuthUserId) {
-      console.error('[useProfile][updateProfile] エラー: 更新実行前にユーザーが未認証状態です。');
-      errorGlobal.value = new Error('更新実行前に認証が確認できませんでした。');
+      const errorMessage = '更新実行前に認証が確認できませんでした。';
+      console.error('[useProfile][updateProfile] エラー:', errorMessage);
+      errorGlobal.value = { name: 'AuthError', message: errorMessage, errorCode: 'update_auth_failed' };
       return false;
     }
 
-    // 2. 状態初期化
     loadingGlobal.value = true;
     errorGlobal.value = null;
 
     try {
-      // 3. サーバーサイドAPI (/api/profile/update) を呼び出し
-      const response = await $fetch('/api/profile/update', {
+      // $fetch の期待されるレスポンス型を定義
+      type UpdateApiResponse = {
+        success: boolean;
+        data?: Tables<'profiles'>;
+        error?: string;
+        errorCode?: string;
+      };
+
+      // サーバーサイドAPI (/api/profile/update) を呼び出し
+      const response = await $fetch<UpdateApiResponse>('/api/profile/update', {
         method: 'POST',
         body: {
           userId: currentAuthUserId,
@@ -121,51 +140,70 @@ export function useProfile() {
             nickname: updates.nickname,
             bio: updates.bio
           }
-        }
+        },
       });
 
-      // 4. レスポンス処理
-      // 型の安全性のため、応答がエラーかどうかを適切に判定
-      if (!response.success) {
-        // エラーレスポンスの場合、エラーを記録して中断
-        console.error('[useProfile][updateProfile] API応答エラー:', 'error' in response ? response.error : '不明なエラー');
-        errorGlobal.value = new Error(`プロフィール更新に失敗しました: ${'error' in response ? response.error : '不明なエラー'}`);
+      if (response && response.success && response.data) {
+        const updatedProfileData = response.data;
+
+        if (profileGlobal.value) {
+          profileGlobal.value.nickname = updatedProfileData.nickname;
+          profileGlobal.value.bio = updatedProfileData.bio;
+          // updated_at も更新したい場合は追加
+        } else {
+          profileGlobal.value = {
+            id: updatedProfileData.id,
+            nickname: updatedProfileData.nickname,
+            account_id: updatedProfileData.account_id, // account_id も response.data から取得
+            bio: updatedProfileData.bio,
+            avatar_data: updatedProfileData.avatar_data, // avatar_data も response.data から取得
+          };
+        }
+        loadingGlobal.value = false;
+        return true;
+      } else {
+        const apiErrorMessage = response?.error || '不明なAPIエラー';
+        const errorCode = response?.errorCode || 'update_api_error';
+        const errorMessage = `プロフィール更新に失敗しました: ${apiErrorMessage}`;
+        console.error('[useProfile][updateProfile] API応答エラー:', errorMessage, response);
+        errorGlobal.value = { name: 'ApiError', message: errorMessage, errorCode: errorCode };
         loadingGlobal.value = false;
         return false;
       }
 
-      // 5. 成功時の処理 - ローカル状態を更新
-      // データプロパティの型を安全に確認
-      if ('data' in response && response.data && Array.isArray(response.data) && response.data.length > 0) {
-        const updatedProfile = response.data[0];
+    // unknown を使用し、型ガードを行う
+    } catch (err: unknown) {
+      let detailedError = 'プロフィール更新中にエラーが発生しました。'
+      let serverDetails: Record<string, unknown> | null = null; // serverDetails の型を Record<string, unknown> に
+      let errorCode: string = 'update_fetch_exception'; // デフォルトエラーコードを let に変更
 
-        // 既存のローカル状態が存在すれば、新しいデータで更新
-        if (profileGlobal.value) {
-          profileGlobal.value.nickname = updatedProfile.nickname;
-          profileGlobal.value.bio = updatedProfile.bio;
-        } else {
-          // ローカル状態が存在しない場合は、取得したデータで新規作成
-          profileGlobal.value = {
-            id: updatedProfile.id,
-            nickname: updatedProfile.nickname,
-            account_id: updatedProfile.account_id,
-            bio: updatedProfile.bio,
-            avatar_data: updatedProfile.avatar_data,
-          };
-        }
-      } else {
-        // APIは成功したがデータが返ってこなかった場合は、最新情報を再取得
-        await fetchProfile();
+      // FetchError かどうかを判定 (Nuxt/Nitro の $fetch が返すエラー)
+      if (err && typeof err === 'object' && 'name' in err && err.name === 'FetchError' && 'data' in err && err.data && typeof err.data === 'object') {
+          serverDetails = err.data as Record<string, unknown>; // 型アサーション
+          console.error('[useProfile][updateProfile] $fetch caught error data:', JSON.stringify(serverDetails));
+          if ('error' in serverDetails && typeof serverDetails.error === 'string') {
+            detailedError += `: ${serverDetails.error}`;
+            if ('errorCode' in serverDetails && typeof serverDetails.errorCode === 'string') {
+              detailedError += ` [Code: ${serverDetails.errorCode}]`;
+              errorCode = serverDetails.errorCode;
+            }
+          } else if ('message' in serverDetails && typeof serverDetails.message === 'string') {
+             // data に message が含まれる場合 (FetchError のデフォルトなど)
+            detailedError += `: ${serverDetails.message}`;
+          }
+      } else if (err instanceof Error) {
+          detailedError += `: ${err.message}`;
       }
 
-      // 6. 成功状態を返し、ローディングを解除
-      loadingGlobal.value = false;
-      return true;
+      const errorName = err instanceof Error ? err.name : 'FetchException';
 
-    } catch (err) {
-      // 予期せぬ例外が発生した場合のエラーハンドリング
-      console.error('[useProfile][updateProfile] エラー: 更新処理中に例外が発生しました:', err instanceof Error ? err.stack || err : err);
-      errorGlobal.value = new Error(`プロフィール更新中にエラーが発生しました: ${err instanceof Error ? err.message : String(err)}`);
+      console.error('[useProfile][updateProfile] エラー: 更新処理中に $fetch 例外が発生しました:', err instanceof Error ? err.stack || err : err, detailedError, serverDetails ? 'ServerDetails:' : '', serverDetails || '');
+      errorGlobal.value = {
+        name: errorName,
+        message: detailedError,
+        errorCode: errorCode,
+        cause: err
+      };
       loadingGlobal.value = false;
       return false;
     }

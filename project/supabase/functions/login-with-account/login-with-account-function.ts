@@ -1,131 +1,154 @@
-// @ts-ignore
+// @ts-ignore // Denoの型チェックを無視するためのコメント
 import { serve } from 'https://deno.land/std@0.131.0/http/server.ts';
-// @ts-ignore
+// @ts-ignore // Denoの型チェックを無視するためのコメント
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 // types/index.ts と同じ型を定義
+/**
+ * Edge Functionのエラーレスポンスの型定義。
+ */
 interface EdgeFunctionErrorResponse {
-  success: false;
-  error: string;
-  errorCode?: string;
+  success: false; // 処理が失敗したことを示すフラグ
+  error: string; // エラーメッセージ
+  errorCode?: string; // エラーコード (オプション)
 }
 
+// CORSヘッダー: 異なるオリジンからのリクエストを許可するための設定
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Origin': '*', // すべてのオリジンを許可
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type', // 許可するヘッダー
 };
 
+// Deno DeployのHTTPリクエストハンドラー
 serve(async (req: Request) => {
-  // CORS対応
+  // CORSプリフライトリクエストへの対応
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
 
   try {
+    // リクエストボディから識別子 (メールアドレスまたはアカウントID) を取得
     const { identifier } = await req.json();
-    
+
     // 識別子が提供されているかチェック
     if (!identifier) {
+      // エラーレスポンスを作成
       const errorResponse: EdgeFunctionErrorResponse = {
         success: false,
         error: '識別子 (メールアドレスまたはアカウントID) が必要です。',
         errorCode: 'missing_identifier'
       };
+      // 400 Bad Request レスポンスを返す
       return new Response(
         JSON.stringify(errorResponse),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // メールアドレス形式かどうかを正規表現でチェック
+    // 識別子がメールアドレス形式かどうかを正規表現でチェック
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
-    
-    // サービスロールキーでクライアントを作成
+
+    // Supabase Adminクライアントをサービスロールキーで初期化
+    // 環境変数からSupabaseのURLとサービスロールキーを取得
     const supabaseAdmin = createClient(
-      // @ts-ignore
+      // @ts-ignore // Denoの環境変数アクセスに関する型エラーを無視
       Deno.env.get('SUPABASE_URL') ?? '',
-      // @ts-ignore
+      // @ts-ignore // Denoの環境変数アクセスに関する型エラーを無視
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
+      // セッションを永続化しない設定
       { auth: { persistSession: false } }
     );
-    
+
+    // メールアドレスを格納する変数を初期化 (デフォルトは識別子そのもの)
     let email = identifier;
-    
-    // アカウントIDの場合、ユーザーIDを取得してからメールアドレスを取得
+
+    // 識別子がメールアドレスでない場合 (アカウントIDの場合)
     if (!isEmail) {
-      // @から始まる場合は@を削除
+      // アカウントIDが '@' で始まる場合は '@' を削除
       const accountId = identifier.startsWith('@') ? identifier.substring(1) : identifier;
-      
-      // プロフィールテーブルからアカウントIDを持つユーザーを検索
+
+      // `profiles` テーブルからアカウントIDに一致するユーザーの `id` を取得
       const { data: profileData, error: profileError } = await supabaseAdmin
-        .from('profiles')
-        .select('id')
-        .eq('account_id', accountId)
-        .single();
-      
+        .from('profiles') // `profiles` テーブルを指定
+        .select('id') // `id` カラムを選択
+        .eq('account_id', accountId) // `account_id` が一致する行を検索
+        .single(); // 結果が単一であることを期待
+
+      // プロフィールデータの取得に失敗した場合、またはデータが存在しない場合
       if (profileError || !profileData) {
-        // エラーログ出力 (profileErrorが存在する場合のみ)
+        // profileErrorが存在する場合のみ、詳細なエラーログを出力
         if (profileError) {
-          console.error('プロフィール取得エラー:', profileError.stack || profileError);
+          console.error('プロフィール取得エラー:', profileError.stack || profileError); // 開発者向けエラーログ
         }
+        // エラーレスポンスを作成
         const errorResponse: EdgeFunctionErrorResponse = {
           success: false,
-          error: '入力されたアカウントIDは見つかりません。',
-          errorCode: 'account_not_found' // より具体的なエラーコード
+          error: '入力されたアカウントIDは見つかりません。', // ユーザー向けエラーメッセージ
+          errorCode: 'account_not_found' // エラーコード
         };
+        // 404 Not Found レスポンスを返す
         return new Response(
           JSON.stringify(errorResponse),
           { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      
-      // ユーザーIDからユーザー情報を取得
+
+      // 取得したユーザーID (`profileData.id`) を使用して、Admin API経由でユーザー情報を取得
       const { data: userData, error: userError } = await supabaseAdmin.auth.admin
         .getUserById(profileData.id);
-      
+
+      // ユーザー情報の取得に失敗した場合、またはメールアドレスが存在しない場合
       if (userError || !userData?.user?.email) {
-        // エラーログ出力 (userErrorが存在する場合のみ)
+        // userErrorが存在する場合のみ、詳細なエラーログを出力
         if (userError) {
-          console.error('ユーザー取得エラー:', userError.stack || userError);
+          console.error('ユーザー取得エラー:', userError.stack || userError); // 開発者向けエラーログ
         }
+        // エラーレスポンスを作成
         const errorResponse: EdgeFunctionErrorResponse = {
           success: false,
-          error: 'アカウントに紐づくユーザー情報の取得に失敗しました。',
-          errorCode: 'user_fetch_failed'
+          error: 'アカウントに紐づくユーザー情報の取得に失敗しました。', // ユーザー向けエラーメッセージ
+          errorCode: 'user_fetch_failed' // エラーコード
         };
+        // 500 Internal Server Error レスポンスを返す
         return new Response(
           JSON.stringify(errorResponse),
           { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
-      
+
+      // 取得したユーザー情報からメールアドレスをセット
       email = userData.user.email;
     }
-    
-    // メールアドレスでログイン（パスワードチェックはSupabaseが行う）
-    // このFunctionはメールアドレスを返すだけに変更
+
+    // 処理が成功した場合、メールアドレスを含む成功レスポンスを作成
+    // 注意: このFunctionはパスワード検証を行わず、アカウントIDからメールアドレスを検索する役割のみを持つ
     const successResponse = {
       success: true,
-      email: email
+      email: email // 検索結果のメールアドレス
     };
+    // 200 OK レスポンスを返す
     return new Response(
       JSON.stringify(successResponse),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    // 予期せぬエラーが発生した場合 (仕様と型安全性を両立)
+    // 予期せぬエラーが発生した場合の処理
+    // エラーオブジェクトが Error インスタンスか確認し、スタックトレースまたはエラー情報をログに出力
     const errorToLog = error instanceof Error ? error.stack || error : error;
-    console.error('login-with-account function 内でのエラー:', errorToLog);
+    console.error('login-with-account function 内での予期せぬエラー:', errorToLog); // 開発者向けエラーログ
 
+    // エラーレスポンスを作成
     const errorResponse: EdgeFunctionErrorResponse = {
       success: false,
-      error: error instanceof Error ? error.message : String(error), // エラーメッセージを安全に取得
-      errorCode: 'internal_error'
+      // エラーメッセージを安全に取得して設定
+      error: error instanceof Error ? error.message : String(error), // ユーザー向けエラーメッセージ (より汎用的)
+      errorCode: 'internal_error' // エラーコード
     };
+    // 500 Internal Server Error レスポンスを返す
     return new Response(
       JSON.stringify(errorResponse),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } } // 500 Internal Server Error に変更
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 }); 

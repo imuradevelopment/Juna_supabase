@@ -18,7 +18,7 @@
       <strong class="font-bold">エラー:</strong>
       <!-- エラーメッセージ -->
       <span class="block sm:inline">プロフィールの読み込みに失敗しました。</span>
-      <!-- 詳細なエラーメッセージ -->
+      <!-- 詳細なエラーメッセージ (error が CustomError オブジェクトであることを想定) -->
       <p class="text-sm mt-1">{{ error.message }}</p>
       <!-- 再試行ボタン -->
       <button @click="fetchProfile" class="mt-2 px-3 py-1 bg-error-300 text-error-900 text-xs font-medium rounded hover:bg-error-400">再試行</button>
@@ -58,7 +58,7 @@
           <!-- 編集アイコン -->
           <NuxtIcon name="mdi:pencil" class="w-4 h-4 mr-2" />
           <!-- 編集リンクラベル -->
-          編集する
+          編集
         </NuxtLink>
       </div>
     </div>
@@ -122,7 +122,8 @@ watch(error, (newError) => {
   // エラーが発生した場合、コンソールに出力 (UI上のエラー表示はテンプレート側で実施)
   if (newError) {
     // console.error は残す
-    console.error('[ProfilePage][watch error] Detected error in useProfile:', newError.stack || newError);
+    // ★ newError は CustomError オブジェクトなので、message, errorCode, cause を参照できる
+    console.error('[ProfilePage][watch error] Detected error in useProfile:', newError.message, newError.errorCode ? `(${newError.errorCode})` : '', newError.cause);
     // ここでトースト通知などのUIエラー表示を追加することも可能
   }
 });
