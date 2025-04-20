@@ -70,4 +70,25 @@ export interface ProfileUpdatePayload {
   bio?: string; // 自己紹介文は更新可能
   // account_id は更新不可
   // avatar_data は別途アップロード処理などを想定
+}
+
+/**
+ * テストなどで使用するユーザー認証情報の型。
+ */
+export interface UserCredentials {
+  email: string;
+  password: string;
+  nickname: string;
+  accountId: string;
+}
+
+// ★ 追加: カスタムエラー型
+export interface CustomError extends Error {
+  message: string;
+  cause?: any; // 元となったエラーを保持
+}
+
+// ★ 追加: isCustomError タイプガード関数
+export function isCustomError(error: unknown): error is CustomError {
+  return typeof error === 'object' && error !== null && 'message' in error;
 } 

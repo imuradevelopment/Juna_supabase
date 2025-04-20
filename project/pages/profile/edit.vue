@@ -101,8 +101,33 @@
       </div>
     </form>
 
-    <!-- プロフィールが見つからない場合の表示 (初期読み込み後) -->
-    <div v-else class="text-center text-gray-500 py-10" data-testid="profile-edit-not-found">
+    <!-- ★ アカウント削除セクション (表示条件を v-if に変更し、profile の存在をチェック) -->
+    <div v-if="!initialLoading && !initialFetchError && profile" class="mt-8 pt-8 border-t border-red-200">
+      <h3 class="text-lg font-semibold text-red-600">アカウント削除</h3>
+      <p class="mt-2 text-sm text-gray-600">
+        アカウントを削除すると、関連する全てのデータ（投稿、コメントなど）が削除され、元に戻すことはできません。
+      </p>
+      <!-- 削除処理エラー表示エリア -->
+      <div v-if="deleteErrorDisplay" class="mt-3 bg-error-100 border border-error-500 text-error-700 px-4 py-3 rounded relative" role="alert" data-testid="profile-edit-delete-error">
+        <strong class="font-bold">削除エラー:</strong>
+        <span class="block sm:inline">{{ deleteErrorDisplay }}</span>
+      </div>
+      <div class="mt-5">
+        <button
+          type="button"
+          @click="confirmAndDeleteAccount"
+          :disabled="isDeleting"
+          class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-error-600 hover:bg-error-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-primary-300 focus:ring-error-500 disabled:opacity-50 disabled:cursor-not-allowed transition duration-150 ease-in-out"
+          data-testid="delete-account-button"
+        >
+          <NuxtIcon v-if="isDeleting" name="svg-spinners:180-ring" class="w-4 h-4 mr-2" />
+          {{ isDeleting ? '削除中...' : 'アカウント削除' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- プロフィールが見つからない場合の表示 (条件を調整) -->
+    <div v-else-if="!initialLoading && !initialFetchError && !profile" class="text-center text-gray-500 py-10" data-testid="profile-edit-not-found">
        <p>プロフィール情報が見つかりません。</p>
        <p class="text-sm mt-1">前のページに戻って再試行してください。</p>
        <!-- プロフィール表示ページへのリンク -->
@@ -115,8 +140,11 @@
 // 必要なモジュールをインポート
 import { ref, onMounted, reactive, watch } from 'vue';
 import { useProfile } from '~/composables/profile/useProfile';
-import type { ProfileUpdatePayload, ProfileData } from '~/types';
+import { useDeleteAccount } from '~/composables/account/useDeleteAccount';
+import type { ProfileUpdatePayload, ProfileData, EdgeFunctionErrorResponse, CustomError } from '~/types';
 import { useRouter, useRoute } from '#imports';
+import type { User } from '@supabase/supabase-js';
+import { useSupabaseClient, useSupabaseUser } from '#imports';
 
 /**
  * プロフィール編集ページ。
@@ -137,66 +165,62 @@ const {
 // Vue Router インスタンスを取得 (ページ遷移用)
 const router = useRouter();
 
+// ★ アカウント削除 Composable から状態と関数を取得 (分割代入を修正)
+const { isDeleting, errorState: deleteError, deleteAccount } = useDeleteAccount();
+// ★ 削除処理のエラー表示用 ref
+const deleteErrorDisplay = ref<string | null>(null);
+
 // 編集フォーム用のローカルリアクティブ状態
-// グローバル状態 (profile) とは別に変更を保持する
 const editableProfile = reactive<ProfileUpdatePayload>({
-  nickname: '', // 初期値は空文字。マウント後に profile から設定
-  bio: '',      // 初期値は空文字。マウント後に profile から設定
+  nickname: '',
+  bio: '',
 });
 
 // ページ初期読み込み時の状態管理用 ref
-const initialLoading = ref(true); // ページ全体の初期データ読み込み中フラグ
-const initialFetchError = ref<Error | null>(null); // 初期データ読み込みエラー
+const initialLoading = ref(true);
+const initialFetchError = ref<CustomError | null>(null);
 
 // プロフィール更新処理中のローディング状態用 ref
 const isUpdating = ref(false);
-// フォームに表示する更新エラーメッセージ用 ref (APIエラー等)
 const updateErrorDisplay = ref<string | null>(null);
-// フォーム項目ごとのバリデーションエラーメッセージ用 ref
 const validationErrors = ref<{ nickname?: string }>({});
 
 // コンポーネントマウント時のライフサイクルフック
-onMounted(async () => {
-  initialLoading.value = true; // ローディング開始
-  initialFetchError.value = null; // エラークリア
-
-  // ユーザーIDが存在する場合のみ処理
-  if (userId.value) {
-    // グローバル状態 (profile) が未設定の場合、まず fetchProfile を呼び出す
-    // これにより、ブラウザリロードなどで直接編集ページに来た場合に対応
-    if (profile.value === null) {
-        await fetchProfile(); // useProfile 内のグローバル状態を更新
-    }
-    // フェッチ後 (または既に存在した場合) にフォームの初期値を設定
-    if (profile.value) {
-      setFormValues(profile.value); // グローバル状態からフォームへコピー
-    } else {
-      // fetch しても profile が null のまま = 取得失敗
-      // console.error は残す
-      console.error('[ProfileEditPage][onMounted] Failed to fetch profile or profile is null after fetch.');
-      initialFetchError.value = profileError.value ?? new Error('プロフィールの読み込みに失敗しました。');
-      // console.error は残す
-      console.error('[ProfileEditPage][onMounted] 初期プロフィール読み込みエラー:', initialFetchError.value.stack || initialFetchError.value);
-    }
-  } else {
-     // ユーザーIDがない = 未ログイン状態
-     // console.error は残す
-     console.error('[ProfileEditPage][onMounted] User ID not found. User might be logged out.');
-     initialFetchError.value = new Error('ログインしていません。');
-     // console.error は残す
-     console.error('[ProfileEditPage][onMounted] 未ログインエラー:', initialFetchError.value.stack || initialFetchError.value);
-  }
-  initialLoading.value = false; // ローディング完了
+onMounted(() => {
+  console.log('[ProfileEditPage][onMounted] Component mounted.');
 });
 
-// グローバルなプロフィール状態 (profile) が変更された場合、フォームに再反映する
-// 例: 別タブで更新された場合など (リアルタイム性は低いが基本的な同期)
-watch(profile, (newProfileData) => {
-  // 初期読み込み中や更新処理中は反映しない (ユーザーの編集中断を防ぐため)
-  if (newProfileData && !initialLoading.value && !isUpdating.value) {
-    setFormValues(newProfileData);
+// ★ ユーザーID (useProfileから取得) の変更を監視してプロフィールを取得
+watch(userId, async (newUserId, oldUserId) => {
+  console.log(`[ProfileEditPage][watch userId] Changed from ${oldUserId} to ${newUserId}`);
+  if (newUserId) {
+    initialFetchError.value = null;
+    initialLoading.value = true;
+    console.log('[ProfileEditPage][watch userId] User ID available, fetching profile...');
+    await fetchProfile();
+  } else {
+    console.log('[ProfileEditPage][watch userId] User ID is null. Setting not logged in error.');
+    initialFetchError.value = { name: 'AuthenticationError', message: 'プロフィールを表示するにはログインが必要です。' };
+    initialLoading.value = false;
   }
-}, { deep: true }); // ネストされたプロパティの変更も検知
+}, { immediate: true });
+
+// グローバルなプロフィール状態 (profile) またはローディング状態 (profileLoading) の変更を監視
+watch([profile, profileLoading], ([newProfile, newLoading], [oldProfile, oldLoading]) => {
+  console.log('[ProfileEditPage][watch profile/loading] Changed.', 'NewProfile:', !!newProfile, 'NewLoading:', newLoading);
+  if (!newLoading && oldLoading) {
+    console.log('[ProfileEditPage][watch profile/loading] Loading finished.');
+    if (newProfile) {
+      console.log('[ProfileEditPage][watch profile/loading] Profile loaded, setting form values.');
+      setFormValues(newProfile);
+      initialFetchError.value = null;
+    } else {
+      console.error('[ProfileEditPage][watch profile/loading] Profile not loaded after fetch.', 'profileError:', profileError.value);
+      initialFetchError.value = profileError.value ?? { name: 'NotFoundError', message: 'プロフィール情報が見つかりませんでした。' };
+    }
+    initialLoading.value = false;
+  }
+}, { deep: true });
 
 /**
  * グローバルなプロフィールデータ (ProfileData) を編集フォームのローカル状態 (editableProfile) にコピーする。
@@ -204,73 +228,77 @@ watch(profile, (newProfileData) => {
  */
 function setFormValues(data: ProfileData | null) {
   if (data) {
-    // nullish coalescing operator (??) を使用して、null または undefined の場合に空文字を設定
     editableProfile.nickname = data.nickname ?? '';
     editableProfile.bio = data.bio ?? '';
+    console.log('[ProfileEditPage][setFormValues] Set editableProfile:', JSON.stringify(editableProfile));
+  } else {
+    console.warn('[ProfileEditPage][setFormValues] Received null data, skipping form set.');
   }
 }
 
 /**
  * 編集フォームの入力値バリデーションを行う。
- * @returns バリデーションが成功した場合は true、失敗した場合は false。
- *          失敗した場合、validationErrors にエラーメッセージが設定される。
  */
 function validateForm(): boolean {
-  validationErrors.value = {}; // エラーメッセージをリセット
+  validationErrors.value = {};
   let isValid = true;
-  // ニックネームが空文字または空白のみでないかチェック
   if (!editableProfile.nickname || editableProfile.nickname.trim() === '') {
     validationErrors.value.nickname = 'ニックネームは必須です。';
-    // console.error は残す
-    console.error('[ProfileEditPage][validateForm] バリデーションエラー:', validationErrors.value.nickname);
+    console.error('[ProfileEditPage][validateForm] Validation error:', validationErrors.value.nickname);
     isValid = false;
   }
-  // 他の項目 (bioなど) のバリデーションが必要な場合はここに追加
   return isValid;
 }
 
 /**
  * プロフィール更新処理を実行する。
- * フォームのバリデーションを行い、成功すれば useProfile の updateProfile を呼び出す。
- * 処理結果に応じてローディング状態やエラー表示を更新し、成功時にはプロフィール表示ページへ遷移する。
  */
 async function handleUpdateProfile() {
-  // フォームバリデーションを実行
-  if (!validateForm()) {
-    return; // バリデーション失敗時は処理中断
-  }
-
-  isUpdating.value = true; // 更新処理開始
-  updateErrorDisplay.value = null; // 更新エラー表示をクリア
-
+  if (!validateForm()) return;
+  isUpdating.value = true;
+  updateErrorDisplay.value = null;
   try {
-    // useProfile の更新関数を呼び出し
     const success = await updateProfile({
       nickname: (editableProfile.nickname ?? '').trim(),
       bio: (editableProfile.bio ?? '').trim(),
     });
-
-    // 更新成功時
     if (success) {
-      // プロフィール表示ページへ遷移
       router.push('/profile');
     } else {
-      // 更新失敗時 (useProfile 側でエラーが設定されているはず)
-      // グローバルエラーが存在すればそれを表示、なければ汎用メッセージ
-      updateErrorDisplay.value = profileError.value?.message || 'プロフィールの更新に失敗しました。時間をおいて再試行してください。';
-      // console.error は残す (profileError.value は useProfile 内で出力済みの可能性あり)
-      console.error('[ProfileEditPage][handleUpdateProfile] 更新失敗:', updateErrorDisplay.value);
+      updateErrorDisplay.value = profileError.value?.message || 'プロフィールの更新に失敗しました。';
+      console.error('[ProfileEditPage][handleUpdateProfile] Update failed:', updateErrorDisplay.value);
     }
   } catch (err) {
-    // updateProfile 関数自体で例外が発生した場合 (通常は useProfile 内で捕捉されるはず)
     const error = err instanceof Error ? err : new Error(String(err));
-    // console.error は残す
-    console.error('[ProfileEditPage][handleUpdateProfile] 更新処理中に予期せぬ例外:', error.stack || error);
+    console.error('[ProfileEditPage][handleUpdateProfile] Unexpected exception:', error.stack || error);
     updateErrorDisplay.value = `予期せぬエラーが発生しました: ${error.message}`;
   } finally {
-    isUpdating.value = false; // 更新処理完了 (成功/失敗問わず)
+    isUpdating.value = false;
   }
 }
+
+// アカウント削除確認と実行
+const confirmAndDeleteAccount = async () => {
+  if (window.confirm('アカウントを削除すると、関連する全てのデータ（投稿、コメントなど）が削除され、元に戻すことはできません。本当に削除しますか？')) {
+    console.log('[ProfileEditPage] Starting account deletion...');
+    await deleteAccount();
+  }
+};
+
+// deleteError の変更を監視して deleteErrorDisplay に反映
+watch(deleteError, (newErrorValue) => {
+  if (newErrorValue) {
+    console.error('[ProfileEditPage][watch deleteError] Detected error in useDeleteAccount:', newErrorValue);
+    if (newErrorValue instanceof Error || (typeof newErrorValue === 'object' && newErrorValue !== null && 'message' in newErrorValue)) {
+      deleteErrorDisplay.value = `${newErrorValue.message}`;
+    } else {
+       deleteErrorDisplay.value = 'アカウントの削除中に不明な形式のエラーが発生しました。';
+       console.error('[ProfileEditPage][watch deleteError] Unexpected error format:', newErrorValue);
+    }
+  } else {
+    deleteErrorDisplay.value = null;
+  }
+});
 
 </script>
 

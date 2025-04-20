@@ -22,9 +22,16 @@ serve(async (req: Request) => {
   }
 
   try {
+    // ★★★ ログ追加: try ブロック開始 ★★★
+    console.log('[delete-user] 関数の実行を開始しました。')
+
     // Authorization ヘッダーから Bearer トークンを取得
     const authHeader = req.headers.get('Authorization');
+    // ★★★ ログ追加: Authorization ヘッダー取得後 ★★★
+    console.log(`[delete-user] Authorization ヘッダー: ${authHeader ? authHeader.substring(0, 15) + '...' : '見つかりません'}`)
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('[delete-user] Authorization ヘッダーが無効または見つかりません。')
       return new Response(
         JSON.stringify({ success: false, error: '認証エラー' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
@@ -32,11 +39,18 @@ serve(async (req: Request) => {
     }
 
     const token = authHeader.replace('Bearer ', '');
+    // ★★★ ログ追加: トークン抽出後 ★★★
+    console.log(`[delete-user] トークンを抽出しました: ${token.substring(0, 10)}...`)
 
     // リクエストボディからユーザーIDを取得
+    // ★★★ ログ追加: req.json() 呼び出し前 ★★★
+    console.log('[delete-user] リクエストボディの解析を試みます...')
     const { userId } = await req.json() as RequestBody;
-    
+    // ★★★ ログ追加: userId 取得後 ★★★
+    console.log(`[delete-user] リクエストボディから取得した userId: ${userId}`)
+
     if (!userId) {
+      console.error('[delete-user] リクエストボディに userId が含まれていません。')
       return new Response(
         JSON.stringify({ success: false, error: 'ユーザーIDが指定されていません' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
@@ -45,7 +59,11 @@ serve(async (req: Request) => {
 
     // サービスロールキーを取得
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    // ★★★ ログ追加: Service Role Key 取得後 ★★★
+    console.log(`[delete-user] Service Role Key の存在確認: ${!!serviceRoleKey}`)
+
     if (!serviceRoleKey) {
+      console.error('[delete-user] 環境変数 SUPABASE_SERVICE_ROLE_KEY が見つかりません。')
       return new Response(
         JSON.stringify({ success: false, error: 'サーバー構成エラー' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
@@ -54,7 +72,11 @@ serve(async (req: Request) => {
 
     // アプリのURLを取得
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    // ★★★ ログ追加: Supabase URL 取得後 ★★★
+    console.log(`[delete-user] Supabase URL の存在確認: ${!!supabaseUrl}`)
+
     if (!supabaseUrl) {
+      console.error('[delete-user] 環境変数 SUPABASE_URL が見つかりません。')
       return new Response(
         JSON.stringify({ success: false, error: 'サーバー構成エラー' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
@@ -72,6 +94,8 @@ serve(async (req: Request) => {
         }
       }
     )
+    // ★★★ ログ追加: supabaseAdmin クライアント作成後 ★★★
+    console.log('[delete-user] supabaseAdmin クライアントを作成しました。')
     
     // JWT デコード用の関数
     async function decodeAndVerifyJWT(token: string) {
@@ -89,6 +113,8 @@ serve(async (req: Request) => {
     }
 
     // ユーザーIDの検証
+    // ★★★ ログ追加: decodeAndVerifyJWT 呼び出し前 ★★★
+    console.log('[delete-user] decodeAndVerifyJWT 関数を呼び出します...')
     const { user, error: jwtError } = await decodeAndVerifyJWT(token)
 
     if (jwtError || !user) {

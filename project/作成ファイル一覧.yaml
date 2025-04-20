@@ -250,3 +250,51 @@
   依存元ユニット: [] # 現状、他から直接依存されていない
   状態: 生成完了
   ユニット生成順: 6 # ログインの次
+
+# 新しく追加: 認証基盤ユニット (標準 supabase-js を利用)
+認証基盤:
+  composables/useSupabaseAuth.ts:
+    状態: 生成完了 # ファイルは作成したが、テストはまだ -> 生成完了
+    依存先相対パス: [] # supabase-js ライブラリには依存するが、プロジェクト内ファイルには依存しない
+    依存元相対パス:
+      - composables/account/useDeleteAccount.ts # まずはアカウント削除から利用
+      # 他の認証関連 Composable (useRegister, useLogin) も将来的に依存する可能性
+  依存先ユニット: [] # Nuxt の useRuntimeConfig や supabase-js に依存
+  依存元ユニット:
+    - アカウント削除 # まずはアカウント削除から利用
+    # 他の認証関連ユニットも将来的に依存
+  状態: 生成完了 # 生成中 -> 生成完了
+  ユニット生成順: 1 # プラグインの後、他の機能ユニットの前あたりに配置
+
+# 新しく追加: アカウント削除ユニット (プロフィール機能群の CRUD 完了のため)
+アカウント削除:
+  composables/account/useDeleteAccount.ts:
+    状態: 生成完了 # ファイルは修正したが、テストはまだ -> 生成完了
+    依存先相対パス:
+      - types/index.ts # Error Handling用
+      - supabase/functions/delete-user/delete-user-function.ts # 機能的依存: invoke で呼び出し
+      - composables/useSupabaseAuth.ts # ★ 依存先に追加
+    依存元相対パス:
+      - pages/profile/edit.vue # 削除ボタンから呼び出す想定
+  tests/account/delete.spec.ts:
+    状態: 生成完了 # 未生成 -> 生成完了
+    依存先相対パス:
+      - pages/profile/edit.vue # 削除ボタンを含むページ
+      - pages/register.vue     # テスト前のユーザー登録用
+      - pages/login.vue        # テスト前のログイン用
+      - layouts/default.vue
+    依存元相対パス: []
+  supabase/functions/delete-user/delete-user-function.ts: # ★ Edge Function をユニットに追加
+    状態: 生成完了
+    依存先相対パス: []
+    依存元相対パス:
+      - composables/account/useDeleteAccount.ts
+  依存先ユニット:
+    - 型定義
+    - 認証基盤 # ★ 依存先をプラグインから認証基盤に変更
+    - ユーザー登録 # テストの前提
+    - ユーザーログイン # テストの前提
+    - プロフィール表示・編集 # 削除UIの配置先ページ
+  依存元ユニット: [] # 他から直接依存されることは少ない想定
+  状態: 生成完了 # 未生成 -> 生成完了
+  ユニット生成順: 7 # プロフィール表示・編集の後
