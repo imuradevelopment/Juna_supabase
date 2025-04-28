@@ -7,9 +7,8 @@ import Typography from '@tiptap/extension-typography'
 import CodeBlock from '@tiptap/extension-code-block'
 import Placeholder from '@tiptap/extension-placeholder'
 
-export default defineNuxtPlugin(() => {
-  // デフォルトの拡張機能をまとめた関数
-  const createTiptapExtensions = (options = {}) => {
+// デフォルトの拡張機能をまとめた関数をエクスポート
+export const createTiptapExtensions = (options = {}) => {
     return [
       StarterKit.configure(),
       Link.configure({
@@ -40,14 +39,9 @@ export default defineNuxtPlugin(() => {
         placeholder: useRuntimeConfig().public.tiptap?.defaultOptions?.placeholder || 'ここに内容を入力してください...'
       })
     ]
-  }
+}
 
+export default defineNuxtPlugin(() => {
   // アプリケーション全体で使用できるようにする
-  return {
-    provide: {
-      tiptap: {
-        createTiptapExtensions,
-      }
-    }
-  }
+  // provide は削除 (もし他に provide するものがなければ return も不要)
 }) 

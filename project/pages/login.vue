@@ -4,7 +4,7 @@
     <!-- フォーム要素を囲むカード -->
     <div class="w-full max-w-md p-8 space-y-6 bg-primary-300 rounded-lg shadow-xl">
       <!-- ページタイトル -->
-      <h2 class="text-3xl font-bold text-center text-secondary-500">ログイン</h2>
+      <h2 data-testid="login-page-title" class="text-3xl font-bold text-center text-secondary-500">ログイン</h2>
       <!-- ログインフォーム -->
       <form data-testid="login-form" class="space-y-6" @submit.prevent="handleLogin" novalidate>
         <!-- メールアドレス/アカウントID入力 -->

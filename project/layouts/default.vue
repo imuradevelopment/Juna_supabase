@@ -10,50 +10,77 @@
       <!-- ナビゲーションメニュー -->
       <nav data-testid="header-nav">
         <ul class="flex space-x-4 items-center">
-          <!-- 認証状態のチェックが完了し、かつユーザーが存在する場合 (ログイン済み) -->
-          <template v-if="!isAuthCheckLoading && user">
-            <li>
-              <NuxtLink
-                to="/profile"
-                class="text-gray-700 hover:text-secondary-500 px-3 py-2 rounded-md text-sm font-medium"
-                data-testid="header-profile-link"
-              >
-                プロフィール
-              </NuxtLink>
-            </li>
-            <li>
-              <button
-                @click="handleLogout"
-                class="text-gray-700 hover:text-secondary-500 px-3 py-2 rounded-md text-sm font-medium bg-transparent border-none cursor-pointer"
-                data-testid="header-logout-button"
-              >
-                ログアウト
-              </button>
-            </li>
-          </template>
-          <!-- 認証状態のチェックが完了し、かつユーザーが存在しない場合 (未ログイン) -->
-          <template v-else-if="!isAuthCheckLoading">
-            <li>
-              <NuxtLink
-                to="/register"
-                class="text-gray-700 hover:text-secondary-500 px-3 py-2 rounded-md text-sm font-medium"
-                data-testid="header-register-link"
-              >
-                新規登録
-              </NuxtLink>
-            </li>
-            <li>
-              <NuxtLink
-                to="/login"
-                class="text-gray-700 hover:text-secondary-500 px-3 py-2 rounded-md text-sm font-medium"
-                data-testid="header-login-link"
-              >
-                ログイン
-              </NuxtLink>
-            </li>
-          </template>
-          <!-- 認証状態のチェック中は何も表示しない -->
-          <li v-else></li>
+          <!-- ClientOnly でラップしてクライアントサイドでのみレンダリング -->
+          <ClientOnly>
+            <!-- 認証状態のチェックが完了し、かつユーザーが存在する場合 (ログイン済み) -->
+            <template v-if="!isAuthCheckLoading && user">
+              <li>
+                <NuxtLink
+                  to="/posts/new"
+                  class="text-gray-700 hover:text-secondary-500 px-3 py-2 rounded-md text-sm font-medium"
+                  data-testid="nav-post-new-link"
+                >
+                  新規投稿
+                </NuxtLink>
+              </li>
+              <li>
+                <NuxtLink
+                  to="/categories"
+                  class="text-gray-700 hover:text-secondary-500 px-3 py-2 rounded-md text-sm font-medium"
+                  data-testid="nav-categories-link"
+                >
+                  カテゴリ
+                </NuxtLink>
+              </li>
+              <li>
+                <NuxtLink
+                  to="/profile"
+                  class="text-gray-700 hover:text-secondary-500 px-3 py-2 rounded-md text-sm font-medium"
+                  data-testid="header-profile-link"
+                >
+                  プロフィール
+                </NuxtLink>
+              </li>
+              <li>
+                <button
+                  @click="handleLogout"
+                  class="text-gray-700 hover:text-secondary-500 px-3 py-2 rounded-md text-sm font-medium bg-transparent border-none cursor-pointer"
+                  data-testid="header-logout-button"
+                >
+                  ログアウト
+                </button>
+              </li>
+            </template>
+            <!-- 認証状態のチェックが完了し、かつユーザーが存在しない場合 (未ログイン) -->
+            <template v-else-if="!isAuthCheckLoading">
+              <li>
+                <NuxtLink
+                  to="/register"
+                  class="text-gray-700 hover:text-secondary-500 px-3 py-2 rounded-md text-sm font-medium"
+                  data-testid="header-register-link"
+                >
+                  新規登録
+                </NuxtLink>
+              </li>
+              <li>
+                <NuxtLink
+                  to="/login"
+                  class="text-gray-700 hover:text-secondary-500 px-3 py-2 rounded-md text-sm font-medium"
+                  data-testid="header-login-link"
+                >
+                  ログイン
+                </NuxtLink>
+              </li>
+            </template>
+            <!-- 認証状態のチェック中は何も表示しない (ClientOnly 内なのでサーバー側では空) -->
+            <template #fallback>
+              <!-- Optional: Add a loading indicator or placeholder here -->
+              <li v-if="isAuthCheckLoading">
+                <!-- You might want a placeholder or loading spinner here -->
+                <div class="w-20 h-6 bg-gray-600 rounded animate-pulse"></div>
+              </li>
+            </template>
+          </ClientOnly>
         </ul>
       </nav>
     </header>
@@ -116,7 +143,7 @@ watch(user, (currentUser) => { // ユーザーオブジェクト (user) の変�
     // 認証状態が確定したのでローディングを終了
     isAuthCheckLoading.value = false; // ローディング状態フラグを false に設定
   }
-}, { immediate: false }); // immediate: false で初期値での発火を防ぎ、マウント後の変更のみを監視
+}, { immediate: true }); // immediate: true で初期値での発火を許可
 
 // ログアウトボタンがクリックされたときの処理を定義する非同期関数
 const handleLogout = async () => { // ログアウト処理を実行する非同期関数

@@ -51,12 +51,18 @@
       - tests/profile/edit.spec.ts
       - tests/account/delete.spec.ts
       - layouts/default.vue
+  plugins/tiptap.client.ts:
+    状態: 生成完了
+    依存先相対パス: []
+    依存元相対パス:
+      - pages/posts/new.vue
   依存先ユニット: []
   依存元ユニット:
     - プロフィール表示・編集
     - ユーザー登録
     - ユーザーログイン
     - アカウント削除
+    - 投稿作成
   状態: 生成完了
   ユニット生成順: 0.5
 
@@ -356,3 +362,443 @@
     - アカウント削除
   状態: 生成完了
   ユニット生成順: 6.5
+
+カテゴリ管理:
+  pages/categories/index.vue:
+    状態: 生成中
+    依存先相対パス:
+      - composables/categories/useCategories.ts
+      - layouts/default.vue
+      - server/api/categories/list.get.ts
+      - server/api/categories/create.post.ts
+    依存元相対パス:
+      - tests/categories/crud.spec.ts
+  pages/categories/[id]/edit.vue:
+    状態: 未生成
+    依存先相対パス:
+      - composables/categories/useCategories.ts
+      - layouts/default.vue
+      - server/api/categories/[id]/update.put.ts
+      - server/api/categories/[id]/delete.delete.ts
+    依存元相対パス:
+      - tests/categories/crud.spec.ts
+  composables/categories/useCategories.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - types/database.ts
+      - composables/useSupabaseClient.ts
+      - composables/useSupabaseUser.ts # For creator_id check potentially
+    依存元相対パス:
+      - pages/categories/index.vue
+      - pages/categories/[id]/edit.vue
+      - tests/categories/crud.spec.ts
+  server/api/categories/create.post.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - types/database.ts
+      - server/utils/supabaseServerClient.ts # Or service role
+    依存元相対パス:
+      - pages/categories/index.vue
+      - tests/categories/crud.spec.ts
+  server/api/categories/list.get.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - types/database.ts
+      - server/utils/supabaseServerClient.ts # Or service role
+    依存元相対パス:
+      - pages/categories/index.vue
+      - tests/categories/crud.spec.ts
+  server/api/categories/[id]/update.put.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - server/utils/supabaseServerClient.ts # Or service role
+    依存元相対パス:
+      - pages/categories/[id]/edit.vue
+      - tests/categories/crud.spec.ts
+  server/api/categories/[id]/delete.delete.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - server/utils/supabaseServerClient.ts # Or service role
+    依存元相対パス:
+      - pages/categories/[id]/edit.vue
+      - tests/categories/crud.spec.ts
+  tests/categories/crud.spec.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - pages/categories/index.vue
+      - pages/categories/[id]/edit.vue
+      - layouts/default.vue
+      # Needs login setup
+    依存元相対パス: []
+  依存先ユニット:
+    - 型定義
+    - プラグイン
+    - レイアウト
+    - ユーザーログイン # For authentication
+    - プロフィール表示・編集 # For creator_id
+  依存元ユニット:
+    - 投稿作成       # 追加
+    - 投稿編集       # 追加
+  状態: 生成完了
+  ユニット生成順: 8
+
+# --- ユニット分割: 投稿作成 ---
+投稿作成:
+  pages/posts/new.vue:
+    状態: 生成完了
+    依存先相対パス:
+      - composables/posts/usePostEditor.ts
+      - layouts/default.vue
+      - server/api/posts/create.post.ts
+      - types/database.ts # For Post content structure (JSONB)
+      - composables/categories/useCategories.ts # If selecting category
+      - '@TipTap' # For editor component
+      - plugins/tiptap.client.ts
+    依存元相対パス:
+      - tests/posts/create.spec.ts
+  # composables/posts/usePostEditor.ts は投稿編集と共有するため、そちらに含めるか別途管理
+  server/api/posts/create.post.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - types/database.ts
+      - server/utils/supabaseServerClient.ts # Or service role
+      # Needs to handle post_categories, post_images linking
+    依存元相対パス:
+      - pages/posts/new.vue
+      - tests/posts/create.spec.ts
+  tests/posts/create.spec.ts:
+    状態: 生成完了
+    依存先相対パス:
+      - pages/posts/new.vue
+      - layouts/default.vue
+      - ユーザーログイン # 機能依存: テスト前のログイン
+      - カテゴリ管理 # 機能依存: テスト前のカテゴリ作成
+    依存元相対パス: []
+  依存先ユニット:
+    - 型定義
+    - プラグイン
+    - レイアウト
+    - ユーザーログイン
+    - プロフィール表示・編集 # 投稿者情報のため
+    - カテゴリ管理
+    - # 画像管理 (Potentially)
+  依存元ユニット:
+    - 投稿編集
+    - 投稿一覧・検索
+    - 投稿表示
+  状態: 生成完了
+  ユニット生成順: 9.1 # 新しい生成順
+
+# --- ユニット分割: 投稿編集 ---
+投稿編集:
+  pages/posts/[id]/edit.vue:
+    状態: 未生成
+    依存先相対パス:
+      - composables/posts/usePostEditor.ts
+      - layouts/default.vue
+      - server/api/posts/[id]/update.put.ts
+      - server/api/posts/[id]/view.get.ts # To load existing post (投稿表示ユニットのAPIに依存)
+      - types/database.ts
+      - composables/categories/useCategories.ts
+      - '@TipTap'
+    依存元相対パス:
+      - tests/posts/edit.spec.ts
+  composables/posts/usePostEditor.ts:
+    # 状態は未生成だが、ファイル自体は存在している可能性あり (分割元)
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - composables/useSupabaseClient.ts
+      - composables/useSupabaseUser.ts
+      - composables/categories/useCategories.ts # Maybe
+      # Potentially storage composables
+      # 投稿作成・編集の両方から利用される
+    依存元相対パス:
+      - pages/posts/new.vue # 投稿作成
+      - pages/posts/[id]/edit.vue # 投稿編集
+      - tests/posts/create.spec.ts # 投稿作成テスト
+      - tests/posts/edit.spec.ts # 投稿編集テスト
+  server/api/posts/[id]/update.put.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - server/utils/supabaseServerClient.ts # Or service role
+      # Needs to handle post_categories, post_images updates
+    依存元相対パス:
+      - pages/posts/[id]/edit.vue
+      - tests/posts/edit.spec.ts
+  tests/posts/edit.spec.ts:
+    # 状態は生成中だったが、依存先未生成のため一旦リセット
+    状態: 未生成
+    依存先相対パス:
+      - pages/posts/[id]/edit.vue
+      - layouts/default.vue
+      - 投稿作成 # 機能依存: テスト前の投稿作成
+      - ユーザーログイン # 機能依存: テスト前のログイン
+      - カテゴリ管理 # 機能依存: テスト前のカテゴリ作成
+    依存元相対パス: []
+  依存先ユニット:
+    - 型定義
+    - プラグイン
+    - レイアウト
+    - ユーザーログイン
+    - プロフィール表示・編集
+    - カテゴリ管理
+    - 投稿作成 # ★ 追加
+    - 投稿表示 # 編集前のデータ取得 (view.get.ts) のため
+    - # 画像管理 (Potentially)
+  依存元ユニット:
+    - 投稿一覧・検索 # 編集結果が一覧に反映されるか
+    - 投稿表示 # 編集結果が表示に反映されるか
+  状態: 未生成 # ユニット全体としては未生成
+  ユニット生成順: 9.2 # 新しい生成順
+
+投稿一覧・検索:
+  pages/posts/index.vue:
+    状態: 未生成
+    依存先相対パス:
+      - composables/posts/usePostList.ts
+      - layouts/default.vue
+      - server/api/posts/list.get.ts
+      - server/api/posts/search.get.ts
+    依存元相対パス:
+      - tests/posts/list.spec.ts
+      - tests/posts/search.spec.ts
+  composables/posts/usePostList.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - composables/useSupabaseClient.ts
+    依存元相対パス:
+      - pages/posts/index.vue
+      - tests/posts/list.spec.ts
+      - tests/posts/search.spec.ts
+  server/api/posts/list.get.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - server/utils/supabaseServerClient.ts # Public access, maybe client?
+    依存元相対パス:
+      - pages/posts/index.vue
+      - tests/posts/list.spec.ts
+  server/api/posts/search.get.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - server/utils/supabaseServerClient.ts # Public access, maybe client?
+      # Uses search_posts function
+    依存元相対パス:
+      - pages/posts/index.vue
+      - tests/posts/search.spec.ts
+  tests/posts/list.spec.ts:
+    状態: 未生成
+    依存先相対パス:
+      - pages/posts/index.vue
+      - layouts/default.vue
+      # Needs post creation setup
+    依存元相対パス: []
+  tests/posts/search.spec.ts:
+    状態: 未生成
+    依存先相対パス:
+      - pages/posts/index.vue
+      - layouts/default.vue
+      # Needs post creation setup with specific content
+    依存元相対パス: []
+  依存先ユニット:
+    - 型定義
+    - プラグイン
+    - レイアウト
+    - 投稿作成       # 追加
+  依存元ユニット:
+    - 投稿いいね # Like button might be on list page
+  状態: 未生成
+  ユニット生成順: 10
+
+投稿表示:
+  pages/posts/[id]/index.vue:
+    状態: 未生成
+    依存先相対パス:
+      - composables/posts/usePostView.ts
+      - composables/comments/useComments.ts
+      - composables/likes/usePostLikes.ts
+      - layouts/default.vue
+      - server/api/posts/[id]/view.get.ts
+      - types/database.ts
+    依存元相対パス:
+      - tests/posts/view.spec.ts
+  composables/posts/usePostView.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - composables/useSupabaseClient.ts
+      # Needs get_related_posts function call logic
+    依存元相対パス:
+      - pages/posts/[id]/index.vue
+      - tests/posts/view.spec.ts
+  server/api/posts/[id]/view.get.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - server/utils/supabaseServerClient.ts # Public access, maybe client?
+      # Needs to fetch post, comments, likes, related posts
+    依存元相対パス:
+      - pages/posts/[id]/index.vue
+      - tests/posts/view.spec.ts
+  tests/posts/view.spec.ts:
+    状態: 未生成
+    依存先相対パス:
+      - pages/posts/[id]/index.vue
+      - layouts/default.vue
+      # Needs post creation setup
+      # Needs comment creation setup
+      # Needs like setup
+    依存元相対パス: []
+  依存先ユニット:
+    - 型定義
+    - プラグイン
+    - レイアウト
+    - 投稿作成       # 追加
+    - コメント投稿・表示
+    - 投稿いいね
+  依存元ユニット:
+    - コメント投稿・表示
+    - 投稿いいね
+    - コメントいいね
+  状態: 未生成
+  ユニット生成順: 11
+
+コメント投稿・表示:
+  # Note: UI likely integrated into pages/posts/[id]/index.vue
+  #       Tests likely integrated into tests/posts/view.spec.ts
+  composables/comments/useComments.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - composables/useSupabaseClient.ts
+      - composables/useSupabaseUser.ts
+    依存元相対パス:
+      - pages/posts/[id]/index.vue # Assumed integration
+      - tests/posts/view.spec.ts # Assumed integration
+  server/api/comments/create.post.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - server/utils/supabaseServerClient.ts
+    依存元相対パス:
+      - pages/posts/[id]/index.vue # Assumed integration
+      - tests/posts/view.spec.ts # Assumed integration
+  server/api/comments/list.get.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - server/utils/supabaseServerClient.ts # Public access, maybe client?
+    依存元相対パス:
+      - pages/posts/[id]/index.vue # Assumed integration
+      - tests/posts/view.spec.ts # Assumed integration
+  server/api/comments/[id]/update.put.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - server/utils/supabaseServerClient.ts
+    依存元相対パス:
+      - tests/posts/view.spec.ts # Assumed integration for testing update
+  server/api/comments/[id]/delete.delete.ts:
+    状態: 未生成
+    依存先相対パス:
+      - server/utils/supabaseServerClient.ts
+      # Uses can_delete_comment function implicitly via RLS or explicitly
+    依存元相対パス:
+      - tests/posts/view.spec.ts # Assumed integration for testing delete
+  依存先ユニット:
+    - 型定義
+    - プラグイン
+    - レイアウト
+    - ユーザーログイン
+    - プロフィール表示・編集
+    - 投稿表示
+  依存元ユニット:
+    - 投稿表示
+    - コメントいいね
+  状態: 未生成
+  ユニット生成順: 12
+
+投稿いいね:
+  # Note: UI likely integrated into pages/posts/[id]/index.vue or list
+  #       Tests likely integrated
+  composables/likes/usePostLikes.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - composables/useSupabaseClient.ts
+      - composables/useSupabaseUser.ts
+    依存元相対パス:
+      - pages/posts/[id]/index.vue # Assumed integration
+      - pages/posts/index.vue # Assumed integration
+      - tests/posts/view.spec.ts # Assumed integration
+      - tests/posts/list.spec.ts # Assumed integration
+  server/api/posts/[postId]/like.post.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - server/utils/supabaseServerClient.ts
+    依存元相対パス:
+      - tests/posts/view.spec.ts # Assumed integration
+      - tests/posts/list.spec.ts # Assumed integration
+  server/api/posts/[postId]/unlike.delete.ts:
+    状態: 未生成
+    依存先相対パス:
+      - server/utils/supabaseServerClient.ts
+    依存元相対パス:
+      - tests/posts/view.spec.ts # Assumed integration
+      - tests/posts/list.spec.ts # Assumed integration
+  依存先ユニット:
+    - 型定義
+    - プラグイン
+    - レイアウト
+    - ユーザーログイン
+    - プロフィール表示・編集
+    - 投稿表示
+    - 投稿一覧・検索
+  依存元ユニット:
+    - 投稿表示
+    - 投稿一覧・検索
+  状態: 未生成
+  ユニット生成順: 13
+
+コメントいいね:
+  # Note: UI likely integrated into comment display
+  #       Tests likely integrated
+  composables/likes/useCommentLikes.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - composables/useSupabaseClient.ts
+      - composables/useSupabaseUser.ts
+    依存元相対パス:
+      - pages/posts/[id]/index.vue # Assumed integration
+      - tests/posts/view.spec.ts # Assumed integration
+  server/api/comments/[commentId]/like.post.ts:
+    状態: 未生成
+    依存先相対パス:
+      - types/database.ts
+      - server/utils/supabaseServerClient.ts
+    依存元相対パス:
+      - tests/posts/view.spec.ts # Assumed integration
+  server/api/comments/[commentId]/unlike.delete.ts:
+    状態: 未生成
+    依存先相対パス:
+      - server/utils/supabaseServerClient.ts
+    依存元相対パス:
+      - tests/posts/view.spec.ts # Assumed integration
+  依存先ユニット:
+    - 型定義
+    - プラグイン
+    - レイアウト
+    - ユーザーログイン
+    - プロフィール表示・編集
+    - コメント投稿・表示
+  依存元ユニット:
+    - 投稿表示 # Via comments
+  状態: 未生成
+  ユニット生成順: 14
