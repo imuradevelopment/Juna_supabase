@@ -1,19 +1,20 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 
 // ★★★ デバッグログ追加: ビルド時の環境変数読み込み確認 ★★★
-console.log('[nuxt.config.ts] Reading env vars for runtimeConfig:');
-console.log('[nuxt.config.ts] SUPABASE_URL:', process.env.SUPABASE_URL ? 'Loaded' : 'Missing');
-console.log('[nuxt.config.ts] SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY ? 'Loaded' : 'Missing');
-console.log('[nuxt.config.ts] SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Loaded' : 'Missing');
+// console.log('[nuxt.config.ts] Reading env vars for runtimeConfig:');
+// console.log('[nuxt.config.ts] SUPABASE_URL:', process.env.SUPABASE_URL ? 'Loaded' : 'Missing');
+// console.log('[nuxt.config.ts] SUPABASE_ANON_KEY:', process.env.SUPABASE_ANON_KEY ? 'Loaded' : 'Missing');
+// console.log('[nuxt.config.ts] SUPABASE_SERVICE_ROLE_KEY:', process.env.SUPABASE_SERVICE_ROLE_KEY ? 'Loaded' : 'Missing');
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
   modules: [
-    '@nuxt/fonts', 
+    // '@nuxt/fonts', 
     '@nuxt/icon', 
     '@nuxt/image', 
-    '@nuxtjs/tailwindcss'
+    '@nuxtjs/tailwindcss',
+    '@pinia/nuxt'
   ],
   
   // cookieモジュールの最適化設定を追加
@@ -23,9 +24,6 @@ export default defineNuxtConfig({
     }
   },
   
-  // グローバルCSS
-  css: ['~/assets/css/tiptap.css'],
-  
   // Tailwind CSS設定
   tailwindcss: {
     cssPath: '~/assets/css/tailwind.css',
@@ -33,27 +31,27 @@ export default defineNuxtConfig({
     viewer: false
   },
   
-  // Nuxt Fonts設定
-  fonts: {
-    families: [
-      {
-        name: 'Roboto',
-        // ウェイトとスタイルを指定
-        weights: [400, 700],
-        styles: ['normal', 'italic']
-      },
-      {
-        name: 'Noto Sans JP',
-        weights: [400, 500, 700],
-        styles: ['normal']
-      }
-    ],
-    // デフォルト設定を上書き
-    defaults: {
-      weights: [400],
-      styles: ['normal']
-    }
-  },
+  // // Nuxt Fonts設定
+  // fonts: {
+  //   families: [
+  //     {
+  //       name: 'Roboto',
+  //       // ウェイトとスタイルを指定
+  //       weights: [400, 700],
+  //       styles: ['normal', 'italic']
+  //     },
+  //     {
+  //       name: 'Noto Sans JP',
+  //       weights: [400, 500, 700],
+  //       styles: ['normal']
+  //     }
+  //   ],
+  //   // デフォルト設定を上書き
+  //   defaults: {
+  //     weights: [400],
+  //     styles: ['normal']
+  //   }
+  // },
   
   // Nuxt Image設定
   image: {
