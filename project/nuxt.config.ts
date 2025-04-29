@@ -13,7 +13,8 @@ export default defineNuxtConfig({
     '@nuxt/fonts', 
     '@nuxt/icon', 
     '@nuxt/image', 
-    '@nuxtjs/tailwindcss'
+    '@nuxtjs/tailwindcss',
+    '@pinia/nuxt'
   ],
   
   // cookieモジュールの最適化設定を追加
@@ -22,9 +23,6 @@ export default defineNuxtConfig({
       include: ['cookie']
     }
   },
-  
-  // グローバルCSS
-  css: ['~/assets/css/tiptap.css'],
   
   // Tailwind CSS設定
   tailwindcss: {

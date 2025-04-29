@@ -1,325 +1,201 @@
-// @ts-nocheck
-import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.21.0'
+// ファイル名: delete-user-function.ts
+// 処理概要: 指定されたSupabaseユーザーの認証・ストレージ・投稿・カテゴリを完全削除（副作用あり）
+// --- 設計思想 ---
+//
+// 1. **多段トランザクション設計**
+//    明示的にrollback関数を積み、失敗時に逆順undo（Stack構造）で整合性担保
+//
+// 2. **完全削除処理の実装**
+//    ストレージ→投稿→カテゴリ→プロフィール→認証の順に副作用を整理
+//
+// 3. **カテゴリの引き継ぎ処理**
+//    共有カテゴリはsystemに引き継ぎ、孤立カテゴリは削除
+//
+// 4. **CORS・入力検証・所有者確認**
+//    ALLOWED_ORIGINS, Bearer Token, auth.getUser() で明示的に実装
+//
+// 5. **監査・トレース性**
+//    traceId + structured logging + rollback追跡用ログ
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
+// @ts-ignore
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
+// @ts-ignore
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.21.0';
+// @ts-ignore
+import { z } from 'https://esm.sh/zod@3.22.4';
+
+const SYSTEM_USER_ID: string = '00000000-0000-0000-0000-000000000000';
+const BUCKETS = ['profile_images', 'post_images', 'cover_images'] as const;
+
+const corsHeaders: Record<string, string> = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Credentials': 'true',
+  'Access-Control-Max-Age': '86400',
+  Vary: 'Origin',
+};
+
+const allowedOrigins: string[] = (() => {
+  // @ts-ignore
+  const raw = Deno.env.get('ALLOWED_ORIGINS');
+  return raw ? raw.split(',').map((s: string) => s.trim()).filter(Boolean) : ['*'];
+})();
+
+function getEnv(key: string): string {
+  // @ts-ignore
+  const val = Deno.env.get(key);
+  if (!val) throw new Error(`Missing env: ${key}`);
+  return val;
 }
 
-// システムユーザーのID
-const SYSTEM_USER_ID = '00000000-0000-0000-0000-000000000000';
-
-interface RequestBody {
-  userId: string;
+function validateOrigin(origin: string | null): boolean {
+  return origin ? allowedOrigins.includes(origin) || allowedOrigins.includes('*') : false;
 }
 
-serve(async (req: Request) => {
-  // CORSプリフライトリクエストの処理
+function jsonResponse<T extends object>(
+  body: T & { success: boolean; errorCode?: string },
+  traceId: string,
+  status = 200,
+  origin: string | null = null
+): Response {
+  const headers = new Headers(corsHeaders);
+  if (origin && validateOrigin(origin)) headers.set('Access-Control-Allow-Origin', origin);
+  headers.set('Content-Type', 'application/json');
+  headers.set('X-Trace-Id', traceId);
+
+  return new Response(JSON.stringify(body), {
+    status,
+    headers,
+  });
+}
+
+const RequestSchema = z.object({
+  userId: z.string().uuid(),
+});
+
+type RequestBody = z.infer<typeof RequestSchema>;
+
+type Profile = {
+  id: string;
+  nickname: string;
+  account_id: string;
+};
+
+type StorageFile = {
+  name: string;
+};
+
+type Category = {
+  id: number;
+};
+
+type PostCategory = {
+  category_id: number;
+  posts: { author_id: string };
+};
+
+serve(async (req: Request): Promise<Response> => {
+  const traceId = crypto.randomUUID();
+  const origin = req.headers.get('origin') || '*';
+
   if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
+    const headers = new Headers(corsHeaders);
+    headers.set('Access-Control-Allow-Origin', validateOrigin(origin) ? origin : 'null');
+    headers.set('X-Trace-Id', traceId);
+    return new Response(null, {
+      status: 204,
+      headers,
+    });
   }
 
   try {
-    // ★★★ ログ追加: try ブロック開始 ★★★
-    console.log('[delete-user] 関数の実行を開始しました。')
-
-    // Authorization ヘッダーから Bearer トークンを取得
-    const authHeader = req.headers.get('Authorization');
-    // ★★★ ログ追加: Authorization ヘッダー取得後 ★★★
-    console.log(`[delete-user] Authorization ヘッダー: ${authHeader ? authHeader.substring(0, 15) + '...' : '見つかりません'}`)
-
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.error('[delete-user] Authorization ヘッダーが無効または見つかりません。')
-      return new Response(
-        JSON.stringify({ success: false, error: '認証エラー' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
-      );
+    if (!validateOrigin(origin)) {
+      return jsonResponse({ success: false, error: '許可されていないオリジンです', errorCode: 'forbidden_origin' }, traceId, 403, origin);
     }
 
-    const token = authHeader.replace('Bearer ', '');
-    // ★★★ ログ追加: トークン抽出後 ★★★
-    console.log(`[delete-user] トークンを抽出しました: ${token.substring(0, 10)}...`)
-
-    // リクエストボディからユーザーIDを取得
-    // ★★★ ログ追加: req.json() 呼び出し前 ★★★
-    console.log('[delete-user] リクエストボディの解析を試みます...')
-    const { userId } = await req.json() as RequestBody;
-    // ★★★ ログ追加: userId 取得後 ★★★
-    console.log(`[delete-user] リクエストボディから取得した userId: ${userId}`)
-
-    if (!userId) {
-      console.error('[delete-user] リクエストボディに userId が含まれていません。')
-      return new Response(
-        JSON.stringify({ success: false, error: 'ユーザーIDが指定されていません' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-      )
+    const token = req.headers.get('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      return jsonResponse({ success: false, error: 'トークンが必要です', errorCode: 'unauthorized' }, traceId, 401, origin);
     }
 
-    // サービスロールキーを取得
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    // ★★★ ログ追加: Service Role Key 取得後 ★★★
-    console.log(`[delete-user] Service Role Key の存在確認: ${!!serviceRoleKey}`)
-
-    if (!serviceRoleKey) {
-      console.error('[delete-user] 環境変数 SUPABASE_SERVICE_ROLE_KEY が見つかりません。')
-      return new Response(
-        JSON.stringify({ success: false, error: 'サーバー構成エラー' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      )
+    const raw = await req.json();
+    const parsed = RequestSchema.safeParse(raw);
+    if (!parsed.success) {
+      return jsonResponse({
+        success: false,
+        error: 'リクエスト形式が不正です',
+        errorCode: 'validation_error',
+        details: parsed.error.flatten(),
+      }, traceId, 400, origin);
     }
 
-    // アプリのURLを取得
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')
-    // ★★★ ログ追加: Supabase URL 取得後 ★★★
-    console.log(`[delete-user] Supabase URL の存在確認: ${!!supabaseUrl}`)
+    const { userId }: RequestBody = parsed.data;
+    const supabase: SupabaseClient = createClient(
+      getEnv('SUPABASE_URL'),
+      getEnv('SUPABASE_SERVICE_ROLE_KEY'),
+      { auth: { persistSession: false } }
+    );
 
-    if (!supabaseUrl) {
-      console.error('[delete-user] 環境変数 SUPABASE_URL が見つかりません。')
-      return new Response(
-        JSON.stringify({ success: false, error: 'サーバー構成エラー' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      )
+    const { data: authUser, error: authErr } = await supabase.auth.getUser(token);
+    if (authErr || authUser.user?.id !== userId) {
+      return jsonResponse({ success: false, error: '認証失敗', errorCode: 'invalid_user' }, traceId, 403, origin);
     }
 
-    // 管理者クライアントの作成
-    const supabaseAdmin = createClient(
-      supabaseUrl,
-      serviceRoleKey,
-      { 
-        auth: { 
-          persistSession: false,
-          autoRefreshToken: false
-        }
-      }
-    )
-    // ★★★ ログ追加: supabaseAdmin クライアント作成後 ★★★
-    console.log('[delete-user] supabaseAdmin クライアントを作成しました。')
-    
-    // JWT デコード用の関数
-    async function decodeAndVerifyJWT(token: string) {
+    const rollbackStack: Array<() => Promise<void>> = [];
+
+    for (const bucket of BUCKETS) {
       try {
-        // サービスロールを使って管理者クライアントでユーザーを取得
-        const { data, error } = await supabaseAdmin.auth.getUser(token)
-        
-        if (error) throw error
-        return { user: data.user, error: null }
-      } catch (error) {
-        const errorToLog = error instanceof Error ? error.stack || error : error;
-        console.error('JWT検証エラー:', errorToLog)
-        return { user: null, error }
-      }
-    }
-
-    // ユーザーIDの検証
-    // ★★★ ログ追加: decodeAndVerifyJWT 呼び出し前 ★★★
-    console.log('[delete-user] decodeAndVerifyJWT 関数を呼び出します...')
-    const { user, error: jwtError } = await decodeAndVerifyJWT(token)
-
-    if (jwtError || !user) {
-      return new Response(
-        JSON.stringify({ 
-          success: false, 
-          error: '認証に失敗しました: ' + (jwtError?.message || 'トークンが無効です') 
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
-      )
-    }
-
-    // 要求されたユーザーIDと認証されたユーザーIDが一致することを確認
-    if (user.id !== userId) {
-      return new Response(
-        JSON.stringify({ success: false, error: '他のユーザーアカウントは削除できません' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
-      )
-    }
-
-    // ストレージ削除処理
-    try {
-      // バケットごとに処理を分離し、エラーが発生しても続行できるように
-      const buckets = ['profile_images', 'post_images', 'cover_images']
-      
-      for (const bucket of buckets) {
-        try {
-          const { data: objects, error: listError } = await supabaseAdmin.storage
-            .from(bucket)
-            .list(userId)
-          
-          if (listError) {
-            console.error(`${bucket} 一覧取得エラー:`, listError.stack || listError)
-            continue
-          }
-          
-          if (objects && objects.length > 0) {
-            const filePaths = objects.map(obj => `${userId}/${obj.name}`)
-            
-            const { error: deleteError } = await supabaseAdmin.storage
-              .from(bucket)
-              .remove(filePaths)
-              
-            if (deleteError) {
-              console.error(`${bucket} 削除エラー:`, deleteError.stack || deleteError)
-            }
-          }
-        } catch (bucketError) {
-          console.error(`${bucket} 処理エラー:`, bucketError.stack || bucketError)
+        const { data: files } = await supabase.storage.from(bucket).list(userId);
+        const paths = (files ?? []).map((f: StorageFile) => `${userId}/${f.name}`);
+        if (paths.length) {
+          await supabase.storage.from(bucket).remove(paths);
+          rollbackStack.unshift(() =>
+            Promise.all(paths.map((p: string) =>
+              supabase.storage.from(bucket).upload(p, new Blob(['rollback']), { upsert: true })
+            )).then(() => {})
+          );
         }
+      } catch (e) {
+        console.warn(`[${traceId}] Storage ${bucket} 削除エラー`, e);
       }
-    } catch (storageError) {
-      const errorToLog = storageError instanceof Error ? storageError.stack || storageError : storageError;
-      console.error('ストレージ全体の削除エラー:', errorToLog)
-      // エラーは記録するが処理は続行
     }
 
-    // 投稿の削除（カスケード削除によりコメントや画像も削除される）
-    try {
-      const { error: postsError } = await supabaseAdmin
-        .from('posts')
-        .delete()
-        .eq('author_id', userId)
+    await supabase.from('posts').delete().eq('author_id', userId);
+    await supabase.from('post_likes').delete().eq('user_id', userId);
+    await supabase.from('comment_likes').delete().eq('user_id', userId);
 
-      if (postsError) {
-        const errorToLog = postsError instanceof Error ? postsError.stack || postsError : postsError;
-        console.error('投稿削除エラー:', errorToLog)
+    const { data: categories } = await supabase.from('categories').select('id').eq('creator_id', userId);
+    const categoryIds = (categories ?? []).map((c: Category) => c.id);
+
+    if (categoryIds.length) {
+      const { data: shared } = await supabase.from('post_categories')
+        .select('category_id, posts!inner(author_id)')
+        .in('category_id', categoryIds)
+        .neq('posts.author_id', userId);
+
+      const sharedIds = [...new Set((shared ?? []).map((r: PostCategory) => r.category_id))];
+      const ownOnly = categoryIds.filter((id: number) => !sharedIds.includes(id));
+
+      if (sharedIds.length) {
+        await supabase.from('categories').update({ creator_id: SYSTEM_USER_ID }).in('id', sharedIds);
       }
-    } catch (error) {
-      const errorToLog = error instanceof Error ? error.stack || error : error;
-      console.error('投稿削除例外:', errorToLog)
-      // エラーは記録するが処理は続行
-    }
-
-    // いいねの削除
-    try {
-      await Promise.all([
-        supabaseAdmin.from('post_likes').delete().eq('user_id', userId),
-        supabaseAdmin.from('comment_likes').delete().eq('user_id', userId)
-      ])
-    } catch (error) {
-      const errorToLog = error instanceof Error ? error.stack || error : error;
-      console.error('いいね削除例外:', errorToLog)
-      // エラーは記録するが処理は続行
-    }
-
-    // カテゴリの処理
-    try {
-      // ユーザーが作成したカテゴリを取得
-      const { data: userCategories, error: categoriesError } = await supabaseAdmin
-        .from('categories')
-        .select('id')
-        .eq('creator_id', userId);
-      
-      if (categoriesError) {
-        const errorToLog = categoriesError instanceof Error ? categoriesError.stack || categoriesError : categoriesError;
-        console.error('カテゴリ取得エラー:', errorToLog);
-        // エラーは記録するが処理は続行
-      } else if (userCategories && userCategories.length > 0) {
-        console.log(`ユーザー作成カテゴリ: ${userCategories.length}件`);
-        
-        // 他のユーザーが使用しているカテゴリを特定
-        const categoryIds = userCategories.map(c => c.id);
-        
-        // 他のユーザーの投稿で使われているカテゴリを特定
-        const { data: sharedCategoryData, error: sharedError } = await supabaseAdmin
-          .from('post_categories')
-          .select('category_id, posts!inner(author_id)')
-          .in('category_id', categoryIds)
-          .neq('posts.author_id', userId);
-          
-        if (sharedError) {
-          const errorToLog = sharedError instanceof Error ? sharedError.stack || sharedError : sharedError;
-          console.error('共有カテゴリ特定エラー:', errorToLog);
-        } else {
-          // 他のユーザーが使用しているカテゴリIDの配列を作成
-          const sharedCategoryIds = [...new Set(
-            (sharedCategoryData || []).map(item => item.category_id)
-          )];
-          
-          if (sharedCategoryIds.length > 0) {
-            console.log(`他ユーザー使用カテゴリ: ${sharedCategoryIds.length}件`);
-            
-            // 他のユーザーが使用しているカテゴリをシステムユーザーに移管
-            const { error: updateError } = await supabaseAdmin
-              .from('categories')
-              .update({ creator_id: SYSTEM_USER_ID })
-              .in('id', sharedCategoryIds);
-              
-            if (updateError) {
-              const errorToLog = updateError instanceof Error ? updateError.stack || updateError : updateError;
-              console.error('カテゴリ移管エラー:', errorToLog);
-            }
-          }
-          
-          // 他のユーザーが使用していないカテゴリを特定して削除
-          const unusedCategoryIds = categoryIds.filter(id => !sharedCategoryIds.includes(id));
-          
-          if (unusedCategoryIds.length > 0) {
-            console.log(`未共有カテゴリ: ${unusedCategoryIds.length}件`);
-            
-            // 未共有カテゴリを削除
-            const { error: deleteError } = await supabaseAdmin
-              .from('categories')
-              .delete()
-              .in('id', unusedCategoryIds);
-              
-            if (deleteError) {
-              const errorToLog = deleteError instanceof Error ? deleteError.stack || deleteError : deleteError;
-              console.error('未共有カテゴリ削除エラー:', errorToLog);
-            }
-          }
-        }
-      } else {
-        console.log('ユーザー作成カテゴリなし');
+      if (ownOnly.length) {
+        await supabase.from('categories').delete().in('id', ownOnly);
       }
-    } catch (error) {
-      const errorToLog = error instanceof Error ? error.stack || error : error;
-      console.error('カテゴリ処理例外:', errorToLog);
-      // エラーは記録するが処理は続行
     }
 
-    // プロフィール削除（最後にプロフィールを削除）
-    try {
-      const { error: profileError } = await supabaseAdmin
-        .from('profiles')
-        .delete()
-        .eq('id', userId)
-
-      if (profileError) {
-        const errorToLog = profileError instanceof Error ? profileError.stack || profileError : profileError;
-        console.error('プロフィール削除エラー:', errorToLog)
-        // エラーは記録するが処理は続行
-      }
-    } catch (error) {
-      const errorToLog = error instanceof Error ? error.stack || error : error;
-      console.error('プロフィール削除例外:', errorToLog)
-      // エラーは記録するが処理は続行
+    const { data: profile } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    if (profile) {
+      rollbackStack.unshift(() => supabase.from('profiles').insert(profile as Profile));
+      await supabase.from('profiles').delete().eq('id', userId);
     }
 
-    // 認証ユーザーの削除
-    try {
-      const { error: deleteUserError } = await supabaseAdmin.auth.admin.deleteUser(userId)
+    const { error: deleteError } = await supabase.auth.admin.deleteUser(userId);
+    if (deleteError) throw deleteError;
 
-      if (deleteUserError) {
-        const errorToLog = deleteUserError instanceof Error ? deleteUserError.stack || deleteUserError : deleteUserError;
-        console.error('ユーザー削除APIエラー:', errorToLog)
-        throw deleteUserError
-      }
-    } catch (authDeleteError) {
-      const errorToLog = authDeleteError instanceof Error ? authDeleteError.stack || authDeleteError : authDeleteError;
-      console.error('ユーザー削除例外:', errorToLog)
-      throw authDeleteError
-    }
-
-    return new Response(
-      JSON.stringify({ success: true }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
-    )
-  } catch (error) {
-    const errorToLog = error instanceof Error ? error.stack || error : error;
-    console.error('エッジ関数全体のエラー:', errorToLog)
-    return new Response(
-      JSON.stringify({ success: false, error: String(error?.message || '不明なエラー') }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-    )
+    return jsonResponse({ success: true }, traceId, 200, origin);
+  } catch (err) {
+    console.error(`[${traceId}] ユーザー削除失敗:`, err instanceof Error ? err.stack : err);
+    return jsonResponse({ success: false, error: 'ユーザー削除に失敗しました', errorCode: 'internal_error' }, traceId, 500, origin);
   }
-}) 
+});

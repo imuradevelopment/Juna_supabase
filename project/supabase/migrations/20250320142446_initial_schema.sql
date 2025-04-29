@@ -191,14 +191,8 @@ CREATE TABLE posts (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   views INTEGER DEFAULT 0,
-  last_edited_by UUID REFERENCES auth.users(id),
-  search_vector tsvector GENERATED ALWAYS AS (
-    setweight(to_tsvector('simple', coalesce(title, '')), 'A') || 
-    setweight(to_tsvector('simple', coalesce(cast(content->>'text' as text), '')), 'B')
-  ) STORED
+  last_edited_by UUID REFERENCES auth.users(id)
 );
-
-CREATE INDEX posts_search_idx ON posts USING GIN (search_vector);
 
 CREATE TRIGGER update_post_updated_at
 BEFORE UPDATE ON posts
@@ -430,16 +424,108 @@ CREATE TRIGGER set_category_creator
 BEFORE INSERT ON categories
 FOR EACH ROW EXECUTE FUNCTION set_creator_id();
 
+-- 検索インデックステーブル
+CREATE TABLE post_search_index (
+  post_id UUID PRIMARY KEY REFERENCES posts(id) ON DELETE CASCADE,
+  search_text TEXT NOT NULL,
+  title_text TEXT NOT NULL,
+  content_text TEXT NOT NULL,
+  excerpt_text TEXT,
+  category_names TEXT,
+  author_name TEXT
+);
+
+-- GiSTインデックスを作成（トリグラム検索用）
+CREATE INDEX post_search_gist_idx ON post_search_index USING gist (search_text gist_trgm_ops);
+CREATE INDEX post_search_title_gist_idx ON post_search_index USING gist (title_text gist_trgm_ops);
+
+-- 検索インデックス更新用のトリガー関数
+CREATE OR REPLACE FUNCTION update_post_search_index()
+RETURNS TRIGGER AS $$
+DECLARE
+  categories_text TEXT;
+  author_nickname TEXT;
+  content_plain TEXT;
+BEGIN
+  -- カテゴリ名を取得
+  SELECT string_agg(c.name, ' ')
+  FROM categories c
+  JOIN post_categories pc ON c.id = pc.category_id
+  WHERE pc.post_id = NEW.id
+  INTO categories_text;
+  
+  -- 作者名を取得
+  SELECT nickname FROM profiles WHERE id = NEW.author_id INTO author_nickname;
+  
+  -- JSONBからプレーンテキストを抽出（適宜調整）
+  SELECT COALESCE(NEW.content->>'text', '') INTO content_plain;
+  
+  -- 検索用テキストを結合
+  DELETE FROM post_search_index WHERE post_id = NEW.id;
+  INSERT INTO post_search_index (
+    post_id,
+    title_text,
+    content_text,
+    excerpt_text,
+    category_names,
+    author_name,
+    search_text
+  ) VALUES (
+    NEW.id,
+    COALESCE(NEW.title, ''),
+    content_plain,
+    COALESCE(NEW.excerpt, ''),
+    COALESCE(categories_text, ''),
+    COALESCE(author_nickname, ''),
+    COALESCE(NEW.title, '') || ' ' || 
+    content_plain || ' ' || 
+    COALESCE(NEW.excerpt, '') || ' ' || 
+    COALESCE(categories_text, '') || ' ' || 
+    COALESCE(author_nickname, '')
+  );
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- 検索インデックス更新用トリガー
+CREATE TRIGGER update_post_search_index_trigger
+AFTER INSERT OR UPDATE ON posts
+FOR EACH ROW
+EXECUTE FUNCTION update_post_search_index();
+
 -- ユーティリティ関数
 CREATE OR REPLACE FUNCTION search_posts(search_term TEXT)
 RETURNS SETOF posts AS $$
 BEGIN
+  -- 検索テキストが空なら最新の投稿を返す
+  IF search_term IS NULL OR search_term = '' THEN
+    RETURN QUERY
+    SELECT p.*
+    FROM posts p
+    WHERE published = true
+    ORDER BY published_at DESC
+    LIMIT 20;
+    RETURN;
+  END IF;
+
+  -- 類似度を使って検索結果を返す
   RETURN QUERY
-  SELECT *
-  FROM posts
-  WHERE published = true 
-    AND search_vector @@ plainto_tsquery('simple', search_term)
-  ORDER BY ts_rank(search_vector, plainto_tsquery('simple', search_term)) DESC;
+  SELECT p.*
+  FROM posts p
+  JOIN post_search_index psi ON p.id = psi.post_id
+  WHERE p.published = true
+    AND (
+      psi.search_text ILIKE '%' || search_term || '%'
+    )
+  ORDER BY 
+    -- 完全一致を優先
+    CASE WHEN psi.title_text ILIKE search_term THEN 1 ELSE 0 END DESC,
+    -- 次に類似度の高いものを優先
+    similarity(psi.search_text, search_term) DESC,
+    -- 最後に日付の新しい順
+    p.published_at DESC
+  LIMIT 50;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
@@ -471,6 +557,33 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Realtimeサブスクリプション設定
 ALTER PUBLICATION supabase_realtime ADD TABLE posts, comments, post_likes, comment_likes;
+
+-- 初期データ移行（既存の投稿を検索インデックスに登録）
+INSERT INTO post_search_index (post_id, title_text, content_text, excerpt_text, category_names, author_name, search_text)
+SELECT 
+  p.id,
+  COALESCE(p.title, ''),
+  COALESCE(p.content->>'text', ''),
+  COALESCE(p.excerpt, ''),
+  (
+    SELECT string_agg(c.name, ' ')
+    FROM categories c
+    JOIN post_categories pc ON c.id = pc.category_id
+    WHERE pc.post_id = p.id
+  ),
+  (SELECT nickname FROM profiles WHERE id = p.author_id),
+  COALESCE(p.title, '') || ' ' || 
+  COALESCE(p.content->>'text', '') || ' ' || 
+  COALESCE(p.excerpt, '') || ' ' || 
+  (
+    SELECT string_agg(c.name, ' ')
+    FROM categories c
+    JOIN post_categories pc ON c.id = pc.category_id
+    WHERE pc.post_id = p.id
+  ) || ' ' || 
+  (SELECT nickname FROM profiles WHERE id = p.author_id)
+FROM posts p
+WHERE NOT EXISTS (SELECT 1 FROM post_search_index WHERE post_id = p.id);
 
 -- システム管理者設定（必要に応じてコメントを外して実行）
 /*
