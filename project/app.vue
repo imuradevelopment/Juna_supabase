@@ -2,11 +2,6 @@
 <!-- Nuxt アプリケーションのエントリーポイント -->
 <!-- ここでデフォルトのレイアウトを指定し、現在のルートに対応するページコンポーネントを描画 -->
 <template>
-  <!-- デフォルトレイアウトコンポーネントを使用 -->
-  <NuxtLayout name="default">
-    <!-- 現在のルートにマッチするページコンポーネントを表示 -->
-    <NuxtPage />
-  </NuxtLayout>
 </template>
 
 <script setup lang="ts">

@@ -1,154 +1,141 @@
-// @ts-ignore // Denoの型チェックを無視するためのコメント
-import { serve } from 'https://deno.land/std@0.131.0/http/server.ts';
-// @ts-ignore // Denoの型チェックを無視するためのコメント
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+// login-with-account-function.ts
+// Supabase Edge Function: アカウントIDまたはメールアドレスを受け取り、
+// メールアドレスを返却する関数（バリデーション、レートリミット、型安全性、セキュリティ対応済）
 
-// types/index.ts と同じ型を定義
-/**
- * Edge Functionのエラーレスポンスの型定義。
- */
+// @ts-ignore - Deno環境で型定義非対応を抑制 (Deno標準ライブラリのインポート)
+import { serve } from 'https://deno.land/std@0.131.0/http/server.ts'; // DenoのHTTPサーバー機能
+// @ts-ignore - Deno環境で型定義非対応を抑制 (Supabaseクライアントライブラリのインポート)
+import { createClient, type SupabaseClient, type UserResponse } from 'https://esm.sh/@supabase/supabase-js@2'; // Supabaseクライアントと関連型
+
+// エラーレスポンスの型定義
 interface EdgeFunctionErrorResponse {
-  success: false; // 処理が失敗したことを示すフラグ
+  success: false; // 処理失敗フラグ
   error: string; // エラーメッセージ
-  errorCode?: string; // エラーコード (オプション)
+  errorCode: string; // エラーコード（クライアントでの識別用）
+  retryAfterSeconds?: number; // レートリミット時に再試行までの秒数を示す (任意)
 }
 
-// CORSヘッダー: 異なるオリジンからのリクエストを許可するための設定
-const corsHeaders = {
+// 成功レスポンスの型定義
+interface EdgeFunctionSuccessResponse {
+  success: true; // 処理成功フラグ
+  email: string; // 取得したメールアドレス
+}
+
+// CORS関連のヘッダーを定義
+const corsHeaders: Record<string, string> = {
   'Access-Control-Allow-Origin': '*', // すべてのオリジンを許可
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type', // 許可するヘッダー
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type', // 許可するリクエストヘッダー
+  'Content-Type': 'application/json' // レスポンスのコンテントタイプをJSONに設定
 };
 
-// Deno DeployのHTTPリクエストハンドラー
-serve(async (req: Request) => {
-  // CORSプリフライトリクエストへの対応
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders });
-  }
+// 環境変数を取得する関数（未定義の場合はエラー）
+function getEnv(name: string): string {
+  // @ts-ignore - Deno環境を想定しているため無視
+  const value = Deno.env.get(name); // DenoのAPIで環境変数を取得
+  if (!value) throw new Error(`環境変数 ${name} が未定義です。`); // 未定義ならエラーをスロー
+  return value; // 取得した値を返す
+}
 
+// JSON形式のエラーレスポンスを生成する関数
+function jsonError(status: number, message: string, code: string, retryAfterSeconds?: number): Response {
+  // エラーレスポンスのボディを作成
+  const body: EdgeFunctionErrorResponse = { success: false, error: message, errorCode: code, ...(retryAfterSeconds && { retryAfterSeconds }) };
+  // ヘッダーにCORS設定をコピー
+  const headers: Record<string, string> = { ...corsHeaders };
+  // retryAfterSecondsが指定されていれば、Retry-Afterヘッダーを追加
+  if (retryAfterSeconds) headers['Retry-After'] = retryAfterSeconds.toString();
+  // JSON文字列化したボディとステータス、ヘッダーを持つResponseオブジェクトを返す
+  return new Response(JSON.stringify(body), { status, headers });
+}
+
+// 簡易レートリミット機構: 同一IPからのリクエストを一定間隔で制限（本番ではDeno KVやRedis推奨）
+const ipAccessMap = new Map<string, number>(); // IPアドレスと最終アクセス時刻(Unixタイムスタンプ)を格納するMap
+const RATE_LIMIT_WINDOW = 10; // レートリミットの期間（秒）
+
+// HTTPリクエストを処理するメイン関数
+serve(async (req: Request): Promise<Response> => {
+  // OPTIONSメソッド（プリフライトリクエスト）への対応
+  if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+
+  // try-catchでエラー処理
   try {
-    // リクエストボディから識別子 (メールアドレスまたはアカウントID) を取得
-    const { identifier } = await req.json();
-
-    // 識別子が提供されているかチェック
-    if (!identifier) {
-      // エラーレスポンスを作成
-      const errorResponse: EdgeFunctionErrorResponse = {
-        success: false,
-        error: '識別子 (メールアドレスまたはアカウントID) が必要です。',
-        errorCode: 'missing_identifier'
-      };
-      // 400 Bad Request レスポンスを返す
-      return new Response(
-        JSON.stringify(errorResponse),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+    // リクエストヘッダーからクライアントIPアドレスを取得（プロキシ経由も考慮）
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || 'unknown';
+    // 現在時刻のUnixタイムスタンプ（秒）を取得
+    const now = Math.floor(Date.now() / 1000);
+    // このIPアドレスからの最後のアクセス時刻を取得
+    const lastAccess = ipAccessMap.get(ip);
+    // 最後のアクセスがあり、かつレートリミット期間内の場合
+    if (lastAccess && now - lastAccess < RATE_LIMIT_WINDOW) {
+      // 429 Too Many Requests エラーを返す
+      return jsonError(429, 'リクエストが多すぎます。しばらく時間をおいてから再度お試しください。', 'rate_limited', RATE_LIMIT_WINDOW);
     }
+    // 現在のアクセス時刻を記録（または更新）
+    ipAccessMap.set(ip, now);
 
-    // 識別子がメールアドレス形式かどうかを正規表現でチェック
+    // リクエストボディをJSONとしてパースし、identifierを取得
+    const { identifier }: { identifier: string } = await req.json();
+    // identifierが空または文字列でない場合は400エラー
+    if (!identifier || typeof identifier !== 'string') return jsonError(400, 'アカウントIDまたはメールアドレスを入力してください。', 'missing_identifier');
+
+    // identifierがメールアドレス形式かどうかを正規表現で判定
     const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identifier);
-
-    // Supabase Adminクライアントをサービスロールキーで初期化
-    // 環境変数からSupabaseのURLとサービスロールキーを取得
-    const supabaseAdmin = createClient(
-      // @ts-ignore // Denoの環境変数アクセスに関する型エラーを無視
-      Deno.env.get('SUPABASE_URL') ?? '',
-      // @ts-ignore // Denoの環境変数アクセスに関する型エラーを無視
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
-      // セッションを永続化しない設定
-      { auth: { persistSession: false } }
+    // Supabaseクライアントを初期化（サービスロールキーを使用）
+    const supabase: SupabaseClient = createClient(
+      getEnv('SUPABASE_URL'), // SupabaseプロジェクトURL
+      getEnv('SUPABASE_SERVICE_ROLE_KEY'), // Supabaseサービスロールキー
+      { auth: { persistSession: false } } // セッションを保持しない設定
     );
 
-    // メールアドレスを格納する変数を初期化 (デフォルトは識別子そのもの)
+    // 結果として返すメールアドレスを格納する変数。初期値はidentifier
     let email = identifier;
 
-    // 識別子がメールアドレスでない場合 (アカウントIDの場合)
+    // identifierがメールアドレス形式でなかった場合（アカウントIDと判断）
     if (!isEmail) {
-      // アカウントIDが '@' で始まる場合は '@' を削除
-      const accountId = identifier.startsWith('@') ? identifier.substring(1) : identifier;
+      // identifierが'@'で始まる場合は'@'を除去、そうでなければそのまま使用
+      const accountId = identifier.startsWith('@') ? identifier.slice(1) : identifier;
 
-      // `profiles` テーブルからアカウントIDに一致するユーザーの `id` を取得
-      const { data: profileData, error: profileError } = await supabaseAdmin
-        .from('profiles') // `profiles` テーブルを指定
-        .select('id') // `id` カラムを選択
-        .eq('account_id', accountId) // `account_id` が一致する行を検索
-        .single(); // 結果が単一であることを期待
-
-      // プロフィールデータの取得に失敗した場合、またはデータが存在しない場合
-      if (profileError || !profileData) {
-        // profileErrorが存在する場合のみ、詳細なエラーログを出力
-        if (profileError) {
-          console.error('プロフィール取得エラー:', profileError.stack || profileError); // 開発者向けエラーログ
-        }
-        // エラーレスポンスを作成
-        const errorResponse: EdgeFunctionErrorResponse = {
-          success: false,
-          error: '入力されたアカウントIDは見つかりません。', // ユーザー向けエラーメッセージ
-          errorCode: 'account_not_found' // エラーコード
-        };
-        // 404 Not Found レスポンスを返す
-        return new Response(
-          JSON.stringify(errorResponse),
-          { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+      // accountId のバリデーション：長さ(3-15文字)、使用可能文字（英数、一部記号、日本語）をチェック
+      if (accountId.length < 3 || accountId.length > 15 || !/^[a-zA-Z0-9_\\-\\u3040-\\u309F\\u30A0-\\u30FF\\u4E00-\\u9FFF]+$/.test(accountId)) {
+        // 無効な形式の場合は400エラー
+        return jsonError(400, 'アカウントIDの形式が正しくありません。3文字以上15文字以下で入力してください。', 'invalid_account_id');
       }
 
-      // 取得したユーザーID (`profileData.id`) を使用して、Admin API経由でユーザー情報を取得
-      const { data: userData, error: userError } = await supabaseAdmin.auth.admin
-        .getUserById(profileData.id);
+      // profilesテーブルからaccountIdに一致するレコードのid（＝ユーザーUUID）を検索
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles') // profilesテーブルを指定
+        .select('id') // idカラムを選択
+        .eq('account_id', accountId) // account_idが一致するものを検索
+        .maybeSingle(); // 結果が0件または1件であることを期待
 
-      // ユーザー情報の取得に失敗した場合、またはメールアドレスが存在しない場合
-      if (userError || !userData?.user?.email) {
-        // userErrorが存在する場合のみ、詳細なエラーログを出力
-        if (userError) {
-          console.error('ユーザー取得エラー:', userError.stack || userError); // 開発者向けエラーログ
-        }
-        // エラーレスポンスを作成
-        const errorResponse: EdgeFunctionErrorResponse = {
-          success: false,
-          error: 'アカウントに紐づくユーザー情報の取得に失敗しました。', // ユーザー向けエラーメッセージ
-          errorCode: 'user_fetch_failed' // エラーコード
-        };
-        // 500 Internal Server Error レスポンスを返す
-        return new Response(
-          JSON.stringify(errorResponse),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
+      // プロフィール検索でエラーが発生したか、プロフィールが見つからなかった場合
+      if (profileError || !profile) return jsonError(404, '入力されたアカウントIDを持つユーザーが見つかりませんでした。', 'account_not_found');
 
-      // 取得したユーザー情報からメールアドレスをセット
-      email = userData.user.email;
+      // プロフィールID（ユーザーUUID）を使って、Authユーザー情報を取得 (Admin API)
+      const { data: userResult, error: userError }: UserResponse = await supabase.auth.admin.getUserById(profile.id);
+      // Authユーザー取得でエラーが発生したか、ユーザー情報またはメールアドレスが存在しない場合
+      if (userError || !userResult?.user?.email) return jsonError(500, 'ユーザー情報の取得中にエラーが発生しました。', 'user_fetch_failed');
+
+      // 取得したAuthユーザーのメールアドレスをemail変数に格納
+      email = userResult.user.email;
     }
 
-    // 処理が成功した場合、メールアドレスを含む成功レスポンスを作成
-    // 注意: このFunctionはパスワード検証を行わず、アカウントIDからメールアドレスを検索する役割のみを持つ
-    const successResponse = {
-      success: true,
-      email: email // 検索結果のメールアドレス
+    // 成功レスポンスのデータを作成
+    const success: EdgeFunctionSuccessResponse = {
+      success: true, // 成功フラグ
+      email // 取得したメールアドレス
     };
-    // 200 OK レスポンスを返す
-    return new Response(
-      JSON.stringify(successResponse),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
-
-  } catch (error) {
-    // 予期せぬエラーが発生した場合の処理
-    // エラーオブジェクトが Error インスタンスか確認し、スタックトレースまたはエラー情報をログに出力
-    const errorToLog = error instanceof Error ? error.stack || error : error;
-    console.error('login-with-account function 内での予期せぬエラー:', errorToLog); // 開発者向けエラーログ
-
-    // エラーレスポンスを作成
-    const errorResponse: EdgeFunctionErrorResponse = {
-      success: false,
-      // エラーメッセージを安全に取得して設定
-      error: error instanceof Error ? error.message : String(error), // ユーザー向けエラーメッセージ (より汎用的)
-      errorCode: 'internal_error' // エラーコード
-    };
-    // 500 Internal Server Error レスポンスを返す
-    return new Response(
-      JSON.stringify(errorResponse),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    // JSON文字列化した成功レスポンスと200 OKステータス、ヘッダーを返す
+    return new Response(JSON.stringify(success), {
+      headers: { ...corsHeaders }
+    });
+  // tryブロック内で予期せぬエラーが発生した場合
+  } catch (err: unknown) {
+    // エラーオブジェクトからメッセージを取得
+    const msg = err instanceof Error ? err.message : String(err);
+    // エラーログをコンソールに出力
+    console.error('識別子からのメールアドレス取得処理中にエラーが発生しました:', msg); // 処理名エラーログ
+    // 500 Internal Server Error を返す
+    return jsonError(500, 'サーバー内部でエラーが発生しました。', 'internal_error');
   }
-}); 
+});

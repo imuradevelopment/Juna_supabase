@@ -23,9 +23,6 @@ export default defineNuxtConfig({
     }
   },
   
-  // グローバルCSS
-  css: ['~/assets/css/tiptap.css'],
-  
   // Tailwind CSS設定
   tailwindcss: {
     cssPath: '~/assets/css/tailwind.css',
