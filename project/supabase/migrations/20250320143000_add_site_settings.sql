@@ -31,8 +31,10 @@ INSERT INTO site_settings (key, value, description) VALUES
   ('theme', '{
     "colors": {
       "primary": "#38bdaa",
+      "primaryLight": "#5cd4c2",
       "primaryDark": "#199687",
       "secondary": "#78a0c3",
+      "secondaryLight": "#95b8d6",
       "secondaryDark": "#5a7fa8",
       "accent": "#ff915a",
       "error": "#f55f5a",
@@ -47,6 +49,7 @@ INSERT INTO site_settings (key, value, description) VALUES
       "borderLight": "#465569",
       "text": "#d2e6f5",
       "textMuted": "#91a0af",
+      "textWhite": "#ffffff",
       "heading": "#fff5e1"
     }
   }', 'テーマカラー設定'),

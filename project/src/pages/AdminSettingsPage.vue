@@ -440,11 +440,13 @@ const navigation = computed(() => [
 
 const saving = ref(false);
 
-// テーマカラーの初期値（現在のtailwind.config.jsの値）
+// デフォルトのテーマカラー
 const defaultThemeColors = {
   primary: '#38bdaa',
+  primaryLight: '#5cd4c2',
   primaryDark: '#199687',
   secondary: '#78a0c3',
+  secondaryLight: '#95b8d6',
   secondaryDark: '#5a7fa8',
   accent: '#ff915a',
   error: '#f55f5a',
@@ -459,14 +461,17 @@ const defaultThemeColors = {
   borderLight: '#465569',
   text: '#d2e6f5',
   textMuted: '#91a0af',
+  textWhite: '#ffffff',
   heading: '#fff5e1'
 };
 
 // カラーラベルの日本語化
 const colorLabels = {
   primary: 'プライマリー',
+  primaryLight: 'プライマリー（明）',
   primaryDark: 'プライマリー（暗）',
   secondary: 'セカンダリー',
+  secondaryLight: 'セカンダリー（明）',
   secondaryDark: 'セカンダリー（暗）',
   accent: 'アクセント',
   error: 'エラー',
@@ -481,6 +486,7 @@ const colorLabels = {
   borderLight: 'ボーダー（明）',
   text: 'テキスト',
   textMuted: 'テキスト（控えめ）',
+  textWhite: 'テキスト（白）',
   heading: '見出し'
 };
 

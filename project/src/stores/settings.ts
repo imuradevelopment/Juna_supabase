@@ -5,8 +5,10 @@ import { hexToRgb } from '../utils/colorUtils';
 
 interface ThemeColors {
   primary: string;
+  primaryLight: string;
   primaryDark: string;
   secondary: string;
+  secondaryLight: string;
   secondaryDark: string;
   accent: string;
   error: string;
@@ -21,6 +23,7 @@ interface ThemeColors {
   borderLight: string;
   text: string;
   textMuted: string;
+  textWhite: string;
   heading: string;
 }
 
