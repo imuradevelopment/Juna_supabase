@@ -42,18 +42,383 @@ interface Features {
 }
 
 interface DomainTexts {
-  heroTitle: string;
-  heroSubtitle: string;
-  aboutDescription: string;
-  feature1Title: string;
-  feature1Description: string;
-  feature2Title: string;
-  feature2Description: string;
-  feature3Title: string;
-  feature3Description: string;
-  targetDisabilitiesTitle: string;
-  targetDisabilities: string[];
-  callToAction: string;
+  // ホームページ
+  home: {
+    heroTitle: string;
+    heroSubtitle: string;
+    aboutTitle: string;
+    aboutDescription: string;
+    feature1Title: string;
+    feature1Description: string;
+    feature2Title: string;
+    feature2Description: string;
+    feature3Title: string;
+    feature3Description: string;
+    targetDisabilitiesTitle: string;
+    targetDisabilities: string[];
+    callToAction: string;
+    startPostingButton: string;
+    viewPostsButton: string;
+    recentPostsTitle: string;
+    viewAllPosts: string;
+    noRecentPosts: string;
+  };
+  
+  // 共通UI要素
+  common: {
+    siteName: string;
+    loading: string;
+    error: string;
+    save: string;
+    cancel: string;
+    delete: string;
+    edit: string;
+    create: string;
+    update: string;
+    submit: string;
+    close: string;
+    back: string;
+    next: string;
+    previous: string;
+    search: string;
+    searchPlaceholder: string;
+    noResults: string;
+    confirmDelete: string;
+    confirmCancel: string;
+    operationSuccess: string;
+    operationFailed: string;
+  };
+  
+  // 認証関連
+  auth: {
+    login: string;
+    logout: string;
+    register: string;
+    email: string;
+    password: string;
+    passwordConfirm: string;
+    nickname: string;
+    loginButton: string;
+    registerButton: string;
+    forgotPassword: string;
+    resetPassword: string;
+    loginSuccess: string;
+    loginFailed: string;
+    registerSuccess: string;
+    registerFailed: string;
+    logoutSuccess: string;
+    emailRequired: string;
+    passwordRequired: string;
+    passwordMismatch: string;
+    invalidCredentials: string;
+    accountExists: string;
+    verifyEmail: string;
+  };
+  
+  // 投稿関連
+  posts: {
+    title: string;
+    createPost: string;
+    editPost: string;
+    postList: string;
+    postDetail: string;
+    postTitle: string;
+    postContent: string;
+    postTags: string;
+    postCategory: string;
+    selectCategory: string;
+    noCategorySelected: string;
+    publishSettings: string;
+    published: string;
+    draft: string;
+    publish: string;
+    unpublish: string;
+    saveAsDraft: string;
+    updating: string;
+    publishing: string;
+    savingDraft: string;
+    confirmPublish: string;
+    confirmUnpublish: string;
+    confirmDeletePost: string;
+    postNotFound: string;
+    postNotPublished: string;
+    postLoadError: string;
+    noPostsFound: string;
+    noPostsYet: string;
+    sortByDate: string;
+    sortByLikes: string;
+    eyecatch: string;
+    uploadEyecatch: string;
+    changeEyecatch: string;
+    removeEyecatch: string;
+  };
+  
+  // コメント関連
+  comments: {
+    comments: string;
+    comment: string;
+    addComment: string;
+    editComment: string;
+    deleteComment: string;
+    confirmDeleteComment: string;
+    noComments: string;
+    commentPosted: string;
+    commentDeleted: string;
+    commentError: string;
+    loginToComment: string;
+    sending: string;
+  };
+  
+  // いいね関連
+  likes: {
+    like: string;
+    unlike: string;
+    likes: string;
+    likeCount: string;
+    loginToLike: string;
+  };
+  
+  // ユーザー関連
+  user: {
+    profile: string;
+    editProfile: string;
+    myPage: string;
+    myPosts: string;
+    drafts: string;
+    settings: string;
+    avatar: string;
+    uploadAvatar: string;
+    changeAvatar: string;
+    bio: string;
+    website: string;
+    following: string;
+    followers: string;
+    follow: string;
+    unfollow: string;
+    userNotFound: string;
+    profileUpdateSuccess: string;
+    profileUpdateError: string;
+  };
+  
+  // ダッシュボード
+  dashboard: {
+    dashboard: string;
+    overview: string;
+    recentPosts: string;
+    drafts: string;
+    statistics: string;
+    totalPosts: string;
+    publishedPosts: string;
+    draftPosts: string;
+    totalLikes: string;
+    totalComments: string;
+    weeklyPosts: string;
+    noDrafts: string;
+    viewPost: string;
+    editDraft: string;
+    publishDraft: string;
+    deleteDraft: string;
+    confirmPublishDraft: string;
+    confirmDeleteDraft: string;
+    draftWillBePublic: string;
+    publishingDraft: string;
+    deletingDraft: string;
+  };
+  
+  // カテゴリ関連
+  categories: {
+    categories: string;
+    category: string;
+    allCategories: string;
+    selectCategory: string;
+    createCategory: string;
+    editCategory: string;
+    deleteCategory: string;
+    categoryName: string;
+    categoryDescription: string;
+    categoryColor: string;
+    postsInCategory: string;
+    confirmDeleteCategory: string;
+    categoryHasPosts: string;
+  };
+  
+  // 管理者関連
+  admin: {
+    adminPanel: string;
+    dashboard: string;
+    users: string;
+    posts: string;
+    comments: string;
+    settings: string;
+    siteSettings: string;
+    themeColors: string;
+    siteInfo: string;
+    features: string;
+    domainTexts: string;
+    userManagement: string;
+    postManagement: string;
+    commentManagement: string;
+    totalUsers: string;
+    activeUsers: string;
+    bannedUsers: string;
+    adminUsers: string;
+    makeAdmin: string;
+    removeAdmin: string;
+    banUser: string;
+    unbanUser: string;
+    deleteUser: string;
+    confirmBanUser: string;
+    confirmDeleteUser: string;
+    resetToDefault: string;
+    savingSettings: string;
+    settingsSaved: string;
+    settingsError: string;
+  };
+  
+  // エラーメッセージ
+  errors: {
+    generalError: string;
+    networkError: string;
+    serverError: string;
+    notFound: string;
+    unauthorized: string;
+    forbidden: string;
+    validationError: string;
+    requiredField: string;
+    invalidFormat: string;
+    tooShort: string;
+    tooLong: string;
+    uploadError: string;
+    fileTooLarge: string;
+    invalidFileType: string;
+    sessionExpired: string;
+    refreshPage: string;
+  };
+  
+  // 成功メッセージ
+  success: {
+    saved: string;
+    updated: string;
+    deleted: string;
+    published: string;
+    unpublished: string;
+    followed: string;
+    unfollowed: string;
+    copied: string;
+    sent: string;
+    uploaded: string;
+  };
+  
+  // ナビゲーション
+  navigation: {
+    home: string;
+    posts: string;
+    categories: string;
+    about: string;
+    contact: string;
+    terms: string;
+    privacy: string;
+    help: string;
+    myPage: string;
+    createPost: string;
+    dashboard: string;
+    admin: string;
+    login: string;
+    logout: string;
+    register: string;
+  };
+  
+  // フッター
+  footer: {
+    copyright: string;
+    allRightsReserved: string;
+    poweredBy: string;
+    contactUs: string;
+    followUs: string;
+    newsletter: string;
+    subscribeNewsletter: string;
+    enterEmail: string;
+    subscribe: string;
+  };
+  
+  // 検索
+  search: {
+    search: string;
+    searchPosts: string;
+    searchUsers: string;
+    searchTags: string;
+    searchResults: string;
+    searchResultsFor: string;
+    noSearchResults: string;
+    searchTips: string;
+  };
+  
+  // フィルター
+  filter: {
+    filter: string;
+    filterBy: string;
+    sortBy: string;
+    orderBy: string;
+    ascending: string;
+    descending: string;
+    newest: string;
+    oldest: string;
+    mostLiked: string;
+    mostCommented: string;
+    alphabetical: string;
+    reset: string;
+    apply: string;
+  };
+  
+  // ページネーション
+  pagination: {
+    page: string;
+    of: string;
+    showing: string;
+    total: string;
+    perPage: string;
+    goToPage: string;
+    firstPage: string;
+    lastPage: string;
+    previousPage: string;
+    nextPage: string;
+  };
+  
+  // 通知
+  notifications: {
+    notifications: string;
+    newNotification: string;
+    markAsRead: string;
+    markAllAsRead: string;
+    noNotifications: string;
+    notificationSettings: string;
+    emailNotifications: string;
+    pushNotifications: string;
+    notifyComments: string;
+    notifyLikes: string;
+    notifyFollows: string;
+    notifyMentions: string;
+  };
+  
+  // 日時
+  datetime: {
+    justNow: string;
+    minutesAgo: string;
+    hoursAgo: string;
+    daysAgo: string;
+    weeksAgo: string;
+    monthsAgo: string;
+    yearsAgo: string;
+    today: string;
+    yesterday: string;
+    tomorrow: string;
+    thisWeek: string;
+    lastWeek: string;
+    thisMonth: string;
+    lastMonth: string;
+    thisYear: string;
+    lastYear: string;
+  };
 }
 
 export const useSettingsStore = defineStore('settings', () => {
