@@ -36,8 +36,8 @@
 
 1. **リポジトリのクローン**
    ```bash
-   git clone https://github.com/yourusername/invisible-disabilities-blog.git
-   cd accessible-blog-app
+   git clone https://github.com/imuradevelopment/Juna_supabase.git
+   cd Juna_supabase/project
    ```
 
 2. **依存関係のインストール**
@@ -47,17 +47,54 @@
 
 3. **環境変数の設定**  
    プロジェクトルートに `.env` ファイルを作成し、`.env.example` を参考に Supabase の認証情報などを設定してください。
+   ```bash
+   cp .env.example .env
+   # .envファイルを編集して実際の値を入力
+   ```
 
-4. **開発サーバーの起動**
+4. **Supabaseプロジェクトのリンク**
+   ```bash
+   npm run supabase:link
+   ```
+
+5. **ローカル環境のセットアップ**
+   ```bash
+   # データベースのリセット、マイグレーション適用、管理者ユーザー作成
+   npm run setup:local
+   ```
+
+6. **開発サーバーの起動**
    ```bash
    npm run dev
    ```
-   ブラウザで `http://localhost:3000` （または設定に応じたポート番号）にアクセスして動作を確認してください。
+   ブラウザで `http://localhost:5173` にアクセスして動作を確認してください。
 
-5. **ビルド**
+### 本番環境へのデプロイ
+
+1. **環境変数の設定とEdge Functionsのデプロイ**
    ```bash
-   npm run build
+   # .envに本番環境用のALLOWED_ORIGINSを設定後
+   npm run setup:production
    ```
+
+### npm スクリプト一覧
+
+#### メインコマンド
+- `npm run setup:all` - **完全セットアップ（リンク→DB初期化→管理者作成→環境変数→デプロイ）**
+- `npm run dev` - 開発サーバーの起動
+- `npm run build` - プロダクションビルド
+
+#### セットアップコマンド
+- `npm run setup:local` - ローカル環境の初期セットアップ（DB + 管理者）
+- `npm run setup:production` - 本番環境へのデプロイ準備（環境変数 + Edge Functions）
+
+#### 個別コマンド
+- `npm run supabase:link` - Supabaseプロジェクトとのリンク
+- `npm run db:reset` - データベースのリセットとマイグレーション適用
+- `npm run admin:create` - 管理者ユーザーの作成（.envの設定値を使用）
+- `npm run functions:deploy` - Edge Functionsのデプロイ
+- `npm run functions:env` - Edge Functions用環境変数の設定
+- `npm run preview` - ビルドしたアプリのプレビュー
 
 ## コントリビューション
 

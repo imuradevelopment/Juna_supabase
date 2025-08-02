@@ -14,17 +14,14 @@
     "preview": "vite preview",
     "analyze": "vite build --mode analyze",
     "deps": "depcruise --config .dependency-cruiser.cjs --include-only \"^src\" --output-type dot src | dot -T svg > dependency-graph.svg",
-    "db:reset": "yes | supabase db reset --linked",
-    "db:push": "supabase db push --include-all",
-    "functions:deploy": "npm run functions:deploy:register && npm run functions:deploy:login && npm run functions:deploy:delete",
-    "functions:deploy:register": "supabase functions deploy register-user --no-verify-jwt",
-    "functions:deploy:login": "supabase functions deploy login-with-account --no-verify-jwt",
-    "functions:deploy:delete": "supabase functions deploy delete-user",
     "supabase:link": "supabase link --project-ref qwsbdmkvozkfpznfzjay",
-    "reset:all": "npm run db:reset && npm run db:push && npm run functions:deploy",
-    "db:seed": "supabase db seed",
+    "db:reset": "yes | supabase db reset --linked && supabase db push --include-all",
     "admin:create": "node scripts/create-admin.js",
-    "setup:admin": "npm run admin:create"
+    "functions:deploy": "supabase functions deploy register-user --no-verify-jwt && supabase functions deploy login-with-account --no-verify-jwt && supabase functions deploy delete-user",
+    "functions:env": "node scripts/set-edge-functions-env.js",
+    "setup:local": "npm run db:reset && npm run admin:create",
+    "setup:production": "npm run functions:env && npm run functions:deploy",
+    "setup:all": "npm run supabase:link && npm run db:reset && npm run admin:create && npm run functions:env && npm run functions:deploy"
   },
   "dependencies": {
     "@phosphor-icons/vue": "^2.1.6",
