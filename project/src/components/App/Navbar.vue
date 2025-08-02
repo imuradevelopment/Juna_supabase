@@ -113,6 +113,17 @@
                     設定
                   </router-link>
                   
+                  <!-- 管理者メニュー -->
+                  <router-link 
+                    v-if="authStore.isAdmin"
+                    to="/admin" 
+                    class="flex items-center px-4 py-2.5 text-sm text-warning hover:bg-primary/15 transition-colors"
+                    @click="dropdownOpen = false"
+                  >
+                    <PhShield class="mr-2 h-4 w-4" />
+                    管理者
+                  </router-link>
+                  
                   <div class="my-1 border-t border-border/30"></div>
                   
                   <button 
@@ -188,6 +199,16 @@
             <router-link :to="`/profile/${authStore.user?.id}`" class="block rounded px-2 py-2.5 text-text hover:bg-primary/10 transition-colors" @click="isMenuOpen = false">プロフィール</router-link>
             <router-link to="/profile/edit" class="block rounded px-2 py-2.5 text-text hover:bg-primary/10 transition-colors" @click="isMenuOpen = false">設定</router-link>
             
+            <!-- 管理者メニュー（モバイル） -->
+            <router-link 
+              v-if="authStore.isAdmin"
+              to="/admin" 
+              class="block rounded px-2 py-2.5 text-warning hover:bg-primary/10 transition-colors" 
+              @click="isMenuOpen = false"
+            >
+              管理者パネル
+            </router-link>
+            
             <div class="my-3 border-t border-border"></div>
             
             <button 
@@ -214,7 +235,8 @@ import {
   PhGear, 
   PhSignOut,
   PhCaretDown,
-  PhX 
+  PhX,
+  PhShield 
 } from '@phosphor-icons/vue';
 
 const router = useRouter();

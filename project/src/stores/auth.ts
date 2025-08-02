@@ -26,6 +26,10 @@ export const useAuthStore = defineStore('auth', () => {
   
   // 計算プロパティ
   const isAuthenticated = computed(() => !!user.value);
+  const isAdmin = computed(() => {
+    // user_metadataのis_adminフラグを確認
+    return user.value?.user_metadata?.is_admin === true;
+  });
   const displayName = computed(() => {
     return profile.value?.nickname || user.value?.email || 'ユーザー';
   });
@@ -382,6 +386,7 @@ export const useAuthStore = defineStore('auth', () => {
     
     // 計算プロパティ
     isAuthenticated,
+    isAdmin,
     displayName,
     avatarUrl,
     

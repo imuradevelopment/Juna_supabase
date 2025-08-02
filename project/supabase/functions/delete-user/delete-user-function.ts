@@ -31,6 +31,7 @@ const SYSTEM_USER_ID = '00000000-0000-0000-0000-000000000000';
 
 interface RequestBody {
   userId: string;
+  isAdmin?: boolean; // 管理者による削除かどうか
 }
 
 serve(async (req: Request) => {
@@ -54,8 +55,8 @@ serve(async (req: Request) => {
 
     const token = authHeader.replace('Bearer ', '');
 
-    // リクエストボディからユーザーIDを取得
-    const { userId } = await req.json() as RequestBody;
+    // リクエストボディからユーザーIDと管理者フラグを取得
+    const { userId, isAdmin } = await req.json() as RequestBody;
     
     console.log('削除リクエスト受信:', { userId: userId.substring(0, 8) + '...' }) // IDの一部だけログ出力
 
@@ -127,13 +128,27 @@ serve(async (req: Request) => {
       )
     }
 
-    // 要求されたユーザーIDと認証されたユーザーIDが一致することを確認
-    if (user.id !== userId) {
-      console.error('ユーザーID不一致: 権限がありません')
-      return new Response(
-        JSON.stringify({ success: false, error: '他のユーザーアカウントは削除できません' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
-      )
+    // 権限チェック
+    if (!isAdmin) {
+      // 管理者でない場合は、自分自身のアカウントのみ削除可能
+      if (user.id !== userId) {
+        console.error('ユーザーID不一致: 権限がありません')
+        return new Response(
+          JSON.stringify({ success: false, error: '他のユーザーアカウントは削除できません' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
+        )
+      }
+    } else {
+      // 管理者の場合は、管理者権限を確認
+      const isUserAdmin = user.user_metadata?.is_admin === true;
+      if (!isUserAdmin) {
+        console.error('管理者権限がありません')
+        return new Response(
+          JSON.stringify({ success: false, error: '管理者権限が必要です' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 403 }
+        )
+      }
+      console.log('管理者による削除リクエスト')
     }
 
     console.log('認証成功')

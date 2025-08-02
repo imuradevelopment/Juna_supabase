@@ -57,6 +57,32 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     
+    // 管理者ページ
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../pages/AdminDashboardPage.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/users',
+      name: 'admin-users',
+      component: () => import('../pages/AdminUsersPage.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/posts',
+      name: 'admin-posts',
+      component: () => import('../pages/AdminPostsPage.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/comments',
+      name: 'admin-comments',
+      component: () => import('../pages/AdminCommentsPage.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    
     // プロフィール
     {
       path: '/profile/:id',
@@ -104,6 +130,10 @@ router.beforeEach((to, _, next) => {
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next({ path: '/auth', query: { redirect: to.fullPath } });
   } 
+  else if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    // 管理者権限が必要なページへのアクセスを制限
+    next({ name: 'home' });
+  }
   else if (to.meta.requiresGuest && authStore.isAuthenticated) {
     next({ name: 'home' });
   } 

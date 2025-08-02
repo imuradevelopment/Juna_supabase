@@ -98,10 +98,59 @@ export function useNotification() {
     }
   };
 
+  /**
+   * 成功通知を表示する
+   * @param message 通知メッセージ
+   */
+  const showSuccess = (message: string) => {
+    showNotification('success', '成功', message);
+  };
+
+  /**
+   * エラー通知を表示する
+   * @param message エラーメッセージ
+   */
+  const showError = (message: string) => {
+    showNotification('error', 'エラー', message);
+  };
+
+  /**
+   * 情報通知を表示する
+   * @param message 情報メッセージ
+   */
+  const showInfo = (message: string) => {
+    showNotification('info', '情報', message);
+  };
+
+  /**
+   * 警告通知を表示する
+   * @param message 警告メッセージ
+   */
+  const showWarning = (message: string) => {
+    showNotification('warning', '警告', message);
+  };
+
+  /**
+   * 確認ダイアログを表示する
+   * @param title ダイアログのタイトル
+   * @param message ダイアログのメッセージ
+   * @returns 確認されたかどうかのPromise<boolean>
+   */
+  const showConfirm = async (title: string, message: string): Promise<boolean> => {
+    // シンプルなconfirmダイアログを使用
+    // TODO: 将来的にカスタムダイアログコンポーネントに置き換え
+    return window.confirm(`${title}\n\n${message}`);
+  };
+
   // 戻り値オブジェクト
   return {
     // 公開API - すべてのコンポーネントで使用可能
     showNotification,
+    showSuccess,
+    showError,
+    showInfo,
+    showWarning,
+    showConfirm,
     clearAllNotifications,
     
     // 内部API - App.vueでのみ使用

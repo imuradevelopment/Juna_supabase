@@ -148,13 +148,18 @@ CREATE POLICY "認証済みユーザーのみプロフィール作成可能"
 CREATE POLICY "ユーザーは自分のプロフィールのみ削除可能" 
   ON profiles FOR DELETE USING (auth.uid() = id);
 
+-- 管理者用プロフィールポリシー
+CREATE POLICY "Admin can manage all profiles" 
+  ON profiles FOR ALL 
+  USING (auth.jwt() -> 'user_metadata' ->> 'is_admin' = 'true');
+
 -- カテゴリテーブル
 CREATE TABLE categories (
   id SERIAL PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
-  creator_id UUID REFERENCES profiles(id)
+  creator_id UUID REFERENCES profiles(id) ON DELETE CASCADE
 );
 
 CREATE TRIGGER update_category_updated_at
@@ -177,6 +182,11 @@ CREATE POLICY "作成者はカテゴリを更新可能"
 CREATE POLICY "作成者はカテゴリを削除可能" 
   ON categories FOR DELETE 
   USING (creator_id = auth.uid());
+
+-- 管理者用カテゴリポリシー
+CREATE POLICY "Admin can manage all categories" 
+  ON categories FOR ALL 
+  USING (auth.jwt() -> 'user_metadata' ->> 'is_admin' = 'true');
 
 -- ブログ投稿テーブル
 CREATE TABLE posts (
@@ -220,6 +230,11 @@ CREATE POLICY "作者のみ投稿更新可能"
 
 CREATE POLICY "作者のみ投稿削除可能" 
   ON posts FOR DELETE USING (auth.uid() = author_id);
+
+-- 管理者用投稿ポリシー
+CREATE POLICY "Admin can manage all posts" 
+  ON posts FOR ALL 
+  USING (auth.jwt() -> 'user_metadata' ->> 'is_admin' = 'true');
 
 -- 投稿カテゴリ関連テーブル
 CREATE TABLE post_categories (
@@ -322,6 +337,11 @@ CREATE POLICY "自分のコメントのみ削除可能"
       SELECT 1 FROM posts WHERE id = post_id AND author_id = auth.uid()
     )
   );
+
+-- 管理者用コメントポリシー
+CREATE POLICY "Admin can manage all comments" 
+  ON comments FOR ALL 
+  USING (auth.jwt() -> 'user_metadata' ->> 'is_admin' = 'true');
 
 -- 投稿いいねテーブル
 CREATE TABLE post_likes (
