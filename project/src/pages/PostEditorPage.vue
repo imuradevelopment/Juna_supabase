@@ -282,9 +282,6 @@ function resetFormData() {
   if (eyecatchUploaderRef.value) {
     eyecatchUploaderRef.value.preview = null;
     eyecatchUploaderRef.value.imageFile = null;
-    if (formData.cover_image_path) {
-      formData.cover_image_path = null;
-    }
   }
   
   // エディタの内容をリセット

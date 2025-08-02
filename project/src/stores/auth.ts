@@ -223,14 +223,14 @@ export const useAuthStore = defineStore('auth', () => {
   // ログアウト処理
   const logout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      const { error: logoutError } = await supabase.auth.signOut();
+      if (logoutError) throw logoutError;
       user.value = null;
       profile.value = null;
       return { success: true };
-    } catch (error: any) {
-      console.error('ログアウトエラー:', error);
-      error.value = error.message || 'ログアウトに失敗しました';
+    } catch (err: any) {
+      console.error('ログアウトエラー:', err);
+      error.value = err.message || 'ログアウトに失敗しました';
       return {
         success: false,
         error: error.value
@@ -245,7 +245,7 @@ export const useAuthStore = defineStore('auth', () => {
     
     try {
       const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`
+        redirectTo: `${window.location.origin}/auth?mode=reset-password`
       });
       
       if (resetError) throw resetError;
@@ -328,8 +328,12 @@ export const useAuthStore = defineStore('auth', () => {
     await supabase.auth.signOut({ scope: 'global' });
     
     // ローカルストレージからの関連データ削除
-    localStorage.removeItem('supabase.auth.token');
-    localStorage.removeItem('darkMode');
+    // Supabase関連のキーを正しく削除
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('sb-')) {
+        localStorage.removeItem(key);
+      }
+    });
     
     // キャッシュもクリア
     if ('caches' in window) {

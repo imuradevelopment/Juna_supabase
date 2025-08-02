@@ -91,13 +91,24 @@ const router = createRouter({
 });
 
 // ナビゲーションガード
-router.beforeEach((to, _, next) => {
+router.beforeEach(async (to, _, next) => {
   const authStore = useAuthStore();
   
-  // 認証状態の初期化が完了していない場合は、認証チェックを保留して次に進む
+  // 認証状態の初期化が完了していない場合は待機
   if (!authStore.isAuthReady) {
-    // まだ認証状態が初期化されていない場合は、認証が必要なページへの移動を一時的に許可する
-    return next();
+    // 認証チェックの完了を待つ（最大5秒）
+    const timeout = 5000;
+    const startTime = Date.now();
+    
+    while (!authStore.isAuthReady && (Date.now() - startTime) < timeout) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    // タイムアウトした場合はホームページにリダイレクト
+    if (!authStore.isAuthReady) {
+      console.warn('認証状態の初期化がタイムアウトしました');
+      return next({ name: 'home' });
+    }
   }
   
   // 認証状態の初期化が完了している場合は、通常の認証チェックを実行

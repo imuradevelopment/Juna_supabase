@@ -492,13 +492,18 @@ function openFileDialog(e?: Event) {
     e.stopPropagation();
   }
   
-  setTimeout(() => {
+  nextTick(() => {
     if (fileInput.value) {
       fileInput.value.click();
     } else {
       console.error('fileInput参照が見つかりません');
+      // fileInput要素を再取得を試みる
+      const fileInputEl = document.querySelector('#fileInput') as HTMLInputElement;
+      if (fileInputEl) {
+        fileInputEl.click();
+      }
     }
-  }, 10);
+  });
 }
 
 /**
