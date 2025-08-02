@@ -154,7 +154,7 @@ const props = defineProps({
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
-const { cleanupUnusedImages } = useImageCleanup();
+const { cleanupUnusedImages, extractImagePathsFromContent } = useImageCleanup();
 
 // 元のデータを保持（クリーンアップ用）
 const originalData = ref<{
@@ -772,19 +772,34 @@ async function updatePost(postData: any) {
     
     if (updateError) throw updateError;
     
-    if (uploadedImages.value.length > 0) {
-      const postImagesData = uploadedImages.value.map((img) => ({
-        post_id: props.id,
-        image_path: img.path,
-        author_id: img.userId
-      }));
-      
-      const { error: imagesError } = await supabase
+    // post_imagesテーブルを更新（既存のレコードを削除してから新しいレコードを挿入）
+    if (props.id) {
+      // 1. 既存のpost_imagesレコードを削除
+      const { error: deleteError } = await supabase
         .from('post_images')
-        .insert(postImagesData);
+        .delete()
+        .eq('post_id', props.id);
       
-      if (imagesError) {
-        console.error('画像データの関連付けエラー:', imagesError);
+      if (deleteError) {
+        console.error('既存の画像レコード削除エラー:', deleteError);
+      }
+      
+      // 2. 現在のコンテンツから画像パスを抽出してpost_imagesテーブルに挿入
+      const currentImagePaths = extractImagePathsFromContent(contentValue);
+      if (currentImagePaths.length > 0) {
+        const postImagesData = currentImagePaths.map((imagePath) => ({
+          post_id: props.id,
+          image_path: imagePath,
+          author_id: userId
+        }));
+        
+        const { error: imagesError } = await supabase
+          .from('post_images')
+          .insert(postImagesData);
+        
+        if (imagesError) {
+          console.error('画像データの関連付けエラー:', imagesError);
+        }
       }
     }
     

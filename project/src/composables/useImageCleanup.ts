@@ -257,16 +257,8 @@ export function useImageCleanup() {
         // ストレージから削除
         deletePromises.push(supabase.storage.from('post_images').remove(postImagesToDelete))
         
-        // post_imagesテーブルからも削除
-        // 各ファイルについて、パスが含まれるレコードを削除
-        postImagesToDelete.forEach(filename => {
-          dbDeletePromises.push(
-            supabase
-              .from('post_images')
-              .delete()
-              .like('image_path', `%${filename}`)
-          )
-        })
+        // ストレージからの削除のみ実行
+        // post_imagesテーブルは投稿保存時に再構築される
       }
       
       if (coverImagesToDelete.length > 0) {
