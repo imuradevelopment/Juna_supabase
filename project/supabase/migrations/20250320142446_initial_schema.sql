@@ -22,14 +22,17 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ストレージバケット設定
-INSERT INTO storage.buckets (id, name, public) VALUES 
-('profile_images', 'プロフィール画像', true);
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('profile_images', 'プロフィール画像', true)
+ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO storage.buckets (id, name, public) VALUES 
-('post_images', '投稿画像', true);
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('post_images', '投稿画像', true)
+ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO storage.buckets (id, name, public) VALUES 
-('cover_images', 'アイキャッチ画像', true);
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('cover_images', 'アイキャッチ画像', true)
+ON CONFLICT (id) DO NOTHING;
 
 -- ストレージポリシー設定
 CREATE POLICY "プロフィール画像は誰でも閲覧可能" 
