@@ -133,6 +133,7 @@ import RichTextEditor from '../components/PostEditorPage/Editor/RichTextEditor.v
 import { PhSpinner } from '@phosphor-icons/vue';
 import EyecatchUploader from '../components/PostEditorPage/Eyecatch/EyecatchUploader.vue';
 import CategorySelector from '../components/PostEditorPage/Category/CategorySelector.vue';
+import { useImageCleanup } from '../composables/useImageCleanup';
 
 interface FormData {
   title: string;
@@ -153,6 +154,7 @@ const props = defineProps({
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+const { extractImagePathsFromContent } = useImageCleanup();
 
 const formData = reactive<FormData>({
   title: '',
@@ -712,19 +714,46 @@ async function updatePost(postData: any) {
     
     if (updateError) throw updateError;
     
-    if (uploadedImages.value.length > 0) {
-      const postImagesData = uploadedImages.value.map((img) => ({
-        post_id: props.id,
-        image_path: img.path,
-        author_id: img.userId
-      }));
-      
-      const { error: imagesError } = await supabase
+    // post_imagesテーブルの更新（既存レコードを削除してから現在の画像を挿入）
+    if (props.id) {
+      // 1. 既存のpost_imagesレコードを削除
+      const { error: deleteError } = await supabase
         .from('post_images')
-        .insert(postImagesData);
+        .delete()
+        .eq('post_id', props.id);
       
-      if (imagesError) {
-        console.error('画像データの関連付けエラー:', imagesError);
+      if (deleteError) {
+        console.error('既存の画像レコード削除エラー:', deleteError);
+      }
+      
+      // 2. 現在のコンテンツから画像パスを抽出
+      const imagePathsFromContent = extractImagePathsFromContent(contentValue);
+      
+      // 3. 新しくアップロードした画像のパスも追加
+      const allImagePaths = [...imagePathsFromContent];
+      if (uploadedImages.value.length > 0) {
+        const newImagePaths = uploadedImages.value.map(img => img.path);
+        allImagePaths.push(...newImagePaths);
+      }
+      
+      // 4. 重複を除去
+      const uniqueImagePaths = [...new Set(allImagePaths)];
+      
+      // 5. post_imagesテーブルに現在の画像を挿入
+      if (uniqueImagePaths.length > 0) {
+        const postImagesData = uniqueImagePaths.map((imagePath) => ({
+          post_id: props.id,
+          image_path: imagePath,
+          author_id: userId
+        }));
+        
+        const { error: imagesError } = await supabase
+          .from('post_images')
+          .insert(postImagesData);
+        
+        if (imagesError) {
+          console.error('画像データの関連付けエラー:', imagesError);
+        }
       }
     }
     
