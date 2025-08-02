@@ -1,136 +1,171 @@
-# セットアップ
+# 見えない障害ブログプラットフォーム（Juna）
+
+## 概要
+
+「見えない障害ブログプラットフォーム」は、見た目からは分かりにくい障害を持つ方々が、自身の体験や知識、日常の思いを安心して発信できるオンラインスペースです。
 
 ## デプロイ情報
 - [Netlify管理パネル](https://app.netlify.com/sites/juna-supabase/overview)
 - [デプロイされたサイト](https://juna-supabase.netlify.app/)
 
-## 依存関係をインストール
+## 特徴
+
+- **レスポンシブデザイン:** どのデバイスからでも快適に利用可能
+- **リッチテキストエディタ:** Tiptapを活用した直感的なブログ投稿体験
+- **画像アップロード機能:** ブログ記事に画像を簡単に添付可能
+- **ユーザー認証:** セキュアなサインアップとログイン機能
+- **コミュニティ機能:** 記事投稿、コメント
+
+## 技術スタック
+
+- **フロントエンド:**
+  - Vue 3
+  - TypeScript
+  - Tailwind CSS
+  - Vue Router
+  - Pinia (状態管理)
+  - Tiptap (リッチテキストエディタ)
+- **バックエンド/サービス:**
+  - Supabase (認証、データベース、ストレージ)
+
+## インストールとセットアップ
+
+### 必要条件
+
+- Node.js v12以上
+- Git クライアント
+- npm
+- Supabase CLI
+
+### クイックスタート
+
 ```bash
-cd project
+# リポジトリのクローン
+git clone https://github.com/imuradevelopment/Juna_supabase.git
+cd Juna_supabase/project
+
+# 依存関係のインストール
 npm install
-```
 
-## supabaseで新しいプロジェクトを作成
-1. 「.env.example」から「.env」ファイルを作成
-2. supabaseから値を取得し「.env」ファイルを編集
+# 環境変数の設定
+cp .env.example .env
+# .envファイルを編集して実際の値を入力
 
-## supabaseにDBをマイグレーション
-```bash
-cd project
-supabase link
-supabase db push --include-all
-```
+# 完全セットアップ（DB、管理者、Edge Functions全て）
+npm run setup:all
 
-## supabaseにfunctionsをデプロイ
-```bash
-# カスタムエントリーポイントファイル名を指定してデプロイ
-supabase functions deploy register-user
-supabase functions deploy login-with-account
-supabase functions deploy delete-user
-```
-
-## ローカルサーバーを起動
-```bash
-cd project
+# 開発サーバーの起動
 npm run dev
 ```
 
+### 詳細なセットアップ手順
 
-## 機能改善
+1. **リポジトリのクローン**
+   ```bash
+   git clone https://github.com/imuradevelopment/Juna_supabase.git
+   cd Juna_supabase/project
+   ```
+
+2. **依存関係のインストール**
+   ```bash
+   npm install
+   ```
+
+3. **環境変数の設定**  
+   プロジェクトルートに `.env` ファイルを作成し、`.env.example` を参考に Supabase の認証情報などを設定してください。
+   ```bash
+   cp .env.example .env
+   # .envファイルを編集して実際の値を入力
+   ```
+
+4. **Supabaseプロジェクトのリンク**
+   ```bash
+   npm run supabase:link
+   ```
+
+5. **ローカル環境のセットアップ**
+   ```bash
+   # データベースのリセット、マイグレーション適用、管理者ユーザー作成
+   npm run setup:local
+   ```
+
+6. **開発サーバーの起動**
+   ```bash
+   npm run dev
+   ```
+   ブラウザで `http://localhost:5173` にアクセスして動作を確認してください。
+
+### 本番環境へのデプロイ
+
+1. **環境変数の設定とEdge Functionsのデプロイ**
+   ```bash
+   # .envに本番環境用のALLOWED_ORIGINSを設定後
+   npm run setup:production
+   ```
+
+### npm スクリプト一覧
+
+#### メインコマンド
+- `npm run setup:all` - **完全セットアップ（リンク→DB初期化→管理者作成→環境変数→デプロイ）**
+- `npm run dev` - 開発サーバーの起動
+- `npm run build` - プロダクションビルド
+
+#### セットアップコマンド
+- `npm run setup:local` - ローカル環境の初期セットアップ（DB + 管理者）
+- `npm run setup:production` - 本番環境へのデプロイ準備（環境変数 + Edge Functions）
+
+#### 個別コマンド
+- `npm run supabase:link` - Supabaseプロジェクトとのリンク
+- `npm run db:reset` - データベースのリセットとマイグレーション適用
+- `npm run admin:create` - 管理者ユーザーの作成（.envの設定値を使用）
+- `npm run functions:deploy` - Edge Functionsのデプロイ
+- `npm run functions:env` - Edge Functions用環境変数の設定
+- `npm run preview` - ビルドしたアプリのプレビュー
+
+## 機能改善（TODO）
 
 - リアルタイム購読の使用
 - WebPush通知の実装
 - 管理者ページの実装
 - フォローの概念
 - 通知機能の集約
-    - @useNotification.ts useNotification.tsを使用してユーザーに対する通知を一元化してください。入力フィールド固有の物などはそのままにしてください。
-
+  - useNotification.tsを使用してユーザーに対する通知を一元化
 - リンクの更新
-    - @index.ts index.tsに記載されているページ以外に遷移していませんか？
-
+  - router/index.tsに記載されているページ以外への遷移確認
 - 画像対応フォーマットの拡張
-    - @useImageUpload.ts useImageUpload.tsで下記のフォーマットに対応してください。 
-    ```markdown
-        # 対応フォーマット一覧（全27種類）
+  - useImageUpload.tsで多様なフォーマットに対応（WebP、AVIF、HEIC、RAW形式など）
 
-        1. original（オリジナル形式を維持）
-        2. webp（WebP）
-        3. jpeg/jpg（JPEG）
-        4. png（PNG）
-        5. gif（GIF）
-        6. bmp（BMP）
-        7. tiff/tif（TIFF）
-        8. avif（AVIF）
-        9. heic（HEIC - Apple）
-        10. heif（HEIF - 高効率画像形式）
-        11. svg（SVG - ベクター画像）
-        12. ico（アイコン）
-        13. apng（アニメーションPNG）
-        14. jxl（JPEG XL）
-        15. jp2（JPEG 2000）
-        16. jpx（JPEG 2000 Part-2）
-        17. j2k（JPEG 2000 CodeStream）
-        18. jxr（JPEG XR）
-        19. wdp（Windows Digital Photo - JPEG XRの別名）
-        20. dng（Adobe Digital Negative - RAW）
-        21. arw（Sony Alpha RAW）
-        22. cr2/cr3（Canon RAW）
-        23. nef（Nikon Electronic Format - RAW）
-        24. orf（Olympus RAW Format）
-        25. raf（Fuji RAW Format）
-        26. rw2（Panasonic RAW）
-        27. pef（Pentax Electronic Format）
-        28. srw（Samsung RAW）
-        29. raw（汎用RAW形式）
-    ```
+## 開発メモ
 
+### よく使うプロンプト
 
-## よく使うプロンプト
+#### DB関連
+- supabaseスキーマの把握: `@supabase/migrations/20250320142446_initial_schema.sql`を参照
 
+#### デザイン関連
+- カラーの統一: `@tailwind.config.js`のカラー定義を使用
+- モバイルファースト対応: レスポンシブバリアント（sm:、md:、lg:、xl:、2xl:）を適切に使用
 
-### DB関連
+#### 機能関連
+- アプリ骨格: `@App.vue`, `@router.ts`, `@auth.ts`, `@supabase.ts`
+- 各ページコンポーネント: `@pages/`ディレクトリ参照
+- 共通コンポーネント: `@components/`ディレクトリ参照
+- Composables: `@composables/`ディレクトリ参照
 
-#### supabaseスキーマの把握
-@20250320142446_initial_schema.sql supabase スキーマを日本語検索用の設定、ユーティリティ関数、ストレージバケット設定、ストレージポリシー設定、セキュリティ関数、カラムを含むテーブル詳細、RLS、ポリシー、トリガー、インデックス、タイプ、トリガー関数、Realtimeサブスクリプション設定などを含めて、完全に把握してください。スキーマは修正しないでください。
+## コントリビューション
 
+貢献は大歓迎です！  
+バグ修正、新機能の提案、ドキュメント改善など、どんな改善提案もプロジェクトの向上に役立ちます。  
+プルリクエストを送る前に、Issueを立てて変更内容についてディスカッションしていただけると助かります。
 
-### デザイン関連
+## ライセンス
 
-#### カラーの統一とモバイルファースト対応
-@tailwind.config.js コンテキストに追加したコンポーネントのカラー使用箇所でカラーをハードコーディングしている箇所や、tailwind.config.jsの「colors:」を使用していない箇所、tailwind.cssのユーティリティカラークラスを使用している箇所があれば修正してください。カラーを使用する際は全てtailwind.config.jsのクラスを使用してください。クラスの記載順は「コンポーネント内に定義されたtailwindcss以外のクラス名 + モバイルファーストの原則に基づき、各プロパティカテゴリ（ポジション、ディスプレイ、フレックス、グリッド、幅、高さ、マージン、パディング、ボーダー、角丸、背景、テキスト、色、タイポグラフィ、間隔、効果、トランジション、アニメーション、ホバー状態、フォーカス、アクセシビリティ）ごとにグループ化し、各グループ内では基本スタイル（プレフィックスなし）を最小画面サイズ（モバイル）向けに定義してから、レスポンシブバリアント（sm:、md:、lg:、xl:、2xl:）を画面サイズの小さい順に並べる。」でお願いします。機能は絶対に変更しないでください。tailwind.config.jsは修正しないで下さい。
+このプロジェクトは [MITライセンス](LICENSE) の下で公開されています。詳細は LICENSE ファイルをご参照ください。
 
+## コンタクト
 
-### 機能関連
+ご意見やご質問、フィードバックがございましたら、GitHub の Issue、またはプロジェクトに記載のメールアドレスまでご連絡ください。
 
-#### アプリ骨格
-@Notifications.vue @Navbar.vue @Footer.vue @auth.ts @App.vue @useNotification.ts @main.ts @index.html @tailwind.config.js @router.ts @storage.ts @supabase.ts アプリケーションの骨格です。どのようになっていますか？説明してください。
+---
 
-#### 認証ページ
-@AuthPage.vue @useNotification.ts @auth.ts @router.ts @register-user-function.ts @login-with-account-function.ts @delete-user-function.ts @tailwind.config.js @storage.ts @supabase.ts これは認証ページです。どのようになっていますか？説明してください。
-
-#### ダッシュボードページ
-@DashboardPage.vue @useNotification.ts @auth.ts @DashboardPostsList.vue @DashboardDraftsList.vue @DashboardCommentsList.vue @DashboardLikesList.vue @DashboardStatistics.vue @router.ts @tailwind.config.js @storage.ts @supabase.ts @auth.ts これはダッシュボードページです。どのようになっていますか？説明してください。
-
-#### ホームページ
-@HomePage.vue @useNotification.ts @supabase.ts @PostCard.vue @router.ts  @tailwind.config.js @storage.ts @auth.ts これはホームページです。どのようになっていますか？説明してください。
-
-#### NotFoundページ
-@NotFoundPage.vue @useNotification.ts @router.ts @tailwind.config.js @storage.ts @supabase.ts @auth.ts これはNotFoundページです。どのようになっていますか？説明してください。
-
-#### 投稿詳細ページ
-@PostDetailPage.vue @PostCard.vue @useNotification.ts @supabase.ts @auth.ts @RichTextContent.vue @CommentSystem.vue @CommentItem.vue @storage.ts @router.ts @tailwind.config.js これは投稿詳細ページです。どのようになっていますか？説明してください。
-
-#### 投稿作成、編集ページ
-@PostEditorPage.vue @useNotification.ts @supabase.ts @auth.ts @RichTextEditor.vue @EditorToolbar.vue @EditorLinkMenu.vue @CategorySelector.vue @EyecatchUploader.vue @useImageUpload.ts @useImageCleanup.ts @storage.ts @router.ts @tailwind.config.js @storage.ts これは投稿作成、編集ページです。どのようになっていますか？説明してください。
-
-#### 投稿一覧ページ
-@PostsPage.vue @useNotification.ts @supabase.ts @PostCard.vue @router.ts @tailwind.config.js @storage.ts @auth.ts これは投稿一覧ページです。どのようになっていますか？説明してください。
-
-#### プロフィール編集ページ
-@ProfileEditPage.vue @useNotification.ts @supabase.ts @auth.ts @useImageUpload.ts @storage.ts @router.ts @tailwind.config.js これはプロフィール編集ページです。どのようになっていますか？説明してください。
-
-#### プロフィールページ
-@ProfilePage.vue @useNotification.ts @supabase.ts @auth.ts @storage.ts @PostCard.vue @tailwind.config.js @router.ts これはプロフィールページです。どのようになっていますか？説明してください。
-
-#### 一時的
-各ファイルでsupabase.tsとstorage.ts、auth.tsはどのように使用されていますか？
+このプラットフォームが、見えない障害を持つ方々にとって情報発信の新たな場となり、より豊かなコミュニティ形成につながることを願っています。
