@@ -173,6 +173,18 @@
             </div>
 
             <div>
+              <label for="aboutTitle" class="block text-sm font-medium text-text mb-2">
+                Aboutセクションのタイトル
+              </label>
+              <input
+                id="aboutTitle"
+                type="text"
+                v-model="domainTexts.aboutTitle"
+                class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
+              />
+            </div>
+
+            <div>
               <label for="aboutDescription" class="block text-sm font-medium text-text mb-2">
                 サイト説明文
               </label>
@@ -273,6 +285,70 @@
                 rows="2"
                 class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
               />
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="startPostingButton" class="block text-sm font-medium text-text mb-2">
+                  投稿開始ボタンテキスト
+                </label>
+                <input
+                  id="startPostingButton"
+                  type="text"
+                  v-model="domainTexts.startPostingButton"
+                  class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
+                />
+              </div>
+
+              <div>
+                <label for="viewPostsButton" class="block text-sm font-medium text-text mb-2">
+                  投稿一覧ボタンテキスト
+                </label>
+                <input
+                  id="viewPostsButton"
+                  type="text"
+                  v-model="domainTexts.viewPostsButton"
+                  class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label for="recentPostsTitle" class="block text-sm font-medium text-text mb-2">
+                  最新投稿セクションタイトル
+                </label>
+                <input
+                  id="recentPostsTitle"
+                  type="text"
+                  v-model="domainTexts.recentPostsTitle"
+                  class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
+                />
+              </div>
+
+              <div>
+                <label for="viewAllPosts" class="block text-sm font-medium text-text mb-2">
+                  すべて見るリンクテキスト
+                </label>
+                <input
+                  id="viewAllPosts"
+                  type="text"
+                  v-model="domainTexts.viewAllPosts"
+                  class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
+                />
+              </div>
+
+              <div>
+                <label for="noRecentPosts" class="block text-sm font-medium text-text mb-2">
+                  投稿がない場合のメッセージ
+                </label>
+                <input
+                  id="noRecentPosts"
+                  type="text"
+                  v-model="domainTexts.noRecentPosts"
+                  class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
+                />
+              </div>
             </div>
           </div>
 
@@ -428,6 +504,7 @@ const features = reactive({
 const domainTexts = reactive({
   heroTitle: '',
   heroSubtitle: '',
+  aboutTitle: '',
   aboutDescription: '',
   feature1Title: '',
   feature1Description: '',
@@ -437,7 +514,12 @@ const domainTexts = reactive({
   feature3Description: '',
   targetDisabilitiesTitle: '',
   targetDisabilities: [],
-  callToAction: ''
+  callToAction: '',
+  startPostingButton: '',
+  viewPostsButton: '',
+  recentPostsTitle: '',
+  viewAllPosts: '',
+  noRecentPosts: ''
 });
 
 // 対象カテゴリリストのテキスト管理用

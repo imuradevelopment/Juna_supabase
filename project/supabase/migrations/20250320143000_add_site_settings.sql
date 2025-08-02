@@ -60,6 +60,7 @@ INSERT INTO site_settings (key, value, description) VALUES
   ('domain_texts', '{
     "heroTitle": "見えない障害と共に生きる",
     "heroSubtitle": "経験を共有し、互いに学び、支え合うコミュニティへようこそ",
+    "aboutTitle": "当サイトについて",
     "aboutDescription": "「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々の経験を共有し、互いに支え合うためのコミュニティプラットフォームです。",
     "feature1Title": "経験の共有",
     "feature1Description": "日常生活での工夫や対処法、成功体験や困難を乗り越えた経験を共有できます。",
@@ -76,7 +77,12 @@ INSERT INTO site_settings (key, value, description) VALUES
       "内部障害",
       "その他の見えない障害"
     ],
-    "callToAction": "あなたの経験は、誰かの助けになります。このコミュニティに参加して、あなたの物語を共有しませんか？"
+    "callToAction": "あなたの経験は、誰かの助けになります。このコミュニティに参加して、あなたの物語を共有しませんか？",
+    "startPostingButton": "今すぐ投稿を始める",
+    "viewPostsButton": "投稿を見る",
+    "recentPostsTitle": "最新の投稿",
+    "viewAllPosts": "すべての投稿を見る",
+    "noRecentPosts": "まだ投稿がありません"
   }', 'ドメイン固有の文言設定'),
   ('features', '{
     "enableComments": true,

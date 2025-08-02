@@ -18,7 +18,7 @@
             class="btn btn-primary rounded-full px-8"
           >
             <PhPlusCircle :size="20" class="mr-2" weight="bold" />
-            <span class="inline-block align-middle">投稿を始める</span>
+            <span class="inline-block align-middle">{{ settingsStore.domainTexts?.startPostingButton || '投稿を始める' }}</span>
           </router-link>
           
           <router-link 
@@ -26,7 +26,7 @@
             class="btn btn-outline-primary rounded-full px-8"
           >
             <PhInfo :size="20" class="mr-2" weight="bold" />
-            <span class="inline-block align-middle">投稿一覧</span>
+            <span class="inline-block align-middle">{{ settingsStore.domainTexts?.viewPostsButton || '投稿一覧' }}</span>
           </router-link>
         </div>
       </div>
@@ -137,10 +137,10 @@
       <div class="mb-8 flex items-center justify-between">
         <h2 class="flex items-center text-2xl font-bold text-heading md:text-3xl">
           <span class="mr-3 inline-block h-6 w-2 rounded-full bg-primary"></span>
-          最新の投稿
+          {{ settingsStore.domainTexts?.recentPostsTitle || '最新の投稿' }}
         </h2>
         <router-link to="/posts?sort=created_at.desc" class="flex items-center text-primary-light hover:underline">
-          すべて見る
+          {{ settingsStore.domainTexts?.viewAllPosts || 'すべて見る' }}
           <PhArrowRight :size="20" class="ml-1" weight="bold" />
         </router-link>
       </div>
@@ -153,7 +153,7 @@
         />
       </div>
       <div v-else class="glass-card p-6 text-center">
-        <p class="text-text-muted">まだ投稿はありません。</p>
+        <p class="text-text-muted">{{ settingsStore.domainTexts?.noRecentPosts || 'まだ投稿はありません。' }}</p>
       </div>
     </section>
   </div>
@@ -203,6 +203,16 @@ interface Category {
 
 // ストア
 const settingsStore = useSettingsStore();
+
+// デフォルトの障害リスト
+const defaultDisabilities = [
+  '発達障害（ASD、ADHD、LD等）',
+  '精神障害（うつ病、統合失調症等）',
+  '慢性疲労症候群',
+  '線維筋痛症',
+  '内部障害',
+  'その他の見えない障害'
+];
 
 // 状態変数
 const featuredPosts = ref<Post[]>([]);
