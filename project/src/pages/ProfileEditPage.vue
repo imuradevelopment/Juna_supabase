@@ -270,8 +270,65 @@ function handleRemoveAvatar() {
   // 削除する画像パスを保持
   if (profileData.value.avatar_data) {
     oldAvatarToDelete.value = profileData.value.avatar_data;
+    console.log('削除対象の画像パス:', profileData.value.avatar_data);
   }
   profileData.value.avatar_data = null; // 既存の画像パスをクリア
+}
+
+// ストレージから画像を削除するヘルパー関数
+async function deleteAvatarFromStorage(avatarPath: string): Promise<boolean> {
+  try {
+    if (!authStore.user) return false;
+    
+    // 方法1: 直接パスで削除
+    const { error: directDeleteError } = await supabase.storage
+      .from('profile_images')
+      .remove([avatarPath]);
+    
+    if (!directDeleteError) {
+      console.log('画像を直接削除しました:', avatarPath);
+      return true;
+    }
+    
+    console.warn('直接削除に失敗、リスト取得して削除を試みます:', directDeleteError);
+    
+    // 方法2: ユーザーフォルダ内のファイルをリスト取得して削除
+    const { data: files, error: listError } = await supabase.storage
+      .from('profile_images')
+      .list(authStore.user.id);
+    
+    if (listError) {
+      console.error('ファイルリスト取得エラー:', listError);
+      return false;
+    }
+    
+    // パスからファイル名を抽出
+    const fileName = avatarPath.split('/').pop();
+    
+    // 該当するファイルを探す
+    const targetFile = files?.find(file => file.name === fileName);
+    
+    if (targetFile) {
+      const fullPath = `${authStore.user.id}/${targetFile.name}`;
+      const { error: deleteError } = await supabase.storage
+        .from('profile_images')
+        .remove([fullPath]);
+      
+      if (deleteError) {
+        console.error('ファイル削除エラー:', deleteError);
+        return false;
+      }
+      
+      console.log('画像をリスト経由で削除しました:', fullPath);
+      return true;
+    }
+    
+    console.warn('削除対象のファイルが見つかりませんでした:', fileName);
+    return false;
+  } catch (error) {
+    console.error('画像削除中にエラーが発生しました:', error);
+    return false;
+  }
 }
 
 // プロフィール保存
@@ -317,13 +374,17 @@ async function saveProfile() {
     // 古いアバター画像があれば削除
     // 画像が変更された場合（新しい画像アップロードまたは削除）
     if (originalAvatarPath.value && avatarUrl !== originalAvatarPath.value) {
-      try {
-        await supabase.storage
-          .from('profile_images')
-          .remove([originalAvatarPath.value]);
-        console.log('古いプロフィール画像を削除しました');
-      } catch (deleteError) {
-        console.error('古いプロフィール画像の削除に失敗しました:', deleteError);
+      console.log('画像削除処理開始:', {
+        originalPath: originalAvatarPath.value,
+        newPath: avatarUrl,
+        bucket: 'profile_images'
+      });
+      
+      // ヘルパー関数を使用して削除
+      const deleteSuccess = await deleteAvatarFromStorage(originalAvatarPath.value);
+      
+      if (!deleteSuccess) {
+        console.error('プロフィール画像の削除に失敗しました');
         // 削除エラーは処理を止めない
       }
     }
