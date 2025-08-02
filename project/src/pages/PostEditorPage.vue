@@ -133,6 +133,7 @@ import RichTextEditor from '../components/PostEditorPage/Editor/RichTextEditor.v
 import { PhSpinner } from '@phosphor-icons/vue';
 import EyecatchUploader from '../components/PostEditorPage/Eyecatch/EyecatchUploader.vue';
 import CategorySelector from '../components/PostEditorPage/Category/CategorySelector.vue';
+import { useImageCleanup } from '../composables/useImageCleanup';
 
 interface FormData {
   title: string;
@@ -153,6 +154,7 @@ const props = defineProps({
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+const { cleanupUnusedImages } = useImageCleanup();
 
 const formData = reactive<FormData>({
   title: '',

@@ -248,27 +248,43 @@ export function useImageCleanup() {
       console.log('削除対象の記事画像リスト:', postImagesToDelete)
       console.log('削除対象のカバー画像リスト:', coverImagesToDelete)
       
-      // 画像を削除
+      // 画像を削除（ストレージとデータベースの両方）
       const deletePromises: Promise<any>[] = []
+      const dbDeletePromises: Promise<any>[] = []
       
       if (postImagesToDelete.length > 0) {
         console.log('記事画像の削除処理を実行します:', postImagesToDelete)
+        // ストレージから削除
         deletePromises.push(supabase.storage.from('post_images').remove(postImagesToDelete))
+        
+        // post_imagesテーブルからも削除
+        postImagesToDelete.forEach(filename => {
+          // より正確な削除のため、完全一致またはパスの終端での一致を確認
+          dbDeletePromises.push(
+            supabase
+              .from('post_images')
+              .delete()
+              .or(`image_path.eq.${filename},image_path.like.%/${filename}`)
+          )
+        })
       }
       
       if (coverImagesToDelete.length > 0) {
         console.log('カバー画像の削除処理を実行します:', coverImagesToDelete)
+        // ストレージから削除
         deletePromises.push(supabase.storage.from('cover_images').remove(coverImagesToDelete))
+        // カバー画像はpostsテーブルのcover_image_pathで管理されているため、個別のテーブル削除は不要
       }
       
-      if (deletePromises.length === 0) {
+      if (deletePromises.length === 0 && dbDeletePromises.length === 0) {
         console.log('削除対象の画像はありません')
         return { success: true, deletedPaths: [] }
       }
       
-      // 削除処理を実行
+      // 削除処理を実行（ストレージとデータベースの両方）
       console.log('削除処理を実行します')
-      const results = await Promise.all(deletePromises)
+      const allPromises = [...deletePromises, ...dbDeletePromises]
+      const results = await Promise.all(allPromises)
       
       // エラーチェック
       const failedResults = results.filter(result => result.error)
