@@ -14,12 +14,17 @@ dotenv.config({ path: path.join(__dirname, '..', '.env') });
 const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const adminEmail = process.env.ADMIN_EMAIL || 'admin@example.com';
-const adminPassword = process.env.ADMIN_PASSWORD || 'Admin123!@#';
+const adminPassword = process.env.ADMIN_PASSWORD;
 const adminNickname = process.env.ADMIN_NICKNAME || '管理者';
 const adminAccountId = process.env.ADMIN_ACCOUNT_ID || 'admin';
 
 if (!supabaseUrl || !supabaseServiceKey) {
   console.error('エラー: SUPABASE_URLとSUPABASE_SERVICE_ROLE_KEYが必要です');
+  process.exit(1);
+}
+
+if (!adminPassword) {
+  console.error('エラー: ADMIN_PASSWORDが環境変数に設定されていません');
   process.exit(1);
 }
 
@@ -86,7 +91,6 @@ async function createAdmin() {
         if (profileError) throw profileError;
 
         console.log('\n✓ 管理者プロフィールが作成されました');
-        console.log(`  ユーザーID: ${existingUser.id}`);
         console.log(`  メール: ${adminEmail}`);
         console.log(`  アカウントID: ${adminAccountId}`);
         console.log(`  ニックネーム: ${adminNickname}`);

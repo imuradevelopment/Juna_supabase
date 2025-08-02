@@ -19,7 +19,7 @@
     "functions:deploy": "npm run functions:deploy:register && npm run functions:deploy:login && npm run functions:deploy:delete",
     "functions:deploy:register": "supabase functions deploy register-user --no-verify-jwt",
     "functions:deploy:login": "supabase functions deploy login-with-account --no-verify-jwt",
-    "functions:deploy:delete": "supabase functions deploy delete-user --no-verify-jwt",
+    "functions:deploy:delete": "supabase functions deploy delete-user",
     "supabase:link": "supabase link --project-ref qwsbdmkvozkfpznfzjay",
     "reset:all": "npm run db:reset && npm run db:push && npm run functions:deploy",
     "db:seed": "supabase db seed",

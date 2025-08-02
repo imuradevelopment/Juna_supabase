@@ -145,6 +145,12 @@ const profileData = ref({
   avatar_data: '' as string | null,
 });
 
+// 元の画像パスを保持（削除時に使用）
+const originalAvatarPath = ref<string | null>(null);
+
+// 削除する画像のパスを保持
+const oldAvatarToDelete = ref<string | null>(null);
+
 // 画像アップロード用コンポーザブル
 const { 
   preview: avatarPreview, 
@@ -204,6 +210,9 @@ async function fetchProfileData() {
         avatar_data: data.avatar_data,
       };
       
+      // 元の画像パスを保持
+      originalAvatarPath.value = data.avatar_data;
+      
       // アバター画像を表示
       if (data.avatar_data) {
         await processExistingAvatar(data.avatar_data);
@@ -258,6 +267,10 @@ async function handleAvatarUpload(event: Event) {
 function handleRemoveAvatar() {
   removeAvatar();
   newImageSelected.value = true; // 削除も変更としてマーク
+  // 削除する画像パスを保持
+  if (profileData.value.avatar_data) {
+    oldAvatarToDelete.value = profileData.value.avatar_data;
+  }
   profileData.value.avatar_data = null; // 既存の画像パスをクリア
 }
 
@@ -302,19 +315,22 @@ async function saveProfile() {
     await authStore.fetchUserProfile();
     
     // 古いアバター画像があれば削除
-    const oldAvatarPath = profileData.value.avatar_data;
-    if (oldAvatarPath && avatarUrl !== oldAvatarPath) {
-      // 新しい画像がアップロードされた場合、または画像が削除された場合
+    // 画像が変更された場合（新しい画像アップロードまたは削除）
+    if (originalAvatarPath.value && avatarUrl !== originalAvatarPath.value) {
       try {
         await supabase.storage
           .from('profile_images')
-          .remove([oldAvatarPath]);
-        console.log('古いプロフィール画像を削除しました:', oldAvatarPath);
+          .remove([originalAvatarPath.value]);
+        console.log('古いプロフィール画像を削除しました');
       } catch (deleteError) {
         console.error('古いプロフィール画像の削除に失敗しました:', deleteError);
         // 削除エラーは処理を止めない
       }
     }
+    
+    // 削除フラグをリセット
+    oldAvatarToDelete.value = null;
+    originalAvatarPath.value = avatarUrl; // 新しい値を元の値として保持
     
     // 状態を更新
     profileData.value.avatar_data = avatarUrl;

@@ -34,8 +34,8 @@
         <!-- タイトル - 見出し色に統一 -->
         <h3 
           class="mb-2 line-clamp-2 text-xl font-semibold text-heading"
-          v-if="post.title_highlight" 
-          v-html="post.title_highlight"
+          v-if="sanitizedTitleHighlight" 
+          v-html="sanitizedTitleHighlight"
         ></h3>
         <h3 
           class="mb-2 line-clamp-2 text-xl font-semibold text-heading"
@@ -61,9 +61,9 @@
         
         <!-- 抜粋 - 二次テキスト色に統一 -->
         <p 
-          v-if="post.excerpt_highlight" 
+          v-if="sanitizedExcerptHighlight" 
           class="mb-4 line-clamp-3 text-sm text-text-muted"
-          v-html="post.excerpt_highlight"
+          v-html="sanitizedExcerptHighlight"
         ></p>
         <p 
           v-else-if="post.excerpt" 
@@ -134,7 +134,12 @@ import {
   PhHeart, 
   PhChatText 
 } from '@phosphor-icons/vue';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { formatRelativeTime } from '@/lib/utils/date';
+import { supabase } from '@/lib/supabase';
+import { useAuthStore } from '@/stores/auth';
+import DOMPurify from 'dompurify';
 
 // カテゴリの型定義
 interface Category {
@@ -222,6 +227,15 @@ const maxCategories = 3;
 const limitedCategories = computed(() => {
   if (!props.post.categories) return [];
   return props.post.categories.slice(0, maxCategories);
+});
+
+// ハイライトされたコンテンツをサニタイズ
+const sanitizedTitleHighlight = computed(() => {
+  return props.post.title_highlight ? DOMPurify.sanitize(props.post.title_highlight) : '';
+});
+
+const sanitizedExcerptHighlight = computed(() => {
+  return props.post.excerpt_highlight ? DOMPurify.sanitize(props.post.excerpt_highlight) : '';
 });
 </script>
 
