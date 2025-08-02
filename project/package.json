@@ -13,7 +13,6 @@
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview",
     "analyze": "vite build --mode analyze",
-    "deps": "depcruise --config .dependency-cruiser.cjs --include-only \"^src\" --output-type dot src | dot -T svg > dependency-graph.svg",
     "supabase:link": "supabase link --project-ref qwsbdmkvozkfpznfzjay",
     "db:reset": "yes | supabase db reset --linked && supabase db push --include-all",
     "admin:create": "node scripts/create-admin.js",

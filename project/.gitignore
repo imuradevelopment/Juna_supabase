@@ -17,6 +17,7 @@ dist
 dist-ssr
 build
 *.local
+*.tsbuildinfo
 
 # Testing
 coverage
@@ -89,3 +90,7 @@ debug
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Generated files
+dependency-graph.svg
+function-dependencies.json
