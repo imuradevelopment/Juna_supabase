@@ -18,7 +18,7 @@
             class="btn btn-primary rounded-full px-8"
           >
             <PhPlusCircle :size="20" class="mr-2" weight="bold" />
-            <span class="inline-block align-middle">投稿を始める</span>
+            <span class="inline-block align-middle">{{ settingsStore.domainTexts?.startPostingButton || '投稿を始める' }}</span>
           </router-link>
           
           <router-link 
@@ -26,7 +26,7 @@
             class="btn btn-outline-primary rounded-full px-8"
           >
             <PhInfo :size="20" class="mr-2" weight="bold" />
-            <span class="inline-block align-middle">投稿一覧</span>
+            <span class="inline-block align-middle">{{ settingsStore.domainTexts?.viewPostsButton || '投稿一覧' }}</span>
           </router-link>
         </div>
       </div>
@@ -37,7 +37,7 @@
       <div class="mb-8">
         <h2 class="flex items-center text-2xl font-bold text-heading md:text-3xl">
           <span class="mr-3 inline-block h-6 w-2 rounded-full bg-primary"></span>
-          当サイトについて
+          {{ settingsStore.domainTexts?.aboutTitle || '当サイトについて' }}
         </h2>
       </div>
       
@@ -53,8 +53,8 @@
               <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary bg-opacity-20">
                 <PhBookOpen :size="32" weight="duotone" class="text-primary-light" />
               </div>
-              <h3 class="mb-2 text-xl font-semibold text-heading">経験の共有</h3>
-              <p class="text-text">日常生活での工夫や対処法、成功体験や困難を乗り越えた経験を共有できます。</p>
+              <h3 class="mb-2 text-xl font-semibold text-heading">{{ settingsStore.domainTexts?.feature1Title || '経験の共有' }}</h3>
+              <p class="text-text">{{ settingsStore.domainTexts?.feature1Description || '日常生活での工夫や対処法、成功体験や困難を乗り越えた経験を共有できます。' }}</p>
             </div>
             
             <!-- 特徴2 -->
@@ -62,8 +62,8 @@
               <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary bg-opacity-20">
                 <PhUsersThree :size="32" weight="duotone" class="text-primary-light" />
               </div>
-              <h3 class="mb-2 text-xl font-semibold text-heading">コミュニティ</h3>
-              <p class="text-text">同じ障害や似た経験を持つ人とつながり、理解し合える関係を築けます。</p>
+              <h3 class="mb-2 text-xl font-semibold text-heading">{{ settingsStore.domainTexts?.feature2Title || 'コミュニティ' }}</h3>
+              <p class="text-text">{{ settingsStore.domainTexts?.feature2Description || '同じ障害や似た経験を持つ人とつながり、理解し合える関係を築けます。' }}</p>
             </div>
             
             <!-- 特徴3 -->
@@ -71,43 +71,28 @@
               <div class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary bg-opacity-20">
                 <PhShieldStar :size="32" weight="duotone" class="text-primary-light" />
               </div>
-              <h3 class="mb-2 text-xl font-semibold text-heading">安心できる場所</h3>
-              <p class="text-text">理解されにくい障害や症状について偏見なく話せる安全な環境を提供します。</p>
+              <h3 class="mb-2 text-xl font-semibold text-heading">{{ settingsStore.domainTexts?.feature3Title || '安心できる場所' }}</h3>
+              <p class="text-text">{{ settingsStore.domainTexts?.feature3Description || '理解されにくい障害や症状について偏見なく話せる安全な環境を提供します。' }}</p>
             </div>
           </div>
           
           <div class="mb-8 rounded-lg border border-primary border-opacity-20 bg-primary bg-opacity-10 p-6">
-            <h3 class="mb-3 text-xl font-semibold text-primary-light">対象となる障害・症状</h3>
+            <h3 class="mb-3 text-xl font-semibold text-primary-light">{{ settingsStore.domainTexts?.targetDisabilitiesTitle || '対象となる障害・症状' }}</h3>
             <ul class="grid grid-cols-2 gap-x-4 gap-y-2 md:grid-cols-3">
-              <li class="flex items-center text-text-white">
-                <div class="mr-2 h-3 w-3 min-w-[0.75rem] min-h-[0.75rem] rounded-full bg-primary"></div>発達障害（ASD、ADHD、LD等）
-              </li>
-              <li class="flex items-center text-text-white">
-                <div class="mr-2 h-3 w-3 min-w-[0.75rem] min-h-[0.75rem] rounded-full bg-primary"></div>精神障害（うつ病、統合失調症等）
-              </li>
-              <li class="flex items-center text-text-white">
-                <div class="mr-2 h-3 w-3 min-w-[0.75rem] min-h-[0.75rem] rounded-full bg-primary"></div>慢性疲労症候群
-              </li>
-              <li class="flex items-center text-text-white">
-                <div class="mr-2 h-3 w-3 min-w-[0.75rem] min-h-[0.75rem] rounded-full bg-primary"></div>線維筋痛症
-              </li>
-              <li class="flex items-center text-text-white">
-                <div class="mr-2 h-3 w-3 min-w-[0.75rem] min-h-[0.75rem] rounded-full bg-primary"></div>内部障害
-              </li>
-              <li class="flex items-center text-text-white">
-                <div class="mr-2 h-3 w-3 min-w-[0.75rem] min-h-[0.75rem] rounded-full bg-primary"></div>その他の見えない障害
+              <li v-for="(disability, index) in (settingsStore.domainTexts?.targetDisabilities || defaultDisabilities)" :key="index" class="flex items-center text-text-white">
+                <div class="mr-2 h-3 w-3 min-w-[0.75rem] min-h-[0.75rem] rounded-full bg-primary"></div>{{ disability }}
               </li>
             </ul>
           </div>
           
           <div class="text-center">
-            <p class="mb-6 text-text">あなたの経験は、誰かの助けになります。<br>このコミュニティに参加して、あなたの物語を共有しませんか？</p>
+            <p class="mb-6 text-text">{{ settingsStore.domainTexts?.callToAction || 'あなたの経験は、誰かの助けになります。このコミュニティに参加して、あなたの物語を共有しませんか？' }}</p>
             <router-link 
               to="/editor" 
               class="btn btn-primary rounded-full px-6"
             >
               <PhPencilSimple :size="20" class="mr-2" weight="bold" />
-              今すぐ投稿を始める
+              <span class="inline-block align-middle">{{ settingsStore.domainTexts?.startPostingButton || '今すぐ投稿を始める' }}</span>
             </router-link>
           </div>
         </div>
@@ -152,10 +137,10 @@
       <div class="mb-8 flex items-center justify-between">
         <h2 class="flex items-center text-2xl font-bold text-heading md:text-3xl">
           <span class="mr-3 inline-block h-6 w-2 rounded-full bg-primary"></span>
-          最新の投稿
+          {{ settingsStore.domainTexts?.recentPostsTitle || '最新の投稿' }}
         </h2>
         <router-link to="/posts?sort=created_at.desc" class="flex items-center text-primary-light hover:underline">
-          すべて見る
+          {{ settingsStore.domainTexts?.viewAllPosts || 'すべて見る' }}
           <PhArrowRight :size="20" class="ml-1" weight="bold" />
         </router-link>
       </div>
@@ -168,7 +153,7 @@
         />
       </div>
       <div v-else class="glass-card p-6 text-center">
-        <p class="text-text-muted">まだ投稿はありません。</p>
+        <p class="text-text-muted">{{ settingsStore.domainTexts?.noRecentPosts || 'まだ投稿はありません。' }}</p>
       </div>
     </section>
   </div>
@@ -218,6 +203,18 @@ interface Category {
 
 // ストア
 const settingsStore = useSettingsStore();
+
+// デフォルトの障害リスト
+const defaultDisabilities = [
+  'インフラ基礎',
+  'ネットワーク',
+  'コンテナ / Kubernetes',
+  'Rinstack Cloud入門',
+  'Rinstack Cloud開発',
+  '運用 / DevOps',
+  'セキュリティ & ガバナンス',
+  '認定試験対策'
+];
 
 // 状態変数
 const featuredPosts = ref<Post[]>([]);

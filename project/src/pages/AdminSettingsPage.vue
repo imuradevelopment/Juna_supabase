@@ -173,6 +173,18 @@
             </div>
 
             <div>
+              <label for="aboutTitle" class="block text-sm font-medium text-text mb-2">
+                Aboutセクションのタイトル
+              </label>
+              <input
+                id="aboutTitle"
+                type="text"
+                v-model="domainTexts.aboutTitle"
+                class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
+              />
+            </div>
+
+            <div>
               <label for="aboutDescription" class="block text-sm font-medium text-text mb-2">
                 サイト説明文
               </label>
@@ -274,6 +286,70 @@
                 class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
               />
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="startPostingButton" class="block text-sm font-medium text-text mb-2">
+                  投稿開始ボタンテキスト
+                </label>
+                <input
+                  id="startPostingButton"
+                  type="text"
+                  v-model="domainTexts.startPostingButton"
+                  class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
+                />
+              </div>
+
+              <div>
+                <label for="viewPostsButton" class="block text-sm font-medium text-text mb-2">
+                  投稿一覧ボタンテキスト
+                </label>
+                <input
+                  id="viewPostsButton"
+                  type="text"
+                  v-model="domainTexts.viewPostsButton"
+                  class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label for="recentPostsTitle" class="block text-sm font-medium text-text mb-2">
+                  最新投稿セクションタイトル
+                </label>
+                <input
+                  id="recentPostsTitle"
+                  type="text"
+                  v-model="domainTexts.recentPostsTitle"
+                  class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
+                />
+              </div>
+
+              <div>
+                <label for="viewAllPosts" class="block text-sm font-medium text-text mb-2">
+                  すべて見るリンクテキスト
+                </label>
+                <input
+                  id="viewAllPosts"
+                  type="text"
+                  v-model="domainTexts.viewAllPosts"
+                  class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
+                />
+              </div>
+
+              <div>
+                <label for="noRecentPosts" class="block text-sm font-medium text-text mb-2">
+                  投稿がない場合のメッセージ
+                </label>
+                <input
+                  id="noRecentPosts"
+                  type="text"
+                  v-model="domainTexts.noRecentPosts"
+                  class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
+                />
+              </div>
+            </div>
           </div>
 
           <div class="mt-6 flex justify-end">
@@ -364,33 +440,38 @@ const navigation = computed(() => [
 
 const saving = ref(false);
 
-// テーマカラーの初期値（現在のtailwind.config.jsの値）
+// デフォルトのテーマカラー
 const defaultThemeColors = {
-  primary: '#38bdaa',
-  primaryDark: '#199687',
-  secondary: '#78a0c3',
-  secondaryDark: '#5a7fa8',
-  accent: '#ff915a',
-  error: '#f55f5a',
-  errorDark: '#dc3c32',
-  warning: '#ffbe3c',
-  success: '#4bd273',
-  info: '#4191ff',
-  background: '#122328',
-  surface: '#19282d',
-  surfaceVariant: '#1e2d32',
-  border: '#37465a',
-  borderLight: '#465569',
-  text: '#d2e6f5',
-  textMuted: '#91a0af',
-  heading: '#fff5e1'
+  primary: '#5E35B1',
+  primaryLight: '#7E57C2',
+  primaryDark: '#4527A0',
+  secondary: '#9575CD',
+  secondaryLight: '#B39DDB',
+  secondaryDark: '#7E57C2',
+  accent: '#7C4DFF',
+  error: '#B00020',
+  errorDark: '#8E0016',
+  warning: '#FFB300',
+  success: '#43A047',
+  info: '#7A86FF',
+  background: '#140E24',
+  surface: '#1C142F',
+  surfaceVariant: '#291E45',
+  border: '#40325F',
+  borderLight: '#574678',
+  text: '#E4E0F5',
+  textMuted: '#A8A0C4',
+  textWhite: '#ffffff',
+  heading: '#F5EBFF'
 };
 
 // カラーラベルの日本語化
 const colorLabels = {
   primary: 'プライマリー',
+  primaryLight: 'プライマリー（明）',
   primaryDark: 'プライマリー（暗）',
   secondary: 'セカンダリー',
+  secondaryLight: 'セカンダリー（明）',
   secondaryDark: 'セカンダリー（暗）',
   accent: 'アクセント',
   error: 'エラー',
@@ -405,6 +486,7 @@ const colorLabels = {
   borderLight: 'ボーダー（明）',
   text: 'テキスト',
   textMuted: 'テキスト（控えめ）',
+  textWhite: 'テキスト（白）',
   heading: '見出し'
 };
 
@@ -428,6 +510,7 @@ const features = reactive({
 const domainTexts = reactive({
   heroTitle: '',
   heroSubtitle: '',
+  aboutTitle: '',
   aboutDescription: '',
   feature1Title: '',
   feature1Description: '',
@@ -437,7 +520,12 @@ const domainTexts = reactive({
   feature3Description: '',
   targetDisabilitiesTitle: '',
   targetDisabilities: [],
-  callToAction: ''
+  callToAction: '',
+  startPostingButton: '',
+  viewPostsButton: '',
+  recentPostsTitle: '',
+  viewAllPosts: '',
+  noRecentPosts: ''
 });
 
 // 対象カテゴリリストのテキスト管理用
