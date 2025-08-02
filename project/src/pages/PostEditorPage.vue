@@ -156,6 +156,15 @@ const route = useRoute();
 const authStore = useAuthStore();
 const { cleanupUnusedImages } = useImageCleanup();
 
+// 元のデータを保持（クリーンアップ用）
+const originalData = ref<{
+  content: any;
+  cover_image_path: string | null;
+}>({
+  content: '',
+  cover_image_path: null
+});
+
 const formData = reactive<FormData>({
   title: '',
   excerpt: null,
@@ -371,6 +380,12 @@ async function fetchPost(postId: string) {
     
     formData.cover_image_path = post.cover_image_path;
     formData.published = post.published;
+    
+    // 元データを保存（クリーンアップ用）
+    originalData.value = {
+      content: post.content,
+      cover_image_path: post.cover_image_path
+    };
     
     if (post.post_categories) {
       formData.categories = post.post_categories.map((c: any) => c.category_id.toString());
@@ -776,6 +791,20 @@ async function updatePost(postData: any) {
     // カテゴリの保存をCategorySelectorコンポーネントに委譲
     if (categorySelectorRef.value && props.id) {
       await categorySelectorRef.value.savePostWithNewCategories(props.id);
+    }
+    
+    // 不要になった画像をクリーンアップ
+    try {
+      await cleanupUnusedImages(
+        originalData.value.content,
+        contentValue,
+        originalData.value.cover_image_path,
+        postData.cover_image_path
+      );
+      console.log('画像クリーンアップが完了しました');
+    } catch (cleanupError) {
+      console.error('画像クリーンアップエラー:', cleanupError);
+      // クリーンアップエラーは投稿の更新を妨げない
     }
   } catch (err) {
     console.error('投稿更新エラー:', err);

@@ -258,13 +258,13 @@ export function useImageCleanup() {
         deletePromises.push(supabase.storage.from('post_images').remove(postImagesToDelete))
         
         // post_imagesテーブルからも削除
+        // 各ファイルについて、パスが含まれるレコードを削除
         postImagesToDelete.forEach(filename => {
-          // より正確な削除のため、完全一致またはパスの終端での一致を確認
           dbDeletePromises.push(
             supabase
               .from('post_images')
               .delete()
-              .or(`image_path.eq.${filename},image_path.like.%/${filename}`)
+              .like('image_path', `%${filename}`)
           )
         })
       }
@@ -283,8 +283,13 @@ export function useImageCleanup() {
       
       // 削除処理を実行（ストレージとデータベースの両方）
       console.log('削除処理を実行します')
+      console.log('ストレージ削除プロミス数:', deletePromises.length)
+      console.log('DB削除プロミス数:', dbDeletePromises.length)
+      
       const allPromises = [...deletePromises, ...dbDeletePromises]
       const results = await Promise.all(allPromises)
+      
+      console.log('削除結果:', results)
       
       // エラーチェック
       const failedResults = results.filter(result => result.error)
