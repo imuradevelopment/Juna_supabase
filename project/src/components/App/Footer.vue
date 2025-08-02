@@ -7,10 +7,10 @@
           <div class="col-span-1 md:col-span-2">
             <div class="flex items-center pt-4 mb-4 space-x-2">
               <PhInfo class="w-6 h-6 text-primary" />
-              <span class="text-lg font-bold text-primary">Juna</span>
+              <span class="text-lg font-bold text-primary">{{ settingsStore.logoText }}</span>
             </div>
             <p class="text-sm mb-4 leading-relaxed text-text-muted">
-              見えない障害を持つ人々のための、経験や情報を共有するブログプラットフォームです。互いに支え合い、理解を深めるコミュニティを目指しています。
+              {{ settingsStore.siteDescription }}
             </p>
           </div>
 
@@ -40,7 +40,7 @@
 
         <div class="flex flex-col items-center justify-between border-t border-border-light pt-5 pb-3 md:flex-row">
           <p class="text-sm mb-3 text-text-muted md:mb-0">
-            &copy; {{ currentYear }} Juna. All rights reserved.
+            {{ settingsStore.copyrightText.replace('2024', currentYear.toString()) }}
           </p>
           <div class="flex space-x-6">
             <router-link to="/privacy" class="btn-link">プライバシーポリシー</router-link>
@@ -55,6 +55,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { PhInfo } from '@phosphor-icons/vue';
+import { useSettingsStore } from '../../stores/settings';
 
+const settingsStore = useSettingsStore();
 const currentYear = computed(() => new Date().getFullYear());
 </script> 

@@ -10,8 +10,8 @@
       </div>
       
       <div class="relative z-10 mx-auto max-w-3xl text-center">
-        <h1 class="mb-6 text-4xl font-bold text-primary-light md:text-6xl">見えない障害と共に生きる</h1>
-        <p class="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-text md:text-xl">経験を共有し、互いに学び、支え合うコミュニティへようこそ</p>
+        <h1 class="mb-6 text-4xl font-bold text-primary-light md:text-6xl">{{ settingsStore.domainTexts?.heroTitle || '見えない障害と共に生きる' }}</h1>
+        <p class="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-text md:text-xl">{{ settingsStore.domainTexts?.heroSubtitle || '経験を共有し、互いに学び、支え合うコミュニティへようこそ' }}</p>
         <div class="relative z-10 flex flex-col justify-center gap-4 sm:flex-row">
           <router-link 
             to="/editor"
@@ -44,8 +44,7 @@
       <div class="glass-card p-6 md:p-8">
         <div class="mx-auto max-w-4xl">
           <p class="mb-6 text-lg leading-relaxed text-text">
-            「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々の経験を共有し、
-            互いに支え合うためのコミュニティプラットフォームです。
+            {{ settingsStore.domainTexts?.aboutDescription || '「見えない障害と共に生きる」は、身体的な症状が外見からはわかりにくい障害を持つ方々の経験を共有し、互いに支え合うためのコミュニティプラットフォームです。' }}
           </p>
           
           <div class="my-10 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -172,444 +171,13 @@
         <p class="text-text-muted">まだ投稿はありません。</p>
       </div>
     </section>
-
-    <!-- テキストスタイルガイド（新規追加） -->
-    <section class="mb-16">
-      <div class="mb-8">
-        <h2 class="flex items-center text-2xl font-bold text-heading md:text-3xl">
-          <span class="mr-3 inline-block h-6 w-2 rounded-full bg-primary"></span>
-          テキストスタイルガイド
-        </h2>
-      </div>
-      
-      <div class="glass-card p-6 md:p-8">
-        <div class="mx-auto">
-          <!-- テキストカラー -->
-          <div class="mb-12">
-            <h3 class="mb-4 text-xl font-semibold text-primary-light">テキストカラー</h3>
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              <div class="flex flex-col">
-                <p class="text-text">通常テキスト</p>
-                <span class="text-xs text-text-muted">.text-text</span>
-              </div>
-              <div class="flex flex-col">
-                <p class="text-heading">見出しテキスト</p>
-                <span class="text-xs text-text-muted">.text-heading</span>
-              </div>
-              <div class="flex flex-col">
-                <p class="text-text-muted">軽減テキスト</p>
-                <span class="text-xs text-text-muted">.text-text-muted</span>
-              </div>
-              <div class="flex flex-col rounded bg-primary bg-opacity-30 p-2">
-                <p class="text-text-white">白テキスト</p>
-                <span class="text-xs text-text-white text-opacity-70">.text-text-white</span>
-              </div>
-            </div>
-          </div>
-          
-          <!-- カラーテキストサンプル（新規追加） -->
-          <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-            <div class="glass-card p-4">
-              <h4 class="mb-2 font-medium text-primary">プライマリテキスト</h4>
-              <span class="mt-2 text-xs text-text-muted">.text-primary</span>
-            </div>
-            
-            <div class="glass-card p-4">
-              <h4 class="mb-2 font-medium text-primary-light">プライマリライト</h4>
-              <span class="mt-2 text-xs text-text-muted">.text-primary-light</span>
-            </div>
-            
-            <div class="glass-card p-4">
-              <h4 class="mb-2 font-medium text-primary-dark">プライマリダーク</h4>
-              <span class="mt-2 text-xs text-text-muted">.text-primary-dark</span>
-            </div>
-            
-            <div class="glass-card p-4">
-              <h4 class="mb-2 font-medium text-secondary">セカンダリ</h4>
-              <span class="mt-2 text-xs text-text-muted">.text-secondary</span>
-            </div>
-            
-            <div class="glass-card p-4">
-              <h4 class="mb-2 font-medium text-error">エラー</h4>
-              <span class="mt-2 text-xs text-text-muted">.text-error</span>
-            </div>
-            
-            <div class="glass-card p-4">
-              <h4 class="mb-2 font-medium text-success">成功</h4>
-              <span class="mt-2 text-xs text-text-muted">.text-success</span>
-            </div>
-            
-            <div class="glass-card p-4">
-              <h4 class="mb-2 font-medium text-warning">警告</h4>
-              <span class="mt-2 text-xs text-text-muted">.text-warning</span>
-            </div>
-            
-            <div class="glass-card p-4">
-              <h4 class="mb-2 font-medium text-info">情報</h4>
-              <span class="mt-2 text-xs text-text-muted">.text-info</span>
-            </div>
-            
-            <div class="glass-card p-4">
-              <h4 class="mb-2 font-medium text-accent1">アクセント1</h4>
-              <span class="mt-2 text-xs text-text-muted">.text-accent1</span>
-            </div>
-            
-            <div class="glass-card p-4">
-              <h4 class="mb-2 font-medium text-accent2">アクセント2</h4>
-              <span class="mt-2 text-xs text-text-muted">.text-accent2</span>
-            </div>
-            
-            <div class="glass-card p-4">
-              <h4 class="mb-2 font-medium text-accent3">アクセント3</h4>
-              <span class="mt-2 text-xs text-text-muted">.text-accent3</span>
-            </div>
-          </div>
-          
-          <!-- フォントサイズ -->
-          <div class="mb-12">
-            <h3 class="mb-4 text-xl font-semibold text-primary-light">フォントサイズ</h3>
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-              <div class="glass-card p-4">
-                <p class="text-xs text-primary">テキスト XS - 小さなサイズのテキストは説明や注釈に適しています。</p>
-                <span class="mt-2 text-xs text-text-muted">.text-xs</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="text-sm text-info">テキスト SM - やや小さめのテキストは補足情報の表示に使われます。</p>
-                <span class="mt-2 text-xs text-text-muted">.text-sm</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="text-base text-secondary">テキスト BASE - 標準サイズは本文の表示に最適です。</p>
-                <span class="mt-2 text-xs text-text-muted">.text-base</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="text-lg text-success">テキスト LG - 少し大きめのテキストで重要な情報を強調できます。</p>
-                <span class="mt-2 text-xs text-text-muted">.text-lg</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="text-xl text-warning">テキスト XL - 小見出しや重要な要素に使用します。</p>
-                <span class="mt-2 text-xs text-text-muted">.text-xl</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="text-2xl text-accent2">テキスト 2XL - 見出しや特に目立たせたい要素に適しています。</p>
-                <span class="mt-2 text-xs text-text-muted">.text-2xl</span>
-              </div>
-            </div>
-          </div>
-          
-          <!-- フォントウェイト -->
-          <div class="mb-12">
-            <h3 class="mb-4 text-xl font-semibold text-primary-light">フォントウェイト</h3>
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-              <div class="glass-card p-4">
-                <p class="font-light text-accent1">軽量フォント - 繊細な印象を与えるフォントウェイトです。</p>
-                <span class="mt-2 text-xs text-text-muted">.font-light</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="font-normal text-info">通常フォント - 標準的な太さで読みやすさを重視します。</p>
-                <span class="mt-2 text-xs text-text-muted">.font-normal</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="font-medium text-primary">中太フォント - 少し強調したい場合に使用します。</p>
-                <span class="mt-2 text-xs text-text-muted">.font-medium</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="font-semibold text-accent3">半太フォント - 見出しや重要な項目に適しています。</p>
-                <span class="mt-2 text-xs text-text-muted">.font-semibold</span>
-              </div>
-              <div class="glass-card p-4">
-                <p class="font-bold text-success">太字フォント - 最も強調したい要素に使用します。</p>
-                <span class="mt-2 text-xs text-text-muted">.font-bold</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ボタンデモセクション（新規追加） -->
-    <section class="mb-16">
-      <div class="mb-8">
-        <h2 class="flex items-center text-2xl font-bold text-heading md:text-3xl">
-          <span class="mr-3 inline-block h-6 w-2 rounded-full bg-primary"></span>
-          ボタンスタイルガイド
-        </h2>
-      </div>
-      
-      <div class="glass-card p-6 md:p-8">
-        <div class="mx-auto">
-          <!-- 標準ボタン -->
-          <div class="mb-12">
-            <h3 class="mb-4 text-xl font-semibold text-primary-light">標準ボタン</h3>
-            <div class="flex flex-wrap gap-4">
-              <div class="flex flex-col items-center">
-                <button class="btn btn-primary">Primary</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-primary</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-secondary">Secondary</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-secondary</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-error">Error</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-error</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-success">Success</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-success</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-warning">Warning</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-warning</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-info">Info</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-info</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-accent1">Accent1</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-accent1</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-accent2">Accent2</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-accent2</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-accent3">Accent3</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-accent3</span>
-              </div>
-            </div>
-          </div>
-          
-          <!-- アウトラインボタン -->
-          <div class="mb-12">
-            <h3 class="mb-4 text-xl font-semibold text-primary-light">アウトラインボタン</h3>
-            <div class="flex flex-wrap gap-4">
-              <div class="flex flex-col items-center">
-                <button class="btn btn-outline-primary">Primary</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-outline-primary</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-outline-secondary">Secondary</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-outline-secondary</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-outline-error">Error</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-outline-error</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-outline-success">Success</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-outline-success</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-outline-warning">Warning</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-outline-warning</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-outline-info">Info</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-outline-info</span>
-              </div>
-              <!-- アクセント系のアウトラインボタン - 新規追加 -->
-              <div class="flex flex-col items-center">
-                <button class="btn btn-outline-accent1">Accent1</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-outline-accent1</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-outline-accent2">Accent2</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-outline-accent2</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-outline-accent3">Accent3</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-outline-accent3</span>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 特殊ボタン -->
-          <div class="mb-12">
-            <h3 class="mb-4 text-xl font-semibold text-primary-light">特殊ボタン</h3>
-            <div class="flex flex-wrap gap-4">
-              <div class="flex flex-col items-center">
-                <button class="btn btn-ghost">ゴーストボタン</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-ghost</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-link">リンクボタン</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-link</span>
-              </div>
-            </div>
-          </div>
-          
-          <!-- サイズバリエーション -->
-          <div class="mb-12">
-            <h3 class="mb-4 text-xl font-semibold text-primary-light">サイズバリエーション</h3>
-            <div class="flex flex-wrap items-center gap-4">
-              <div class="flex flex-col items-center">
-                <button class="btn btn-primary btn-sm">小</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-sm</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-primary">標準</button>
-                <span class="mt-2 text-xs text-text-muted">.btn</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-primary btn-lg">大</button>
-                <span class="mt-2 text-xs text-text-muted">.btn-lg</span>
-              </div>
-            </div>
-          </div>
-          
-          <!-- アイコンボタン -->
-          <div class="mb-6">
-            <h3 class="mb-4 text-xl font-semibold text-primary-light">アイコンボタン</h3>
-            <div class="flex flex-wrap gap-4">
-              <div class="flex flex-col items-center">
-                <button class="btn-icon-primary">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-icon-primary</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn-icon-secondary">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-icon-secondary</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn-icon-text">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-icon-text</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn-icon-error">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-icon-error</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn-icon-success">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-icon-success</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn-icon-warning">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-icon-warning</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn-icon-info">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-icon-info</span>
-              </div>
-              <!-- アイコンボタン - アクセント系を追加 -->
-              <div class="flex flex-col items-center">
-                <button class="btn-icon-accent1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-icon-accent1</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn-icon-accent2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-icon-accent2</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn-icon-accent3">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-icon-accent3</span>
-              </div>
-            </div>
-          </div>
-          
-          <!-- アイコンボタンサイズ -->
-          <div class="mb-6">
-            <h3 class="mb-4 text-xl font-semibold text-primary-light">アイコンボタンサイズ</h3>
-            <div class="flex flex-wrap items-center gap-4">
-              <div class="flex flex-col items-center">
-                <button class="btn-icon-primary btn-icon-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-icon-sm</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn-icon-primary">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-icon</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn-icon-primary btn-icon-lg">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-icon-lg</span>
-              </div>
-            </div>
-          </div>
-          
-          <!-- ボタン + アイコン -->
-          <div>
-            <h3 class="mb-4 text-xl font-semibold text-primary-light">ボタン + アイコン</h3>
-            <div class="flex flex-wrap gap-4">
-              <div class="flex flex-col items-center">
-                <button class="btn btn-primary">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                  </svg>
-                  アイコン付きボタン
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn + アイコン</span>
-              </div>
-              <div class="flex flex-col items-center">
-                <button class="btn btn-outline-primary">
-                  <span>アイコンの位置</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="ml-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </button>
-                <span class="mt-2 text-xs text-text-muted">.btn-outline + アイコン</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { supabase } from '../lib/supabase';
+import { useSettingsStore } from '../stores/settings';
 import PostCard from '../components/common/PostCard.vue';
 // Phosphor Iconsのインポート（修正版）
 import { 
@@ -648,131 +216,129 @@ interface Category {
   description?: string | null;
 }
 
+// ストア
+const settingsStore = useSettingsStore();
+
 // 状態変数
 const featuredPosts = ref<Post[]>([]);
 const recentPosts = ref<Post[]>([]);
-const categories = ref<Category[]>([]);
 const loading = ref(true);
-const error = ref('');
 
-// 初期化
-onMounted(async () => {
+// 注目の投稿を取得（閲覧数順）
+const fetchFeaturedPosts = async () => {
   try {
-    // 並行してデータを取得する
-    await Promise.all([
-      fetchFeaturedPosts(),
-      fetchRecentPosts(),
-      fetchCategories()
-    ]);
-  } catch (err: any) {
-    console.error('データ取得エラー:', err);
-  } finally {
-    loading.value = false;
-  }
-});
-
-// 投稿の完全なデータを取得する共通関数 - パラメーターに型を追加
-async function fetchCompletePostData(baseQuery: any) {
-  const { data, error } = await baseQuery;
-  
-  if (error) throw error;
-  
-  // いいね数とコメント数を並行して取得して投稿データに追加
-  return await Promise.all((data || []).map(async (post: any) => {
-    // いいね数、コメント数、カテゴリを並行取得
-    const [{ count: likeCount }, { count: commentCount }, { data: categoryData }] = await Promise.all([
-      supabase.from('post_likes').select('*', { count: 'exact', head: true }).eq('post_id', post.id),
-      supabase.from('comments').select('*', { count: 'exact', head: true }).eq('post_id', post.id),
-      supabase.from('post_categories').select('categories(id, name)').eq('post_id', post.id)
-    ]);
-    
-    // カテゴリデータの整形 - 配列チェックを追加
-    const categories = (categoryData || [])
-      .filter(item => item.categories)
-      .map(item => {
-        // 配列かオブジェクトかをチェック
-        const cat = Array.isArray(item.categories) 
-          ? (item.categories.length > 0 ? item.categories[0] : { id: 0, name: '' })
-          : item.categories;
-          
-        return {
-          id: Number(cat.id),
-          name: String(cat.name)
-        };
-      });
-    
-    return {
-      ...post,
-      like_count: likeCount || 0,
-      comment_count: commentCount || 0,
-      categories
-    };
-  }));
-}
-
-// 注目の投稿を取得（共通関数を使用）
-async function fetchFeaturedPosts() {
-  loading.value = true;
-  
-  try {
-    const query = supabase
+    const { data, error } = await supabase
       .from('posts')
       .select(`
-        *,
-        profiles:author_id(
-          nickname, 
+        id,
+        title,
+        excerpt,
+        cover_image_path,
+        published_at,
+        created_at,
+        views,
+        author_id,
+        profiles!posts_author_id_fkey (
+          nickname,
           avatar_data
         )
       `)
       .eq('published', true)
       .order('views', { ascending: false })
       .limit(6);
-    
-    featuredPosts.value = await fetchCompletePostData(query);
-  } catch (err) {
-    console.error('注目投稿取得エラー:', err);
-  } finally {
-    loading.value = false;
-  }
-}
 
-// 最新の投稿を取得（共通関数を使用）
-async function fetchRecentPosts() {
+    if (error) throw error;
+
+    // 各投稿のいいね数とコメント数を取得
+    const postsWithCounts = await Promise.all(
+      (data || []).map(async (post) => {
+        // いいね数を取得
+        const { count: likeCount } = await supabase
+          .from('post_likes')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', post.id);
+
+        // コメント数を取得
+        const { count: commentCount } = await supabase
+          .from('comments')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', post.id);
+
+        return {
+          ...post,
+          like_count: likeCount || 0,
+          comment_count: commentCount || 0
+        };
+      })
+    );
+
+    featuredPosts.value = postsWithCounts;
+  } catch (error) {
+    console.error('注目の投稿の取得エラー:', error);
+  }
+};
+
+// 最新の投稿を取得
+const fetchRecentPosts = async () => {
   try {
-    const query = supabase
+    const { data, error } = await supabase
       .from('posts')
       .select(`
-        *,
-        profiles:author_id(
-          nickname, 
+        id,
+        title,
+        excerpt,
+        cover_image_path,
+        published_at,
+        created_at,
+        views,
+        author_id,
+        profiles!posts_author_id_fkey (
+          nickname,
           avatar_data
         )
       `)
       .eq('published', true)
-      .order('created_at', { ascending: false })
-      .limit(5);
-    
-    recentPosts.value = await fetchCompletePostData(query);
-  } catch (err) {
-    console.error('最新投稿取得エラー:', err);
-  }
-}
+      .order('published_at', { ascending: false })
+      .limit(6);
 
-// カテゴリを取得
-async function fetchCategories() {
-  try {
-    const { data, error: fetchError } = await supabase
-      .from('categories')
-      .select('*')
-      .order('name');
-    
-    if (fetchError) throw fetchError;
-    categories.value = data || [];
-  } catch (err: any) {
-    // すでにエラー状態の場合は上書きしない
-    if (!error.value) {
-      error.value = 'カテゴリの読み込みに失敗しました';
-    }
+    if (error) throw error;
+
+    // 各投稿のいいね数とコメント数を取得
+    const postsWithCounts = await Promise.all(
+      (data || []).map(async (post) => {
+        // いいね数を取得
+        const { count: likeCount } = await supabase
+          .from('post_likes')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', post.id);
+
+        // コメント数を取得
+        const { count: commentCount } = await supabase
+          .from('comments')
+          .select('*', { count: 'exact', head: true })
+          .eq('post_id', post.id);
+
+        return {
+          ...post,
+          like_count: likeCount || 0,
+          comment_count: commentCount || 0
+        };
+      })
+    );
+
+    recentPosts.value = postsWithCounts;
+  } catch (error) {
+    console.error('最新の投稿の取得エラー:', error);
   }
-}
+};
+
+// データの取得
+onMounted(async () => {
+  loading.value = true;
+  await Promise.all([
+    fetchFeaturedPosts(),
+    fetchRecentPosts()
+  ]);
+  loading.value = false;
+});
 </script>

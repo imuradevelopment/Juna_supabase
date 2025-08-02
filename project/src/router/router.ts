@@ -96,6 +96,38 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     
+    // 管理者ページ
+    {
+      path: '/admin',
+      name: 'admin',
+      component: () => import('../pages/AdminDashboardPage.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/users',
+      name: 'adminUsers',
+      component: () => import('../pages/AdminUsersPage.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/posts',
+      name: 'adminPosts',
+      component: () => import('../pages/AdminPostsPage.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/comments',
+      name: 'adminComments',
+      component: () => import('../pages/AdminCommentsPage.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    {
+      path: '/admin/settings',
+      name: 'adminSettings',
+      component: () => import('../pages/AdminSettingsPage.vue'),
+      meta: { requiresAuth: true, requiresAdmin: true }
+    },
+    
     // 404ページ
     {
       path: '/:pathMatch(.*)*',

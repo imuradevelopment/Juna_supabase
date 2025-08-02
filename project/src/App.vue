@@ -35,6 +35,7 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick, onBeforeMount } from 'vue';
 import { useAuthStore } from './stores/auth';
+import { useSettingsStore } from './stores/settings';
 import { useNotification } from './composables/useNotification';
 import Navbar from './components/App/Navbar.vue';
 import Footer from './components/App/Footer.vue';
@@ -42,12 +43,16 @@ import Notifications from './components/App/Notifications.vue';
 import { PhSpinner } from '@phosphor-icons/vue';
 
 const authStore = useAuthStore();
+const settingsStore = useSettingsStore();
 const notificationsRef = ref<any>(null);
 const initialAuthCheckComplete = ref(false);
 const { setNotificationsRef, clearAllNotifications } = useNotification();
 
-// アプリケーション初期化前に認証状態をチェック
+// アプリケーション初期化前に認証状態とサイト設定をチェック
 onBeforeMount(async () => {
+  // サイト設定を取得
+  await settingsStore.fetchSettings();
+  
   // ログイン状態の確認
   await authStore.checkSession();
   initialAuthCheckComplete.value = true;
@@ -63,6 +68,9 @@ onMounted(async () => {
   
   // 既存の通知をクリアする
   clearAllNotifications();
+  
+  // リアルタイム設定更新の購読
+  settingsStore.subscribeToSettings();
 });
 </script>
 

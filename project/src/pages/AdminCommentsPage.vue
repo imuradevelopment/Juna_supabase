@@ -149,6 +149,7 @@ const navigation = computed(() => [
   { name: 'ユーザー管理', href: '/admin/users', current: route.path === '/admin/users' },
   { name: '投稿管理', href: '/admin/posts', current: route.path === '/admin/posts' },
   { name: 'コメント管理', href: '/admin/comments', current: route.path === '/admin/comments' },
+  { name: 'サイト設定', href: '/admin/settings', current: route.path === '/admin/settings' },
 ]);
 
 const comments = ref<any[]>([]);
