@@ -206,12 +206,14 @@ const settingsStore = useSettingsStore();
 
 // デフォルトの障害リスト
 const defaultDisabilities = [
-  '発達障害（ASD、ADHD、LD等）',
-  '精神障害（うつ病、統合失調症等）',
-  '慢性疲労症候群',
-  '線維筋痛症',
-  '内部障害',
-  'その他の見えない障害'
+  'インフラ基礎',
+  'ネットワーク',
+  'コンテナ / Kubernetes',
+  'Rinstack Cloud入門',
+  'Rinstack Cloud開発',
+  '運用 / DevOps',
+  'セキュリティ & ガバナンス',
+  '認定試験対策'
 ];
 
 // 状態変数

@@ -442,27 +442,27 @@ const saving = ref(false);
 
 // デフォルトのテーマカラー
 const defaultThemeColors = {
-  primary: '#38bdaa',
-  primaryLight: '#5cd4c2',
-  primaryDark: '#199687',
-  secondary: '#78a0c3',
-  secondaryLight: '#95b8d6',
-  secondaryDark: '#5a7fa8',
-  accent: '#ff915a',
-  error: '#f55f5a',
-  errorDark: '#dc3c32',
-  warning: '#ffbe3c',
-  success: '#4bd273',
-  info: '#4191ff',
-  background: '#122328',
-  surface: '#19282d',
-  surfaceVariant: '#1e2d32',
-  border: '#37465a',
-  borderLight: '#465569',
-  text: '#d2e6f5',
-  textMuted: '#91a0af',
+  primary: '#5E35B1',
+  primaryLight: '#7E57C2',
+  primaryDark: '#4527A0',
+  secondary: '#9575CD',
+  secondaryLight: '#B39DDB',
+  secondaryDark: '#7E57C2',
+  accent: '#7C4DFF',
+  error: '#B00020',
+  errorDark: '#8E0016',
+  warning: '#FFB300',
+  success: '#43A047',
+  info: '#7A86FF',
+  background: '#140E24',
+  surface: '#1C142F',
+  surfaceVariant: '#291E45',
+  border: '#40325F',
+  borderLight: '#574678',
+  text: '#E4E0F5',
+  textMuted: '#A8A0C4',
   textWhite: '#ffffff',
-  heading: '#fff5e1'
+  heading: '#F5EBFF'
 };
 
 // カラーラベルの日本語化
