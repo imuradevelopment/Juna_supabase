@@ -199,6 +199,39 @@ const isSessionValid = ref(true);
 const autoSaveInterval = ref<number | null>(null);
 const lastAutoSaveTime = ref<Date | null>(null);
 
+// 強化された権限チェック関数
+async function verifyEditPermission(postId: string, userId: string): Promise<boolean> {
+  try {
+    // サーバーサイドで投稿の所有者を確認
+    const { data, error } = await supabase
+      .from('posts')
+      .select('author_id, id')
+      .eq('id', postId)
+      .single();
+
+    if (error) {
+      console.error('投稿の権限確認に失敗しました:', error);
+      return false;
+    }
+
+    if (!data) {
+      console.error('投稿が見つかりません');
+      return false;
+    }
+
+    // 投稿の作成者と現在のユーザーが一致するかチェック
+    if (data.author_id !== userId) {
+      console.error('編集権限がありません');
+      return false;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('権限チェック中にエラーが発生しました:', err);
+    return false;
+  }
+}
+
 // propsのidの変更を監視して、画面遷移時にデータをリセット
 watch(() => route.path, async () => {
   // パスが変わったらデータをリセット
@@ -671,6 +704,16 @@ async function updatePost(postData: any) {
     }
     
     const userId = session.user.id;
+
+    // 権限チェックを実行
+    if (!props.id) {
+      throw new Error('投稿IDが指定されていません。');
+    }
+
+    const hasPermission = await verifyEditPermission(props.id, userId);
+    if (!hasPermission) {
+      throw new Error('この投稿を編集する権限がありません。');
+    }
     
     const { data: profile, error: profileError } = await supabase
       .from('profiles')

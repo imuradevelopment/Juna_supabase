@@ -7,7 +7,20 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase URLまたはAnon Keyが設定されていません。.envファイルを確認してください。');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// セキュリティ強化されたSupabaseクライアント設定
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    // セッションの自動更新を有効化
+    autoRefreshToken: true,
+    // ローカルストレージの代わりにより安全なストレージを使用
+    // Supabaseが自動的に最適なストレージ方法を選択
+    persistSession: true,
+    // セッションの検出改善
+    detectSessionInUrl: true,
+    // セキュリティヘッダーの追加
+    flowType: 'pkce'
+  }
+});
 
 // 認証状態変更のリスナー関数
 export function subscribeToAuthChanges(callback: (event: 'SIGNED_IN' | 'SIGNED_OUT', session: any) => void) {

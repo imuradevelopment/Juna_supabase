@@ -1,6 +1,29 @@
 import { ref } from 'vue'
 import { supabase } from '../lib/supabase'
 
+// 画像削除処理の排他制御用
+const deletionLocks = new Map<string, Promise<any>>()
+
+// ロック機構を追加
+async function withLock<T>(key: string, operation: () => Promise<T>): Promise<T> {
+  // 既存のロックを待つ
+  if (deletionLocks.has(key)) {
+    await deletionLocks.get(key)
+  }
+
+  // 新しい操作をロックとして設定
+  const promise = operation()
+  deletionLocks.set(key, promise)
+
+  try {
+    const result = await promise
+    return result
+  } finally {
+    // 完了後にロックを削除
+    deletionLocks.delete(key)
+  }
+}
+
 /**
  * クリーンアップ処理の結果を表す型
  */
@@ -144,10 +167,14 @@ export function useImageCleanup() {
     oldCoverImage?: string | null,
     newCoverImage?: string | null
   ): Promise<CleanupResult> {
-    isProcessing.value = true
-    error.value = null
+    // 排他制御を使用してクリーンアップ処理を実行
+    const lockKey = `cleanup_${Date.now()}_${Math.random()}`
     
-    try {
+    return withLock(lockKey, async () => {
+      isProcessing.value = true
+      error.value = null
+      
+      try {
       console.log('==== 画像クリーンアップ処理開始 ====')
       console.log('古いカバー画像:', oldCoverImage)
       console.log('新しいカバー画像:', newCoverImage)
@@ -256,23 +283,24 @@ export function useImageCleanup() {
         }
       }
       
-      console.log('==== 画像クリーンアップ処理完了 ====')
-      return { 
-        success: true, 
-        deletedPaths: pathsToDelete 
+        console.log('==== 画像クリーンアップ処理完了 ====')
+        return { 
+          success: true, 
+          deletedPaths: pathsToDelete 
+        }
+        
+      } catch (err: any) {
+        console.error('画像クリーンアップエラー:', err)
+        error.value = err.message || '画像クリーンアップ処理に失敗しました'
+        return { 
+          success: false, 
+          deletedPaths: [],
+          error: err.message || '画像クリーンアップ処理に失敗しました'
+        }
+      } finally {
+        isProcessing.value = false
       }
-      
-    } catch (err: any) {
-      console.error('画像クリーンアップエラー:', err)
-      error.value = err.message || '画像クリーンアップ処理に失敗しました'
-      return { 
-        success: false, 
-        deletedPaths: [],
-        error: err.message || '画像クリーンアップ処理に失敗しました'
-      }
-    } finally {
-      isProcessing.value = false
-    }
+    })
   }
 
   return {

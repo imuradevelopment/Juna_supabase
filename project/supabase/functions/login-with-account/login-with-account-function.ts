@@ -70,8 +70,13 @@ serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
+    // セキュリティ上、詳細なエラー情報はログに残すが、クライアントには汎用的なメッセージを返す
+    console.error('ログイン処理エラー:', error)
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
+      JSON.stringify({ 
+        success: false, 
+        error: 'ログイン処理中にエラーが発生しました。アカウントIDとパスワードを確認して再度お試しください。' 
+      }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

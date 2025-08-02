@@ -80,17 +80,43 @@ serve(async (req: Request) => {
       }
     )
     
-    // JWT デコード用の関数
+    // JWT検証用の強化された関数
     async function decodeAndVerifyJWT(token: string) {
       try {
-        // サービスロールを使って管理者クライアントでユーザーを取得
-        const { data, error } = await supabaseAdmin.auth.getUser(token)
+        // 1. トークンの基本フォーマット検証
+        if (!token || typeof token !== 'string') {
+          throw new Error('無効なトークン形式です');
+        }
+
+        // 2. JWTの構造検証（3つの部分に分かれているか）
+        const tokenParts = token.split('.');
+        if (tokenParts.length !== 3) {
+          throw new Error('無効なJWT構造です');
+        }
+
+        // 3. サービスロールを使って管理者クライアントでユーザーを取得
+        const { data, error } = await supabaseAdmin.auth.getUser(token);
         
-        if (error) throw error
-        return { user: data.user, error: null }
+        if (error) {
+          throw new Error('トークン検証に失敗しました');
+        }
+
+        if (!data.user) {
+          throw new Error('ユーザー情報の取得に失敗しました');
+        }
+
+        // 4. ユーザーの有効性確認
+        if (!data.user.id || !data.user.email) {
+          throw new Error('無効なユーザー情報です');
+        }
+
+        // 5. セッションの有効期限確認（Supabaseが内部的に処理）
+        // data.userが取得できている時点で有効なセッション
+
+        return { user: data.user, error: null };
       } catch (error) {
-        console.error('JWT検証エラー:', error)
-        return { user: null, error }
+        // セキュリティ上、詳細なエラー情報はログに残さない
+        return { user: null, error: new Error('認証に失敗しました') };
       }
     }
 
@@ -311,9 +337,13 @@ serve(async (req: Request) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     )
   } catch (error) {
-    console.error('エッジ関数全体のエラー:', error)
+    // セキュリティ上、詳細なエラー情報はログに残すが、クライアントには汎用的なメッセージを返す
+    console.error('ユーザー削除処理エラー:', error)
     return new Response(
-      JSON.stringify({ success: false, error: String(error?.message || '不明なエラー') }),
+      JSON.stringify({ 
+        success: false, 
+        error: 'ユーザーの削除処理中にエラーが発生しました。しばらく時間をおいて再度お試しください。' 
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }

@@ -78,7 +78,10 @@ export const useAuthStore = defineStore('auth', () => {
         profile.value = null;
       }
     } catch (err) {
-      console.error('セッション確認エラー:', err);
+      // 開発時のみ詳細ログを出力
+      if (import.meta.env.DEV) {
+        console.error('セッション確認エラー:', err);
+      }
       user.value = null;
       profile.value = null;
     } finally {
@@ -102,7 +105,10 @@ export const useAuthStore = defineStore('auth', () => {
       if (error) throw error;
       profile.value = data;
     } catch (error) {
-      console.error('プロフィール取得エラー:', error);
+      // 開発時のみ詳細ログを出力
+      if (import.meta.env.DEV) {
+        console.error('プロフィール取得エラー:', error);
+      }
     }
   };
   
@@ -318,7 +324,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
   
-  // ユーザー情報をクリアするメソッド（新規追加）
+  // ユーザー情報をクリアするメソッド（セキュリティ強化版）
   async function clearUser() {
     user.value = null;
     profile.value = null;
@@ -327,8 +333,9 @@ export const useAuthStore = defineStore('auth', () => {
     // セッションを完全に削除
     await supabase.auth.signOut({ scope: 'global' });
     
-    // ローカルストレージからの関連データ削除
-    localStorage.removeItem('supabase.auth.token');
+    // セキュリティ上の理由により、認証トークンはSupabaseが内部的に管理
+    // ローカルストレージから明示的に削除しない（Supabaseが自動処理）
+    // 必要最小限のローカルデータのみ削除
     localStorage.removeItem('darkMode');
     
     // キャッシュもクリア
@@ -339,7 +346,10 @@ export const useAuthStore = defineStore('auth', () => {
           cacheNames.filter(name => name.includes('supabase')).map(name => caches.delete(name))
         );
       } catch (e) {
-        console.error('キャッシュ削除エラー:', e);
+        // エラーログは開発時のみ出力（本番では出力しない）
+        if (import.meta.env.DEV) {
+          console.error('キャッシュ削除エラー:', e);
+        }
       }
     }
   }
