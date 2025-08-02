@@ -301,17 +301,23 @@ async function saveProfile() {
     // プロフィールデータをストアに反映
     await authStore.fetchUserProfile();
     
-    // 古いアバター画像があれば削除（新しい画像がアップロードされた場合）
-    if (avatarUrl && avatarUrl !== profileData.value.avatar_data) {
-      if (profileData.value.avatar_data) {
+    // 古いアバター画像があれば削除
+    const oldAvatarPath = profileData.value.avatar_data;
+    if (oldAvatarPath && avatarUrl !== oldAvatarPath) {
+      // 新しい画像がアップロードされた場合、または画像が削除された場合
+      try {
         await supabase.storage
           .from('profile_images')
-          .remove([profileData.value.avatar_data]);
+          .remove([oldAvatarPath]);
+        console.log('古いプロフィール画像を削除しました:', oldAvatarPath);
+      } catch (deleteError) {
+        console.error('古いプロフィール画像の削除に失敗しました:', deleteError);
+        // 削除エラーは処理を止めない
       }
-      
-      // 状態を更新
-      profileData.value.avatar_data = avatarUrl;
     }
+    
+    // 状態を更新
+    profileData.value.avatar_data = avatarUrl;
     
     // 成功通知を表示
     showNotification('success', 'プロフィール更新', 'プロフィール情報が正常に更新されました');
