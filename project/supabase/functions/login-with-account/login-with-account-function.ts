@@ -3,12 +3,33 @@ import { serve } from 'https://deno.land/std@0.131.0/http/server.ts';
 // @ts-ignore
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': Deno.env.get('ALLOWED_ORIGINS') || '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+// 許可されたオリジンのリスト
+const allowedOrigins = (Deno.env.get('ALLOWED_ORIGINS') || '*').split(',').map(origin => origin.trim());
+
+// CORS ヘッダーを動的に生成する関数
+function getCorsHeaders(req: Request) {
+  const origin = req.headers.get('origin');
+  
+  // オリジンが許可リストに含まれているか、または全許可（*）の場合
+  if (allowedOrigins.includes('*') || (origin && allowedOrigins.includes(origin))) {
+    return {
+      'Access-Control-Allow-Origin': origin || '*',
+      'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    };
+  }
+  
+  // 許可されていないオリジンの場合は、最初の許可されたオリジンを返す
+  return {
+    'Access-Control-Allow-Origin': allowedOrigins[0] === '*' ? '*' : allowedOrigins[0],
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  };
+}
 
 serve(async (req) => {
+  const corsHeaders = getCorsHeaders(req);
+  
   // CORS対応
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
