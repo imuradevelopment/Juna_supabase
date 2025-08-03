@@ -14,7 +14,8 @@ const requiredEnvVars = [
   'SMTP_USER',
   'SMTP_PASS',
   'SMTP_SENDER_EMAIL',
-  'SMTP_SENDER_NAME'
+  'SMTP_SENDER_NAME',
+  'SITE_URL'
 ];
 
 const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
@@ -31,13 +32,18 @@ const {
   SMTP_USER,
   SMTP_PASS,
   SMTP_SENDER_EMAIL,
-  SMTP_SENDER_NAME
+  SMTP_SENDER_NAME,
+  SITE_URL,
+  ALLOWED_ORIGINS
 } = process.env;
 
 const url = `https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_ID}/config/auth`;
 
 const body = {
   external_email_enabled: true,
+  mailer_autoconfirm: false,  // false = メール確認必須（Confirm emailがON）
+  site_url: SITE_URL,  // メインのサイトURL
+  uri_allow_list: ALLOWED_ORIGINS,  // ALLOWED_ORIGINSと同じ値を使用
   smtp_admin_email: SMTP_SENDER_EMAIL,
   smtp_host: SMTP_HOST,
   smtp_port: SMTP_PORT, // 文字列のまま送信
@@ -62,7 +68,14 @@ fetch(url, {
     return res.json();
   })
   .then(data => {
-    console.log('SMTP設定をAPI経由で反映しました:', data);
+    console.log('SMTP設定をAPI経由で反映しました');
+    console.log('\n📌 設定内容:');
+    console.log(`- mailer_autoconfirm: false (Confirm emailがON)`);
+    console.log(`- site_url: ${SITE_URL}`);
+    console.log(`- uri_allow_list: ${ALLOWED_ORIGINS}`);
+    console.log('\n✅ 設定完了:');
+    console.log('- メール内のリンクは正しいドメインで生成されます');
+    console.log('- リダイレクト許可URLはALLOWED_ORIGINSと同じ値を使用');
   })
   .catch(err => {
     console.error('SMTP設定APIエラー:', err);

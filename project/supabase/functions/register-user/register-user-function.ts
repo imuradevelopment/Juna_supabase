@@ -59,19 +59,62 @@ serve(async (req) => {
       if (settingsData?.value) {
         requireEmailVerification = settingsData.value.requireEmailVerification ?? false;
       }
+      console.log('📧 Email verification setting:', { requireEmailVerification });
     } catch (settingsError) {
       // 設定取得に失敗した場合はデフォルト値を使用
       console.error('Failed to fetch settings:', settingsError);
     }
     
     // ユーザー登録
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email,
-      password,
-      email_confirm: !requireEmailVerification, // 設定に基づいて切り替え
-    });
+    console.log('👤 Creating user:', { email, requireEmailVerification });
     
-    if (authError) throw authError;
+    let authData;
+    let authError;
+    
+    if (requireEmailVerification) {
+      // メール認証が必要な場合：通常のsignUpを使用してメールを送信
+      // 一時的なクライアントを作成（anonキーを使用）
+      const supabaseClient = createClient(
+        // @ts-ignore
+        Deno.env.get('SUPABASE_URL') ?? '',
+        // @ts-ignore
+        Deno.env.get('ANON_KEY') ?? '',
+        { auth: { persistSession: false } }
+      );
+      
+      // signUpを実行（これによりメールが送信される）
+      const { data: signUpData, error: signUpError } = await supabaseClient.auth.signUp({
+        email,
+        password,
+      });
+      
+      if (signUpError) {
+        authError = signUpError;
+      } else {
+        authData = { user: signUpData.user };
+      }
+    } else {
+      // メール認証不要の場合：admin.createUserで確認済みとして作成
+      const { data, error } = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password,
+        email_confirm: true, // 確認済みとして作成
+      });
+      authData = data;
+      authError = error;
+    }
+    
+    if (authError) {
+      console.error('❌ User creation error:', authError);
+      throw authError;
+    }
+    
+    console.log('✅ User created:', { 
+      userId: authData.user.id, 
+      email_confirmed_at: authData.user.email_confirmed_at,
+      requireEmailVerification,
+      method: requireEmailVerification ? 'signUp' : 'admin.createUser'
+    });
     
     // ユーザーIDを取得
     const userId = authData.user.id;
