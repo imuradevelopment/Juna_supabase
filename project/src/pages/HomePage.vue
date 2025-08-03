@@ -204,16 +204,14 @@ interface Category {
 // ストア
 const settingsStore = useSettingsStore();
 
-// デフォルトの障害リスト
+// デフォルトのカテゴリリスト
 const defaultDisabilities = [
-  'インフラ基礎',
-  'ネットワーク',
-  'コンテナ / Kubernetes',
-  'Rinstack Cloud入門',
-  'Rinstack Cloud開発',
-  '運用 / DevOps',
-  'セキュリティ & ガバナンス',
-  '認定試験対策'
+  'テクノロジー',
+  'ライフスタイル',
+  'ビジネス',
+  '教育・学習',
+  '趣味・エンタメ',
+  'その他'
 ];
 
 // 状態変数

@@ -23,72 +23,24 @@ export default {
         'border-light': 'rgb(var(--color-border-light) / <alpha-value>)',
         secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
         'secondary-light': 'rgb(var(--color-secondary-light) / <alpha-value>)',
+        'secondary-dark': 'rgb(var(--color-secondary-dark) / <alpha-value>)',
+        accent: 'rgb(var(--color-accent) / <alpha-value>)',
+        accent1: 'rgb(var(--color-accent1) / <alpha-value>)',
+        accent2: 'rgb(var(--color-accent2) / <alpha-value>)',
+        accent3: 'rgb(var(--color-accent3) / <alpha-value>)',
         error: 'rgb(var(--color-error) / <alpha-value>)',
         'error-dark': 'rgb(var(--color-error-dark) / <alpha-value>)',
         success: 'rgb(var(--color-success) / <alpha-value>)',
         'success-dark': 'rgb(var(--color-success-dark) / <alpha-value>)',
         warning: 'rgb(var(--color-warning) / <alpha-value>)',
         info: 'rgb(var(--color-info) / <alpha-value>)',
-        accent1: 'rgb(var(--color-accent1) / <alpha-value>)',
-        accent2: 'rgb(var(--color-accent2) / <alpha-value>)',
-        accent3: 'rgb(var(--color-accent3) / <alpha-value>)',
       }
     }
   },
   plugins: [
-    function({ addBase, addComponents }) {
-      addBase({
-        ':root': {
-          /* プライマリカラー - アプリのメインカラー（ティール/ターコイズ） */
-          '--color-primary': '56 189 170',
-          /* プライマリカラーの暗い色合い - ホバー状態などに使用 */
-          '--color-primary-dark': '25 150 135',
-          /* プライマリカラーの明るい色合い - 補助的な要素に使用 */
-          '--color-primary-light': '115 210 195',
-          /* 背景色 - アプリの基本背景色（プライマリーカラー寄りの深い青緑色） */
-          '--color-background': '18 35 40',
-          /* サーフェスカラー - カード、パネルなどの背景色（青緑味を加えた色） */
-          '--color-surface': '25 40 45',
-          /* サーフェスバリアントカラー - サーフェスの代替色（わずかに緑味を含む） */
-          '--color-surface-variant': '30 45 50',
-          /* サーフェスアクセントカラー - 強調されたサーフェス要素（よりティール寄り） */
-          '--color-surface-accent': '35 55 60',
-          /* テキストカラー - 標準テキストの色（青みがかった明るい色） */
-          '--color-text': '210 230 245',
-          /* 見出しカラー - 見出しテキストの色（より明確なクリーム色） */
-          '--color-heading': '255 245 225',
-          /* 控えめなテキストカラー - 二次的なテキスト情報（グレイッシュ） */
-          '--color-text-muted': '145 160 175',
-          /* 白テキストカラー - 暗い背景上のテキスト（純粋な白） */
-          '--color-text-white': '255 255 255',
-          /* ボーダーカラー - 標準的な境界線の色 */
-          '--color-border': '55 70 90',
-          /* 明るいボーダーカラー - より軽い境界線の色 */
-          '--color-border-light': '70 85 105',
-          /* セカンダリカラー - 二次的な要素の色（青みの強い色） */
-          '--color-secondary': '120 160 195',
-          /* 明るいセカンダリカラー - 明るい二次的要素 */
-          '--color-secondary-light': '185 205 225',
-          /* エラーカラー - エラーメッセージや警告表示に使用（赤） */
-          '--color-error': '245 95 90',
-          /* 暗いエラーカラー - エラーボタンやアクションに使用 */
-          '--color-error-dark': '220 60 50',
-          /* 成功カラー - 成功メッセージや確認表示に使用（緑） */
-          '--color-success': '75 210 115',
-          /* 暗い成功カラー - 成功ボタンやアクションに使用 */
-          '--color-success-dark': '35 180 80',
-          /* 警告カラー - 注意や警告の表示に使用（黄色） */
-          '--color-warning': '255 190 60',
-          /* 情報カラー - 情報メッセージに使用（青） */
-          '--color-info': '65 145 255',
-          /* アクセントカラー1 - 補足的な強調色1（パープル/ピンク系） */
-          '--color-accent1': '180 100 190',
-          /* アクセントカラー2 - 補足的な強調色2（オレンジ系） */
-          '--color-accent2': '255 145 90',
-          /* アクセントカラー3 - 補足的な強調色3（明るい青） */
-          '--color-accent3': '90 205 220',
-        }
-      });
+    function({ addComponents }) {
+      // CSS変数はデータベースから動的に設定されるため、
+      // ここでは定義しない
       
       addComponents({
         '.glass-card': {
