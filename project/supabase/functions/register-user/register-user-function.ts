@@ -68,7 +68,7 @@ serve(async (req) => {
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: !requireEmailVerification, // 設定に基づいて切り替え
+      email_confirm: requireEmailVerification ? false : true, // メール認証が必須の場合はfalse、不要の場合はtrue
     });
     
     if (authError) throw authError;
