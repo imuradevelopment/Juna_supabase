@@ -171,7 +171,7 @@
       </div>
       
       <!-- コメントセクション -->
-      <div class="mt-10">
+      <div v-if="settingsStore.features?.enableComments" class="mt-10">
         <h3 class="mb-4 text-xl font-bold text-heading">コメント {{ commentCount }}件</h3>
         <div class="bg-surface">
           <CommentSystem 
@@ -268,6 +268,7 @@ import { format, parseISO } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../stores/auth';
+import { useSettingsStore } from '../stores/settings';
 import RichTextContent from '../components/PostDetailPage/RichTextContent.vue';
 import CommentSystem from '../components/PostDetailPage/CommentSystem.vue';
 import PostCard from '../components/common/PostCard.vue';
@@ -289,6 +290,7 @@ import {
 const route = useRoute();
 const router = useRouter();
 const authStore = useAuthStore();
+const settingsStore = useSettingsStore();
 
 // 投稿ID
 const postId = computed(() => route.params.id as string);
