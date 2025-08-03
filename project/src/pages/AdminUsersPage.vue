@@ -96,9 +96,6 @@
                     <div class="text-sm font-medium text-text">
                       {{ user.nickname || '未設定' }}
                     </div>
-                    <div class="text-sm text-text-muted">
-                      {{ user.email }}
-                    </div>
                   </div>
                 </div>
               </td>
@@ -206,12 +203,16 @@ const fetchUsers = async () => {
           .select('*', { count: 'exact', head: true })
           .eq('author_id', profile.id);
 
+        // メールアドレスは直接取得できないため、表示を工夫
+        // 実際のメールアドレスが必要な場合はEdge Functionで実装が必要
+        const email = '非表示';
+
         // 現在の管理者ユーザーIDと比較して管理者判定
         const isCurrentAdmin = authStore.user?.id === profile.id && authStore.isAdmin;
 
         return {
           ...profile,
-          email: profile.account_id ? `${profile.account_id}@example.com` : 'メール不明',
+          email: email,
           is_admin: profile.account_id === 'admin' || isCurrentAdmin, // account_idが'admin'または現在の管理者
           post_count: postCount || 0,
           avatar_url: profile.avatar_data ? getProfileImageUrl(profile.avatar_data) : null
