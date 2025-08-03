@@ -651,6 +651,11 @@ async function createPost(postData: any) {
       await categorySelectorRef.value.savePostWithNewCategories(newPost.id);
     }
     
+    // 埋め込みを生成（非同期で実行、エラーが出ても投稿作成は成功させる）
+    generateEmbedding(newPost.id, postData.title, contentValue).catch(err => {
+      console.error('埋め込み生成エラー:', err);
+    });
+    
     return newPost;
   } catch (err) {
     console.error('投稿作成エラー:', err);
@@ -761,6 +766,11 @@ async function updatePost(postData: any) {
     if (categorySelectorRef.value && props.id) {
       await categorySelectorRef.value.savePostWithNewCategories(props.id);
     }
+    
+    // 埋め込みを生成（非同期で実行、エラーが出ても投稿更新は成功させる）
+    generateEmbedding(props.id, postData.title, contentValue).catch(err => {
+      console.error('埋め込み生成エラー:', err);
+    });
   } catch (err) {
     console.error('投稿更新エラー:', err);
     throw new Error('投稿の更新に失敗しました');
@@ -806,6 +816,69 @@ function checkExpiredData() {
       }
     }
   }
+}
+
+// 埋め込みを生成する関数
+async function generateEmbedding(postId: string, title: string, content: any) {
+  try {
+    // テキストコンテンツを抽出
+    let textContent = '';
+    if (typeof content === 'object' && content?.type === 'doc') {
+      // TipTapのJSON形式からテキストを抽出
+      textContent = extractTextFromTipTap(content);
+    } else if (typeof content === 'string') {
+      // HTMLからテキストを抽出
+      const div = document.createElement('div');
+      div.innerHTML = content;
+      textContent = div.textContent || div.innerText || '';
+    }
+    
+    // タイトルとコンテンツを結合
+    const fullText = `${title}\n\n${textContent}`.substring(0, 1000); // 最初の1000文字に制限
+    
+    // Edge Functionを呼び出して埋め込みを生成
+    const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-embedding`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({
+        text: fullText,
+        postId: postId
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error('埋め込み生成に失敗しました');
+    }
+    
+    const result = await response.json();
+    console.log('埋め込み生成成功:', result.dimension);
+  } catch (error) {
+    console.error('埋め込み生成エラー:', error);
+    // エラーが出ても投稿自体は成功しているので、ここでは何もしない
+  }
+}
+
+// TipTapのJSONからテキストを抽出
+function extractTextFromTipTap(doc: any): string {
+  let text = '';
+  
+  function extractFromNode(node: any) {
+    if (node.text) {
+      text += node.text + ' ';
+    }
+    if (node.content) {
+      node.content.forEach(extractFromNode);
+    }
+  }
+  
+  if (doc.content) {
+    doc.content.forEach(extractFromNode);
+  }
+  
+  return text.trim();
 }
 
 // 保存データのチェックと復元確認

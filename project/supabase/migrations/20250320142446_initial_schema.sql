@@ -1,16 +1,5 @@
 -- 拡張機能と基本設定
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
-
--- 日本語検索用の設定
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_ts_config WHERE cfgname = 'japanese'
-  ) THEN
-    CREATE TEXT SEARCH CONFIGURATION japanese (COPY = pg_catalog.simple);
-  END IF;
-END $$;
 
 -- ユーティリティ関数（事前定義）
 CREATE OR REPLACE FUNCTION set_updated_at()
@@ -201,14 +190,8 @@ CREATE TABLE posts (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
   views INTEGER DEFAULT 0,
-  last_edited_by UUID REFERENCES auth.users(id),
-  search_vector tsvector GENERATED ALWAYS AS (
-    setweight(to_tsvector('simple', coalesce(title, '')), 'A') || 
-    setweight(to_tsvector('simple', coalesce(cast(content->>'text' as text), '')), 'B')
-  ) STORED
+  last_edited_by UUID REFERENCES auth.users(id)
 );
-
-CREATE INDEX posts_search_idx ON posts USING GIN (search_vector);
 
 CREATE TRIGGER update_post_updated_at
 BEFORE UPDATE ON posts
@@ -445,17 +428,6 @@ BEFORE INSERT ON categories
 FOR EACH ROW EXECUTE FUNCTION set_creator_id();
 
 -- ユーティリティ関数
-CREATE OR REPLACE FUNCTION search_posts(search_term TEXT)
-RETURNS SETOF posts AS $$
-BEGIN
-  RETURN QUERY
-  SELECT *
-  FROM posts
-  WHERE published = true 
-    AND search_vector @@ plainto_tsquery('simple', search_term)
-  ORDER BY ts_rank(search_vector, plainto_tsquery('simple', search_term)) DESC;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 CREATE OR REPLACE FUNCTION get_related_posts(input_post_id UUID, limit_count INTEGER DEFAULT 5)
 RETURNS SETOF posts AS $$

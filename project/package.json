@@ -14,14 +14,17 @@
     "preview": "vite preview",
     "analyze": "vite build --mode analyze",
     "supabase:link": "supabase link --project-ref qwsbdmkvozkfpznfzjay",
-    "db:reset": "yes | supabase db reset --linked && supabase db push --include-all",
+    "db:reset": "echo 'y' | supabase db reset --linked",
+    "db:seed": "node scripts/seed-database.js",
     "admin:create": "node scripts/create-admin.js",
     "functions:deploy": "supabase functions deploy register-user --no-verify-jwt && supabase functions deploy login-with-account --no-verify-jwt && supabase functions deploy delete-user",
     "functions:env": "node scripts/set-edge-functions-env.js",
     "setup:local": "npm run db:reset && npm run admin:create",
     "setup:production": "npm run functions:env && npm run functions:deploy",
     "setup:smtp": "node scripts/setup-smtp.js",
-    "setup:all": "npm run supabase:link && npm run db:reset && npm run admin:create && npm run functions:env && npm run functions:deploy && npm run setup:smtp"
+    "embeddings:generate": "node scripts/generate-embeddings.js",
+    "setup:all": "npm run supabase:link && npm run db:reset && npm run admin:create && npm run functions:env && npm run functions:deploy && npm run setup:smtp && supabase functions deploy generate-embedding && supabase functions deploy search-posts",
+    "setup:test": "npm run supabase:link && npm run db:reset && npm run admin:create && npm run db:seed && npm run functions:env && npm run functions:deploy && npm run setup:smtp && supabase functions deploy generate-embedding && supabase functions deploy search-posts && npm run embeddings:generate"
   },
   "dependencies": {
     "@phosphor-icons/vue": "^2.1.6",
