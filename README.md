@@ -103,10 +103,66 @@ npm run dev
    npm run setup:production
    ```
 
+### メール認証の設定（本番環境）
+
+本番環境でメール認証を有効にする場合は、カスタムSMTPサーバーの設定が必要です。
+
+#### Gmail SMTPを使用する場合
+
+1. **Googleアカウントの準備**
+   - 2段階認証を有効にする
+   - [アプリパスワードを生成](https://myaccount.google.com/apppasswords)
+
+2. **.envファイルに設定を追加**
+   ```env
+   # Gmail SMTP設定
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your-email@gmail.com
+   SMTP_PASS=your-16-char-app-password  # アプリパスワード（通常のパスワードではない）
+   SMTP_SENDER_EMAIL=your-email@gmail.com
+   SMTP_SENDER_NAME=Your App Name
+   ```
+
+3. **設定ガイドを表示**
+   ```bash
+   npm run setup:smtp
+   ```
+   このコマンドを実行すると、Supabase Dashboardでの設定手順が表示されます。
+
+4. **Supabase Dashboardで設定**
+   - [Supabase Dashboard](https://app.supabase.com) にアクセス
+   - プロジェクトを選択
+   - Authentication → Email Templates → SMTP Settings
+   - "Enable Custom SMTP" をONにして、表示された設定値を入力
+
+#### その他のSMTPサービス
+
+**SendGrid:**
+```env
+SMTP_HOST=smtp.sendgrid.net
+SMTP_PORT=587
+SMTP_USER=apikey
+SMTP_PASS=your-sendgrid-api-key
+```
+
+**Amazon SES:**
+```env
+SMTP_HOST=email-smtp.us-east-1.amazonaws.com
+SMTP_PORT=587
+SMTP_USER=your-ses-smtp-username
+SMTP_PASS=your-ses-smtp-password
+```
+
+**注意事項:**
+- Gmailは開発・テスト用途に適していますが、本番環境では専用のメールサービスを推奨
+- カスタムSMTPを設定しない場合、メールは組織メンバーにのみ送信されます
+- メール認証を無効にしたい場合は、管理画面から設定可能です
+
 ### npm スクリプト一覧
 
 #### メインコマンド
-- `npm run setup:all` - **完全セットアップ（リンク→DB初期化→管理者作成→環境変数→デプロイ）**
+- `npm run setup:all` - **完全セットアップ（リンク→DB初期化→管理者作成→環境変数→デプロイ→SMTP設定ガイド）**
 - `npm run dev` - 開発サーバーの起動
 - `npm run build` - プロダクションビルド
 
@@ -120,6 +176,7 @@ npm run dev
 - `npm run admin:create` - 管理者ユーザーの作成（.envの設定値を使用）
 - `npm run functions:deploy` - Edge Functionsのデプロイ
 - `npm run functions:env` - Edge Functions用環境変数の設定
+- `npm run setup:smtp` - SMTP設定ガイドの表示
 - `npm run preview` - ビルドしたアプリのプレビュー
 
 ## 機能改善（TODO）
