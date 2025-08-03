@@ -21,9 +21,7 @@
     "setup:local": "npm run db:reset && npm run admin:create",
     "setup:production": "npm run functions:env && npm run functions:deploy",
           "setup:smtp": "node scripts/setup-smtp.js",
-      "setup:all": "npm run supabase:link && npm run db:reset && npm run admin:create && npm run functions:env && npm run functions:deploy && npm run setup:smtp",
-      "check:email-logs": "node scripts/check-email-logs.js",
-      "test:email": "node scripts/test-email.js"
+      "setup:all": "npm run supabase:link && npm run db:reset && npm run admin:create && npm run functions:env && npm run functions:deploy && npm run setup:smtp"
   },
   "dependencies": {
     "@phosphor-icons/vue": "^2.1.6",
