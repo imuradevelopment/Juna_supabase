@@ -386,6 +386,14 @@
               <span class="ml-2 text-sm text-text">いいね機能を有効にする</span>
             </label>
 
+            <label class="flex items-center">
+              <input
+                type="checkbox"
+                v-model="features.requireEmailVerification"
+                class="h-4 w-4 text-primary rounded border-border"
+              />
+              <span class="ml-2 text-sm text-text">新規登録時にメール認証を必須にする</span>
+            </label>
           </div>
 
           <div class="mt-6 flex justify-end">
@@ -495,10 +503,7 @@ const siteMetadata = reactive({
 const features = reactive({
   enableComments: true,
   enableLikes: true,
-  enableCategories: true,
-  enableSearch: true,
-  requireEmailVerification: false,
-  allowGuestComments: false
+  requireEmailVerification: false
 });
 const domainTexts = reactive({
   heroTitle: '',

@@ -44,7 +44,6 @@ interface Features {
   enableComments: boolean;
   enableLikes: boolean;
   requireEmailVerification: boolean;
-  allowGuestComments: boolean;
 }
 
 interface DomainTexts {
