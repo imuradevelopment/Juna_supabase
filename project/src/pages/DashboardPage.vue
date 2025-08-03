@@ -41,6 +41,7 @@
               コメント
             </button>
             <button 
+              v-if="settingsStore.features?.enableLikes"
               @click="activeTab = 'likes'" 
               class="btn btn-ghost flex w-full justify-start"
               :class="activeTab === 'likes' ? 'bg-primary/20 text-primary' : ''"
@@ -72,7 +73,7 @@
         <DashboardCommentsList v-else-if="activeTab === 'comments' && settingsStore.features?.enableComments" />
         
         <!-- いいね -->
-        <DashboardLikesList v-else-if="activeTab === 'likes'" />
+        <DashboardLikesList v-else-if="activeTab === 'likes' && settingsStore.features?.enableLikes" />
         
         <!-- 統計 -->
         <DashboardStatistics v-else-if="activeTab === 'stats'" />
@@ -116,6 +117,11 @@ function getTabFromUrl() {
   
   // コメントタブが無効で、コメントタブが選択されている場合は投稿タブにリダイレクト
   if (tabParam === 'comments' && !settingsStore.features?.enableComments) {
+    return 'posts';
+  }
+  
+  // いいねタブが無効で、いいねタブが選択されている場合は投稿タブにリダイレクト
+  if (tabParam === 'likes' && !settingsStore.features?.enableLikes) {
     return 'posts';
   }
   

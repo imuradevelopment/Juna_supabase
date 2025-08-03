@@ -43,8 +43,6 @@ interface SiteMetadata {
 interface Features {
   enableComments: boolean;
   enableLikes: boolean;
-  enableCategories: boolean;
-  enableSearch: boolean;
   requireEmailVerification: boolean;
   allowGuestComments: boolean;
 }

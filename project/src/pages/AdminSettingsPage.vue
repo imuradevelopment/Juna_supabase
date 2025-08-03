@@ -377,14 +377,13 @@
               <span class="ml-2 text-sm text-text">コメント機能を有効にする</span>
             </label>
 
-            <label class="flex items-center cursor-not-allowed opacity-50">
+            <label class="flex items-center">
               <input
                 type="checkbox"
                 v-model="features.enableLikes"
-                disabled
-                class="h-4 w-4 text-primary rounded border-border cursor-not-allowed"
+                class="h-4 w-4 text-primary rounded border-border"
               />
-              <span class="ml-2 text-sm text-text">いいね機能を有効にする（今後実装予定）</span>
+              <span class="ml-2 text-sm text-text">いいね機能を有効にする</span>
             </label>
 
           </div>

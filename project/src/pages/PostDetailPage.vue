@@ -98,6 +98,7 @@
               <div class="flex flex-wrap gap-2">
                 <!-- いいねボタン -->
                 <button 
+                  v-if="settingsStore.features?.enableLikes"
                   @click="toggleLike" 
                   class="btn btn-outline-primary btn-sm"
                   :class="{ 'text-primary-light': isLiked }"
@@ -364,8 +365,10 @@ async function fetchPost() {
     incrementViews();
     
     // いいね数と状態を取得
-    fetchLikes();
-    checkIfLiked();
+    if (settingsStore.features?.enableLikes) {
+      fetchLikes();
+      checkIfLiked();
+    }
     
     // 関連投稿を取得
     fetchRelatedPosts();

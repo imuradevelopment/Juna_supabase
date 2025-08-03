@@ -95,8 +95,6 @@ INSERT INTO site_settings (key, value, description) VALUES
   ('features', '{
     "enableComments": true,
     "enableLikes": true,
-    "enableCategories": true,
-    "enableSearch": true,
     "requireEmailVerification": false,
     "allowGuestComments": false
   }', '機能の有効/無効設定');

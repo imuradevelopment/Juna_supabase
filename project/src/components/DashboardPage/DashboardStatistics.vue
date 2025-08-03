@@ -47,7 +47,7 @@
       </div>
       
       <!-- いいね数 -->
-      <div class="glass-card p-4">
+      <div v-if="settingsStore.features?.enableLikes" class="glass-card p-4">
         <div class="flex items-center justify-between">
           <h3 class="text-sm font-medium text-text-muted">総いいね数</h3>
           <PhHeart class="h-6 w-6 text-primary" />
@@ -91,7 +91,7 @@
                   <PhEye class="mr-1 h-4 w-4" />
                   {{ post.views }}
                 </span>
-                <span class="flex items-center">
+                <span v-if="settingsStore.features?.enableLikes" class="flex items-center">
                   <PhHeart class="mr-1 h-4 w-4" />
                   {{ post.like_count }}
                 </span>
@@ -224,23 +224,30 @@ async function fetchPostStats() {
   }
   
   // 総いいね数 - post_likesテーブルから著者の投稿に対するいいね数を集計
-  const { data: likeData } = await supabase
-    .from('posts')
-    .select('id')
-    .eq('author_id', authStore.user.id)
-    .eq('published', true);
-  
-  const postIds = likeData?.map(post => post.id) || [];
-  
   let totalLikes = 0;
-  if (postIds.length > 0) {
-    const { count } = await supabase
-      .from('post_likes')
-      .select('*', { count: 'exact', head: true })
-      .in('post_id', postIds);
+  if (settingsStore.features?.enableLikes) {
+    const { data: likeData } = await supabase
+      .from('posts')
+      .select('id')
+      .eq('author_id', authStore.user.id)
+      .eq('published', true);
     
-    totalLikes = count || 0;
+    const postIds = likeData?.map(post => post.id) || [];
+    
+    if (postIds.length > 0) {
+      const { count } = await supabase
+        .from('post_likes')
+        .select('*', { count: 'exact', head: true })
+        .in('post_id', postIds);
+      
+      totalLikes = count || 0;
+    }
   }
+  
+  // postIdsは総いいね数の計算時にのみ必要なため、コメント用に再度取得
+  const postIds = settingsStore.features?.enableLikes ? 
+    (await supabase.from('posts').select('id').eq('author_id', authStore.user.id).eq('published', true)).data?.map(post => post.id) || [] :
+    (await supabase.from('posts').select('id').eq('author_id', authStore.user.id).eq('published', true)).data?.map(post => post.id) || [];
   
   // 総コメント数 - commentsテーブルから著者の投稿に対するコメント数を集計
   let totalComments = 0;
@@ -296,17 +303,19 @@ async function fetchPopularPosts() {
     const postIds = posts.map(post => post.id);
     
     // 各投稿のいいね数を取得
-    const { data: likeData } = await supabase
-      .from('post_likes')
-      .select('post_id')
-      .in('post_id', postIds);
-    
-    // 投稿ごとのいいね数をカウント
     const likeCounts: Record<string, number> = {};
-    if (likeData) {
-      likeData.forEach(like => {
-        likeCounts[like.post_id] = (likeCounts[like.post_id] || 0) + 1;
-      });
+    if (settingsStore.features?.enableLikes) {
+      const { data: likeData } = await supabase
+        .from('post_likes')
+        .select('post_id')
+        .in('post_id', postIds);
+      
+      // 投稿ごとのいいね数をカウント
+      if (likeData) {
+        likeData.forEach(like => {
+          likeCounts[like.post_id] = (likeCounts[like.post_id] || 0) + 1;
+        });
+      }
     }
     
     // 各投稿のコメント数を取得

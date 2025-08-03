@@ -108,7 +108,7 @@
               <span class="text-sm text-text-muted">{{ post.views || 0 }}</span>
             </div>
             
-            <div class="flex items-center">
+            <div v-if="settingsStore.features?.enableLikes" class="flex items-center">
               <PhHeart class="mr-1 h-4 w-4 text-error" />
               <span class="text-sm text-error">{{ post.like_count || post.likes_count || 0 }}</span>
             </div>
