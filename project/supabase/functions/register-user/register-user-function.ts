@@ -47,11 +47,28 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
     
+    // 機能設定を取得
+    let requireEmailVerification = false; // デフォルト値
+    try {
+      const { data: settingsData } = await supabaseAdmin
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'features')
+        .single();
+      
+      if (settingsData?.value) {
+        requireEmailVerification = settingsData.value.requireEmailVerification ?? false;
+      }
+    } catch (settingsError) {
+      // 設定取得に失敗した場合はデフォルト値を使用
+      console.error('Failed to fetch settings:', settingsError);
+    }
+    
     // ユーザー登録
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: true,
+      email_confirm: !requireEmailVerification, // 設定に基づいて切り替え
     });
     
     if (authError) throw authError;

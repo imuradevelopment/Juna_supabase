@@ -214,12 +214,14 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useAuthStore } from '../stores/auth';
+import { useSettingsStore } from '../stores/settings';
 import { useNotification } from '../composables/useNotification';
 import { PhSpinner, PhSignIn, PhUserPlus } from '@phosphor-icons/vue';
 
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
+const settingsStore = useSettingsStore();
 
 // 通知表示関数を取得
 const { showNotification } = useNotification();
@@ -329,8 +331,12 @@ async function handleRegisterSubmit() {
     );
     
     if (success) {
-      // 登録成功通知を表示
-      showNotification('success', '会員登録完了', '会員登録が完了しました。ログインしてください。');
+      // メール認証が必要かどうかで表示メッセージを変更
+      if (settingsStore.features?.requireEmailVerification) {
+        showNotification('info', '会員登録完了', 'メールを確認して認証を完了してください。');
+      } else {
+        showNotification('success', '会員登録完了', '会員登録が完了しました。ログインしてください。');
+      }
       // ログインタブに切り替え
       activeTab.value = 'login';
     } else {
