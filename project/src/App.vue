@@ -48,9 +48,10 @@ const notificationsRef = ref<any>(null);
 const initialAuthCheckComplete = ref(false);
 const { setNotificationsRef, clearAllNotifications } = useNotification();
 
-// アプリケーション初期化前に認証状態とサイト設定をチェック
+// アプリケーション初期化前に認証状態をチェック
 onBeforeMount(async () => {
-  // サイト設定を取得
+  // 設定はmain.tsで既に取得済みなので、ここでは再取得しない
+  // ストアの状態のみ同期
   await settingsStore.fetchSettings();
   
   // ログイン状態の確認
