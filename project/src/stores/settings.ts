@@ -38,6 +38,7 @@ interface SiteMetadata {
   siteKeywords: string;
   copyrightText: string;
   logoText: string;
+  faviconBase64?: string;
 }
 
 interface Features {

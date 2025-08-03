@@ -130,6 +130,43 @@
                 class="w-full rounded-lg border border-border bg-surface-variant px-4 py-2.5 text-text"
               />
             </div>
+
+            <div>
+              <label for="favicon" class="block text-sm font-medium text-text mb-2">
+                ファビコン
+              </label>
+              <div class="flex items-center space-x-4">
+                <input
+                  id="favicon"
+                  type="file"
+                  accept="image/png,image/x-icon,image/ico"
+                  @change="handleFaviconChange"
+                  class="hidden"
+                  ref="faviconInput"
+                />
+                <button
+                  @click="$refs.faviconInput.click()"
+                  type="button"
+                  class="px-4 py-2 bg-surface-variant border border-border rounded-lg hover:bg-surface-accent text-text"
+                >
+                  ファビコンを選択
+                </button>
+                <span v-if="faviconFileName" class="text-sm text-text-muted">
+                  {{ faviconFileName }}
+                </span>
+                <button
+                  v-if="siteMetadata.faviconBase64"
+                  @click="removeFavicon"
+                  type="button"
+                  class="text-error hover:text-error-dark"
+                >
+                  削除
+                </button>
+              </div>
+              <p class="mt-1 text-xs text-text-muted">
+                推奨: 32x32px または 16x16px の PNG/ICO ファイル
+              </p>
+            </div>
           </div>
 
           <div class="mt-6 flex justify-end">
@@ -498,7 +535,8 @@ const siteMetadata = reactive({
   siteDescription: '',
   siteKeywords: '',
   copyrightText: '',
-  logoText: ''
+  logoText: '',
+  faviconBase64: ''
 });
 const features = reactive({
   enableComments: true,
@@ -541,6 +579,10 @@ const loadSettings = () => {
   }
   if (settingsStore.siteMetadata) {
     Object.assign(siteMetadata, settingsStore.siteMetadata);
+    // ファビコンが設定されている場合はファイル名を設定
+    if (siteMetadata.faviconBase64) {
+      faviconFileName.value = 'favicon.ico';
+    }
   }
   if (settingsStore.features) {
     Object.assign(features, settingsStore.features);
@@ -621,6 +663,45 @@ const saveDomainTexts = async () => {
   } finally {
     saving.value = false;
   }
+};
+
+// ファビコン関連
+const faviconFileName = ref('');
+
+const handleFaviconChange = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  
+  if (!file) return;
+  
+  // ファイルサイズチェック（64KB以下）
+  if (file.size > 64 * 1024) {
+    showError('ファビコンは64KB以下にしてください');
+    return;
+  }
+  
+  // ファイルタイプチェック
+  if (!file.type.match(/^image\/(png|x-icon|vnd\.microsoft\.icon)$/)) {
+    showError('PNG または ICO ファイルを選択してください');
+    return;
+  }
+  
+  try {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      siteMetadata.faviconBase64 = result;
+      faviconFileName.value = file.name;
+    };
+    reader.readAsDataURL(file);
+  } catch (error) {
+    showError('ファビコンの読み込みに失敗しました');
+  }
+};
+
+const removeFavicon = () => {
+  siteMetadata.faviconBase64 = '';
+  faviconFileName.value = '';
 };
 
 onMounted(() => {

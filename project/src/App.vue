@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, onBeforeMount } from 'vue';
+import { ref, onMounted, nextTick, onBeforeMount, watch } from 'vue';
 import { useAuthStore } from './stores/auth';
 import { useSettingsStore } from './stores/settings';
 import { useNotification } from './composables/useNotification';
@@ -59,6 +59,30 @@ onBeforeMount(async () => {
   initialAuthCheckComplete.value = true;
 });
 
+// サイト名の変更を監視してタイトルを更新
+watch(() => settingsStore.siteName, (newSiteName) => {
+  if (newSiteName) {
+    document.title = newSiteName;
+  }
+});
+
+// ファビコンの変更を監視して更新
+watch(() => settingsStore.siteMetadata?.faviconBase64, (newFavicon) => {
+  if (newFavicon) {
+    // 既存のファビコンリンクを取得または作成
+    let faviconLink = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
+    if (!faviconLink) {
+      faviconLink = document.createElement('link');
+      faviconLink.rel = 'icon';
+      document.head.appendChild(faviconLink);
+    }
+    
+    // Base64データをファビコンとして設定
+    faviconLink.href = newFavicon;
+    faviconLink.type = 'image/x-icon';
+  }
+});
+
 // 初期化
 onMounted(async () => {
   // 通知コンポーネントの参照が解決されるまで待機
@@ -72,6 +96,23 @@ onMounted(async () => {
   
   // リアルタイム設定更新の購読
   settingsStore.subscribeToSettings();
+  
+  // 初期タイトルを設定
+  if (settingsStore.siteName) {
+    document.title = settingsStore.siteName;
+  }
+  
+  // 初期ファビコンを設定
+  if (settingsStore.siteMetadata?.faviconBase64) {
+    let faviconLink = document.querySelector("link[rel*='icon']") as HTMLLinkElement;
+    if (!faviconLink) {
+      faviconLink = document.createElement('link');
+      faviconLink.rel = 'icon';
+      document.head.appendChild(faviconLink);
+    }
+    faviconLink.href = settingsStore.siteMetadata.faviconBase64;
+    faviconLink.type = 'image/x-icon';
+  }
 });
 </script>
 
