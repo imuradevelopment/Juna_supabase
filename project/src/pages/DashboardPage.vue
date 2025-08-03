@@ -32,6 +32,7 @@
               下書き
             </button>
             <button 
+              v-if="settingsStore.features?.enableComments"
               @click="activeTab = 'comments'" 
               class="btn btn-ghost flex w-full justify-start"
               :class="activeTab === 'comments' ? 'bg-primary/20 text-primary' : ''"
@@ -68,7 +69,7 @@
         <DashboardDraftsList v-else-if="activeTab === 'drafts'" />
         
         <!-- コメント -->
-        <DashboardCommentsList v-else-if="activeTab === 'comments'" />
+        <DashboardCommentsList v-else-if="activeTab === 'comments' && settingsStore.features?.enableComments" />
         
         <!-- いいね -->
         <DashboardLikesList v-else-if="activeTab === 'likes'" />
@@ -83,6 +84,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { useAuthStore } from '../stores/auth';
+import { useSettingsStore } from '../stores/settings';
 import { useRouter, useRoute } from 'vue-router';
 import DashboardPostsList from '../components/DashboardPage/DashboardPostsList.vue';
 import DashboardDraftsList from '../components/DashboardPage/DashboardDraftsList.vue';
@@ -101,6 +103,7 @@ import {
 const router = useRouter();
 const route = useRoute();  // ルート情報を取得するために追加
 const authStore = useAuthStore();
+const settingsStore = useSettingsStore();
 
 // 状態
 const activeTab = ref('posts');
@@ -110,6 +113,12 @@ const loading = ref(true);
 function getTabFromUrl() {
   const tabParam = route.query.tab as string;
   const validTabs = ['posts', 'drafts', 'comments', 'likes', 'stats'];
+  
+  // コメントタブが無効で、コメントタブが選択されている場合は投稿タブにリダイレクト
+  if (tabParam === 'comments' && !settingsStore.features?.enableComments) {
+    return 'posts';
+  }
+  
   return validTabs.includes(tabParam) ? tabParam : 'posts';
 }
 

@@ -113,7 +113,7 @@
               <span class="text-sm text-error">{{ post.like_count || post.likes_count || 0 }}</span>
             </div>
             
-            <div class="flex items-center">
+            <div v-if="settingsStore.features?.enableComments" class="flex items-center">
               <PhChatText class="mr-1 h-4 w-4 text-info" />
               <span class="text-sm text-info">{{ post.comment_count || post.comments_count || 0 }}</span>
             </div>
@@ -139,6 +139,7 @@ import { useRouter } from 'vue-router';
 import { formatRelativeTime } from '@/lib/utils/date';
 import { supabase } from '@/lib/supabase';
 import { useAuthStore } from '@/stores/auth';
+import { useSettingsStore } from '@/stores/settings';
 import DOMPurify from 'dompurify';
 
 // カテゴリの型定義
@@ -180,6 +181,9 @@ const props = defineProps({
     required: true
   }
 });
+
+// Store
+const settingsStore = useSettingsStore();
 
 // 日付フォーマット
 function formatDate(dateString: string): string {

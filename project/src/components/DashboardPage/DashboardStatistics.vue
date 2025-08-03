@@ -59,7 +59,7 @@
       </div>
       
       <!-- コメント数 -->
-      <div class="glass-card p-4">
+      <div v-if="settingsStore.features?.enableComments" class="glass-card p-4">
         <div class="flex items-center justify-between">
           <h3 class="text-sm font-medium text-text-muted">総コメント数</h3>
           <PhChatText class="h-6 w-6 text-primary" />
@@ -95,7 +95,7 @@
                   <PhHeart class="mr-1 h-4 w-4" />
                   {{ post.like_count }}
                 </span>
-                <span class="flex items-center">
+                <span v-if="settingsStore.features?.enableComments" class="flex items-center">
                   <PhChatText class="mr-1 h-4 w-4" />
                   {{ post.comment_count }}
                 </span>
@@ -113,6 +113,7 @@
 import { ref, onMounted } from 'vue';
 import { supabase } from '../../lib/supabase';
 import { useAuthStore } from '../../stores/auth';
+import { useSettingsStore } from '../../stores/settings';
 import { format, parseISO, subDays } from 'date-fns';
 import { ja } from 'date-fns/locale';
 import { 
@@ -147,6 +148,7 @@ interface PopularPost {
 }
 
 const authStore = useAuthStore();
+const settingsStore = useSettingsStore();
 const loading = ref(true);
 
 // 統計データ
@@ -242,7 +244,7 @@ async function fetchPostStats() {
   
   // 総コメント数 - commentsテーブルから著者の投稿に対するコメント数を集計
   let totalComments = 0;
-  if (postIds.length > 0) {
+  if (settingsStore.features?.enableComments && postIds.length > 0) {
     const { count } = await supabase
       .from('comments')
       .select('*', { count: 'exact', head: true })
@@ -308,17 +310,19 @@ async function fetchPopularPosts() {
     }
     
     // 各投稿のコメント数を取得
-    const { data: commentData } = await supabase
-      .from('comments')
-      .select('post_id')
-      .in('post_id', postIds);
-    
-    // 投稿ごとのコメント数をカウント
     const commentCounts: Record<string, number> = {};
-    if (commentData) {
-      commentData.forEach(comment => {
-        commentCounts[comment.post_id] = (commentCounts[comment.post_id] || 0) + 1;
-      });
+    if (settingsStore.features?.enableComments) {
+      const { data: commentData } = await supabase
+        .from('comments')
+        .select('post_id')
+        .in('post_id', postIds);
+      
+      // 投稿ごとのコメント数をカウント
+      if (commentData) {
+        commentData.forEach(comment => {
+          commentCounts[comment.post_id] = (commentCounts[comment.post_id] || 0) + 1;
+        });
+      }
     }
     
     // 結果を整形

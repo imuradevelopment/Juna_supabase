@@ -91,19 +91,29 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { supabase } from '../lib/supabase';
+import { useSettingsStore } from '../stores/settings';
 import { PhUsers, PhFileText, PhChatCircle, PhChartBar } from '@phosphor-icons/vue';
 import { useNotification } from '../composables/useNotification';
 
 const route = useRoute();
+const settingsStore = useSettingsStore();
 const { showError } = useNotification();
 
-const navigation = computed(() => [
-  { name: '概要', href: '/admin', current: route.path === '/admin' },
-  { name: 'ユーザー管理', href: '/admin/users', current: route.path === '/admin/users' },
-  { name: '投稿管理', href: '/admin/posts', current: route.path === '/admin/posts' },
-  { name: 'コメント管理', href: '/admin/comments', current: route.path === '/admin/comments' },
-  { name: 'サイト設定', href: '/admin/settings', current: route.path === '/admin/settings' },
-]);
+const navigation = computed(() => {
+  const nav = [
+    { name: '概要', href: '/admin', current: route.path === '/admin' },
+    { name: 'ユーザー管理', href: '/admin/users', current: route.path === '/admin/users' },
+    { name: '投稿管理', href: '/admin/posts', current: route.path === '/admin/posts' },
+  ];
+  
+  if (settingsStore.features?.enableComments) {
+    nav.push({ name: 'コメント管理', href: '/admin/comments', current: route.path === '/admin/comments' });
+  }
+  
+  nav.push({ name: 'サイト設定', href: '/admin/settings', current: route.path === '/admin/settings' });
+  
+  return nav;
+});
 
 const stats = ref([
   { name: '総ユーザー数', value: 0, icon: PhUsers },
@@ -129,9 +139,13 @@ const fetchStatistics = async () => {
       .eq('published', true);
     
     // コメント数
-    const { count: commentCount } = await supabase
-      .from('comments')
-      .select('*', { count: 'exact', head: true });
+    let commentCount = 0;
+    if (settingsStore.features?.enableComments) {
+      const result = await supabase
+        .from('comments')
+        .select('*', { count: 'exact', head: true });
+      commentCount = result.count;
+    }
     
     // 今週の新規投稿
     const lastWeek = new Date();
@@ -141,12 +155,18 @@ const fetchStatistics = async () => {
       .select('*', { count: 'exact', head: true })
       .gte('created_at', lastWeek.toISOString());
 
-    stats.value = [
+    const baseStats = [
       { name: '総ユーザー数', value: userCount || 0, icon: PhUsers },
       { name: '公開投稿数', value: postCount || 0, icon: PhFileText },
-      { name: '総コメント数', value: commentCount || 0, icon: PhChatCircle },
-      { name: '今週の新規投稿', value: weeklyPostCount || 0, icon: PhChartBar },
     ];
+    
+    if (settingsStore.features?.enableComments) {
+      baseStats.push({ name: '総コメント数', value: commentCount || 0, icon: PhChatCircle });
+    }
+    
+    baseStats.push({ name: '今週の新規投稿', value: weeklyPostCount || 0, icon: PhChartBar });
+    
+    stats.value = baseStats;
   } catch (error) {
     console.error('統計情報の取得エラー:', error);
     showError('統計情報の取得に失敗しました');
@@ -169,17 +189,21 @@ const fetchRecentActivities = async () => {
       .limit(5);
 
     // 最近のコメント
-    const { data: recentComments } = await supabase
-      .from('comments')
-      .select(`
-        id,
-        content,
-        created_at,
-        author:profiles!comments_author_id_fkey(nickname),
-        post:posts!comments_post_id_fkey(title)
-      `)
-      .order('created_at', { ascending: false })
-      .limit(5);
+    let recentComments = null;
+    if (settingsStore.features?.enableComments) {
+      const result = await supabase
+        .from('comments')
+        .select(`
+          id,
+          content,
+          created_at,
+          author:profiles!comments_author_id_fkey(nickname),
+          post:posts!comments_post_id_fkey(title)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(5);
+      recentComments = result.data;
+    }
 
     // 活動を統合してソート
     const activities: any[] = [];

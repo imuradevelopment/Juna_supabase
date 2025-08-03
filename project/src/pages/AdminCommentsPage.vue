@@ -137,20 +137,31 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { supabase } from '../lib/supabase';
+import { useSettingsStore } from '../stores/settings';
 import { useNotification } from '../composables/useNotification';
 
 const route = useRoute();
+const router = useRouter();
+const settingsStore = useSettingsStore();
 const { showSuccess, showError, showConfirm } = useNotification();
 
-const navigation = computed(() => [
-  { name: '概要', href: '/admin', current: route.path === '/admin' },
-  { name: 'ユーザー管理', href: '/admin/users', current: route.path === '/admin/users' },
-  { name: '投稿管理', href: '/admin/posts', current: route.path === '/admin/posts' },
-  { name: 'コメント管理', href: '/admin/comments', current: route.path === '/admin/comments' },
-  { name: 'サイト設定', href: '/admin/settings', current: route.path === '/admin/settings' },
-]);
+const navigation = computed(() => {
+  const nav = [
+    { name: '概要', href: '/admin', current: route.path === '/admin' },
+    { name: 'ユーザー管理', href: '/admin/users', current: route.path === '/admin/users' },
+    { name: '投稿管理', href: '/admin/posts', current: route.path === '/admin/posts' },
+  ];
+  
+  if (settingsStore.features?.enableComments) {
+    nav.push({ name: 'コメント管理', href: '/admin/comments', current: route.path === '/admin/comments' });
+  }
+  
+  nav.push({ name: 'サイト設定', href: '/admin/settings', current: route.path === '/admin/settings' });
+  
+  return nav;
+});
 
 const comments = ref<any[]>([]);
 const searchQuery = ref('');
@@ -257,6 +268,12 @@ watch(searchQuery, () => {
 });
 
 onMounted(() => {
+  // コメント機能が無効の場合は管理画面にリダイレクト
+  if (!settingsStore.features?.enableComments) {
+    router.push('/admin');
+    return;
+  }
+  
   fetchComments();
 });
 </script>
