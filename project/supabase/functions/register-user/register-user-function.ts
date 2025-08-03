@@ -59,12 +59,17 @@ serve(async (req) => {
       if (settingsData?.value) {
         requireEmailVerification = settingsData.value.requireEmailVerification ?? false;
       }
+      
+      // デバッグログ
+      console.log('Settings data:', settingsData);
+      console.log('requireEmailVerification:', requireEmailVerification);
     } catch (settingsError) {
       // 設定取得に失敗した場合はデフォルト値を使用
       console.error('Failed to fetch settings:', settingsError);
     }
     
     // ユーザー登録
+    console.log('Creating user with email_confirm:', !requireEmailVerification);
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
