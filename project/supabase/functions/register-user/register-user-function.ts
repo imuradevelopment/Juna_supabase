@@ -69,6 +69,10 @@ serve(async (req) => {
       email,
       password,
       email_confirm: !requireEmailVerification, // 設定に基づいて切り替え
+      user_metadata: {
+        nickname: nickname,
+        account_id: accountId || generateAccountId(nickname)
+      }
     });
     
     if (authError) throw authError;
