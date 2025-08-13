@@ -505,7 +505,7 @@ async function handleSubmit() {
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     
     if (sessionError || !session) {
-      router.push('/login?redirect=' + encodeURIComponent(router.currentRoute.value.fullPath));
+      router.push({ path: '/auth', query: { mode: 'login', redirect: router.currentRoute.value.fullPath } });
       throw new Error('認証セッションが見つかりません。再ログインしてください。');
     }
     
@@ -779,7 +779,7 @@ async function updatePost(postData: any) {
 
 function handleLoginRedirect() {
   saveToLocalStorage();
-  router.push('/login?redirect=' + encodeURIComponent(router.currentRoute.value.fullPath));
+  router.push({ path: '/auth', query: { mode: 'login', redirect: router.currentRoute.value.fullPath } });
 }
 
 // キャンセル処理を修正

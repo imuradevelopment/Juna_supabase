@@ -756,7 +756,7 @@ onMounted(() => {
   
   // ルーターガードを設定
   routerGuard = router.beforeEach(async (to, from) => {
-    if (to.name === 'post-detail' && from.name === 'post-detail' && to.params.id !== from.params.id) {
+    if (to.name === 'post' && from.name === 'post' && to.params.id !== from.params.id) {
       // 同じ型のルートだが、IDが異なる場合（関連投稿への遷移など）
       loading.value = true;
       post.value = null;

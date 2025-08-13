@@ -64,24 +64,6 @@ const router = createRouter({
       component: () => import('../pages/AdminDashboardPage.vue'),
       meta: { requiresAuth: true, requiresAdmin: true }
     },
-    {
-      path: '/admin/users',
-      name: 'admin-users',
-      component: () => import('../pages/AdminUsersPage.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
-    },
-    {
-      path: '/admin/posts',
-      name: 'admin-posts',
-      component: () => import('../pages/AdminPostsPage.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
-    },
-    {
-      path: '/admin/comments',
-      name: 'admin-comments',
-      component: () => import('../pages/AdminCommentsPage.vue'),
-      meta: { requiresAuth: true, requiresAdmin: true }
-    },
     
     // プロフィール
     {

@@ -6,7 +6,7 @@
         <p class="mb-3 text-text-muted">
           コメントするにはログインが必要です
         </p>
-        <router-link to="/login" class="btn btn-primary">
+        <router-link :to="{ path: '/auth', query: { mode: 'login' } }" class="btn btn-primary">
           ログインする
         </router-link>
       </div>
@@ -301,7 +301,7 @@ async function saveEdit(comment: any) {
 // 返信する対象を設定
 function setReplyTo(comment: any) {
   if (!authStore.isAuthenticated) {
-    router.push('/login');
+    router.push({ path: '/auth', query: { mode: 'login' } });
     return;
   }
   

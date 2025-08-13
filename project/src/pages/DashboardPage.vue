@@ -136,7 +136,7 @@ watch(activeTab, (newTab) => {
 // 認証チェックとタブの初期化
 onMounted(async () => {
   if (!authStore.isAuthenticated) {
-    router.push('/login');
+    router.push({ path: '/auth', query: { mode: 'login' } });
     return;
   }
   
