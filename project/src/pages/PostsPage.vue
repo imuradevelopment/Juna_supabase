@@ -19,10 +19,6 @@
           <PhMagnifyingGlass class="h-6 w-6" />
         </button>
       </div>
-      <p class="mt-2 text-center text-xs text-text-muted">
-        <PhSparkle class="inline-block w-4 h-4 mr-1" />
-        Supabase AI Inferenceによる意味検索
-      </p>
     </div>
     
     <!-- フィルターとソート -->
@@ -175,8 +171,7 @@ import {
   PhArrowCounterClockwise, 
   PhCaretLeft, 
   PhCaretRight,
-  PhSpinner,
-  PhSparkle
+  PhSpinner
 } from '@phosphor-icons/vue';
 
 // カテゴリの型定義
@@ -433,34 +428,18 @@ async function performSearch() {
   }
   
   try {
-    // Supabase AI Inferenceを使用した意味検索
-    const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/search-posts`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify({
-          query: searchQuery.value,
-          limit: 50
-        })
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error('検索に失敗しました');
-    }
+    // SQLスキーマに合わせて修正：search_term のみを渡す
+    const { data, error: searchError } = await supabase.rpc('search_posts', {
+      search_term: searchQuery.value
+    });
     
-    const searchResult = await response.json();
-    const data = searchResult.results;
+    if (searchError) throw searchError;
     
     if (data && data.length > 0) {
       let filteredData: any[] = data;
-        
-        // カテゴリでさらにフィルタリング
-        if (selectedCategoryId.value) {
+      
+      // カテゴリでさらにフィルタリング
+      if (selectedCategoryId.value) {
         const { data: postIds } = await supabase
           .from('post_categories')
           .select('post_id')
@@ -565,13 +544,21 @@ async function fetchFilteredPosts() {
       }
     }
     
-    // 検索クエリがある場合は、Edge Functionを使用するため、ここでは処理しない
+    // 検索クエリによるフィルタリング
     if (searchQuery.value.trim()) {
-      // performSearch()で処理されるため、ここでは何もしない
-      posts.value = [];
-      totalResults.value = 0;
-      loading.value = false;
-      return;
+      const { data: searchResults } = await supabase.rpc('search_posts', {
+        search_term: searchQuery.value
+      });
+      
+      if (searchResults && searchResults.length > 0) {
+        query = query.in('id', searchResults.map((result: any) => result.id));
+      } else {
+        // 検索結果がない場合
+        posts.value = [];
+        totalResults.value = 0;
+        loading.value = false;
+        return;
+      }
     }
     
     // ソート適用
@@ -706,10 +693,20 @@ async function updateFilterCounts() {
     // 基本クエリ - 公開済みの投稿を取得
     let baseQuery = supabase.from('posts').select('id').eq('published', true);
     
-    // 検索クエリがある場合は、カウント更新をスキップ
+    // 検索クエリがある場合
     if (searchQuery.value.trim()) {
-      // Edge Functionを使用した検索の場合、フィルターカウントは更新しない
-      return;
+      const { data: searchResults } = await supabase.rpc('search_posts', {
+        search_term: searchQuery.value
+      });
+      
+      if (searchResults && searchResults.length > 0) {
+        const postIds = searchResults.map((post: any) => post.id);
+        baseQuery = baseQuery.in('id', postIds);
+      } else {
+        // 検索結果がない場合は空のカウントを設定して終了
+        updateEmptyCounts();
+        return;
+      }
     }
     
     // カテゴリが選択されている場合
