@@ -185,32 +185,6 @@ SMTP_PASS=your-ses-smtp-password
 - `npm run setup:smtp` - SMTP設定ガイドの表示
 - `npm run preview` - ビルドしたアプリのプレビュー
 
-## 機能改善（TODO）
-
-- Web Push 通知
-- フォロー/フォロワー機能
-- アクティビティ通知の集約・配信
-- i18n（多言語化）
-- E2E/ユニットテストの拡充
-- 画像対応フォーマットの拡張（AVIF 等）
-
-## 開発メモ
-
-### よく使うプロンプト
-
-#### DB関連
-- supabaseスキーマの把握: `@supabase/migrations/20250320142446_initial_schema.sql`を参照
-
-#### デザイン関連
-- カラーの統一: `@tailwind.config.js`のカラー定義を使用
-- モバイルファースト対応: レスポンシブバリアント（sm:、md:、lg:、xl:、2xl:）を適切に使用
-
-#### 機能関連
-- アプリ骨格: `@App.vue`, `@router.ts`, `@auth.ts`, `@supabase.ts`
-- 各ページコンポーネント: `@pages/`ディレクトリ参照
-- 共通コンポーネント: `@components/`ディレクトリ参照
-- Composables: `@composables/`ディレクトリ参照
-
 ## コントリビューション
 
 貢献は大歓迎です！  
