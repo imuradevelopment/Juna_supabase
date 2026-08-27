@@ -1,0 +1,46 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: project
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: project/package-lock.json
+      - run: npm ci
+      - run: npx -y vitest run --passWithNoTests
+        env:
+          VITE_SUPABASE_URL: https://ci-dummy.supabase.co
+          VITE_SUPABASE_ANON_KEY: ci-dummy-anon-key
+      - run: npx vite build
+        env:
+          VITE_SUPABASE_URL: https://ci-dummy.supabase.co
+          VITE_SUPABASE_ANON_KEY: ci-dummy-anon-key
+
+  # 型チェックは「見える化のみ」で落とさない（既存負債 約40件。runbookのバックログ参照）
+  # ゼロになったら continue-on-error を外してブロッキングに戻すこと
+  typecheck:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: project
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: project/package-lock.json
+      - run: npm ci
+      - run: npx vue-tsc -b

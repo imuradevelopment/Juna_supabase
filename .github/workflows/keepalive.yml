@@ -1,0 +1,23 @@
+# Supabase Keepalive - deadman switch against free-tier 7-day inactivity pause
+# Root cause prevention (2026-08-23): old project was paused -> abandoned -> deleted.
+# Values below are filled by deploy/juna-deploy.ps1 (backend phase).
+# The anon (publishable) key ships in the frontend bundle, so hardcoding here is safe.
+name: Supabase Keepalive
+on:
+  schedule:
+    - cron: "20 20 * * 1" # every Monday 05:20 JST
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: REST ping
+        run: |
+          url="https://poqofsrsyqudqbjuklog.supabase.co"
+          code=$(curl -s -o /dev/null -w "%{http_code}" -H "apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBvcW9mc3JzeXF1ZHFianVrbG9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0Mzc2OTcsImV4cCI6MjEwMzAxMzY5N30.xLQIiboN7guSDlQruxPaQZKfOSZdIQIKECw15QDLDak" "$url/rest/v1/")
+          echo "supabase rest status = $code"
+          if [ "$code" != "200" ]; then
+            echo "::warning::Supabase REST returned $code (paused or deleted?) - see deploy/runbook.md"
+            exit 1
+          fi

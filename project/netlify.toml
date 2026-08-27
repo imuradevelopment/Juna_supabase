@@ -1,0 +1,11 @@
+# Netlify設定（正本）— UI設定より優先される
+# 型検査（vue-tsc）は GitHub Actions CI の担当。Netlifyビルドはviteのみ。
+[build]
+  command = "npx vite build"
+  publish = "dist"
+
+# SPAルーティング用フォールバック
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
