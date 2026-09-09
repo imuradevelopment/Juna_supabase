@@ -1,0 +1,33 @@
+# Juna Supabase keepalive — 無料枠「7日間非アクティブで自動pause」の予防 ping
+# 2026-09-10 新規作成。GitHub の定期ワークフローはデフォルトブランチ
+# （feature/social-blog-platform）の定義のみ実行されるため、このファイルは
+# デフォルトブランチに置くこと。他ブランチに置いても発火しない。
+name: Supabase Keepalive
+on:
+  schedule:
+    - cron: "0 21 * * 0,3" # 月曜・木曜 06:00 JST（日曜・水曜 21:00 UTC）
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Supabase REST health check
+        run: |
+          url="https://poqofsrsyqudqbjuklog.supabase.co"
+          # anon key はフロントエンドバンドルに同梱される公開鍵のため直書き可能（RLS が最終防衛線）
+          key="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBvcW9mc3JzeXF1ZHFianVrbG9nIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0Mzc2OTcsImV4cCI6MjEwMzAxMzY5N30.xLQIiboN7guSDlQruxPaQZKfOSZdIQIKECw15QDLDak"
+          # 注意: /rest/v1/ ルートは anon キーで 401 になるため、RLS で誰でも読める
+          # profiles テーブルへの実クエリ（200 期待）で生死を判定する
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            -H "apikey: $key" \
+            -H "Authorization: Bearer $key" \
+            "$url/rest/v1/profiles?select=id&limit=1")
+          echo "supabase health = $code"
+          if [ "$code" != "200" ]; then
+            echo "::warning::Supabase returned $code (paused or deleted?)"
+            exit 1
+          fi
